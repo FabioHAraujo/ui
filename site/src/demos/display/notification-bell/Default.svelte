@@ -1,0 +1,14 @@
+<script lang="ts">
+  import { NotificationBell, Row } from '@codeatlasdev/ui';
+
+  const items = [
+    { id: '1', title: 'Deploy succeeded', body: 'prod-api-v2.4 is live', time: '2m ago', read: false },
+    { id: '2', title: 'New comment', body: 'Ana replied on PR #142', time: '18m ago', read: false },
+    { id: '3', title: 'Budget alert', body: '80% of monthly quota used', time: '1h ago', read: true },
+  ];
+</script>
+
+<Row gap={24} align="center">
+  <NotificationBell notifications={items} />
+  <NotificationBell notifications={[]} />
+</Row>

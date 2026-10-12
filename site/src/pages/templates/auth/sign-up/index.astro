@@ -1,0 +1,7 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import SignUp from "~/templates/auth/SignUp.svelte";
+---
+<TemplateLayout title="Sign up template" description="Registration page with inline validation, onboarding steps and AuthLayout.">
+	<SignUp client:load />
+</TemplateLayout>

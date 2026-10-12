@@ -1,0 +1,37 @@
+---
+title: Progress
+description: A linear progress bar with determinate values, an indeterminate animation and an accessible label.
+group: Feedback
+order: 7
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Determinate from "~/demos/feedback/progress/Determinate.svelte";
+import DeterminateSrc from "~/demos/feedback/progress/Determinate.svelte?raw";
+import Indeterminate from "~/demos/feedback/progress/Indeterminate.svelte";
+import IndeterminateSrc from "~/demos/feedback/progress/Indeterminate.svelte?raw";
+import Animated from "~/demos/feedback/progress/Animated.svelte";
+import AnimatedSrc from "~/demos/feedback/progress/Animated.svelte?raw";
+
+```svelte
+<script>
+  import { Progress } from "@codeatlasdev/ui";
+</script>
+
+<Progress value={60} label="Upload progress" />
+<Progress indeterminate label="Loading" />
+```
+
+Renders `role="progressbar"` with `aria-valuenow`, `aria-valuemin` and `aria-valuemax`. Always pass `label` so screen readers know what is progressing. The indeterminate state omits `aria-valuenow`.
+
+<Demo title="Determinate" description="An explicit value from 0 to max (100 by default)." src={DeterminateSrc}><Determinate /></Demo>
+<Demo title="Indeterminate" description="Use when progress cannot be determined." src={IndeterminateSrc}><Indeterminate /></Demo>
+<Demo title="Animated" description="Start a simulated upload." src={AnimatedSrc}><Animated client:visible /></Demo>
+
+<Props rows={[
+  { name: "value", type: "number", default: "0", description: "Current progress value." },
+  { name: "max", type: "number", default: "100", description: "Maximum value. The fill is clamped between 0 and 100%." },
+  { name: "indeterminate", type: "boolean", default: "false", description: "Plays the shimmer animation when progress is unknown." },
+  { name: "label", type: "string", description: "Accessible aria-label for screen readers." },
+  { name: "class", type: "string", default: "''", description: "Extra CSS classes." },
+]} />

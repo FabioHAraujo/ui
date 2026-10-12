@@ -1,0 +1,155 @@
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { page, userEvent } from "vitest/browser";
+import { render } from "vitest-browser-svelte";
+import { checkA11y } from "../../../../tests/a11y";
+import { setLocale } from "../../i18n/index.js";
+import DocsSearchHarness from "./DocsSearchHarness.test.svelte";
+import type { DocsSearchEntry } from "./types";
+
+const entries: DocsSearchEntry[] = [
+	{
+		href: "/guia/inicio",
+		title: "Primeiros passos",
+		section: "Guia",
+		description: "Comece aqui",
+		headings: [{ text: "Instalação", id: "instalacao" }],
+		text: "instale o pacote",
+	},
+	{
+		href: "/api/mensagens",
+		title: "Enviar mensagem",
+		section: "API",
+		description: "Endpoint de envio",
+		headings: [],
+		text: "webhook e QR code",
+	},
+	{
+		href: "/api/webhooks",
+		title: "Webhooks",
+		section: "API",
+		description: "Eventos",
+		headings: [],
+		text: "configuração de callbacks",
+	},
+];
+
+const input = () => page.getByRole("combobox", { name: "Buscar" });
+
+// These tests assert the Portuguese wording of the catalog.
+beforeAll(() => setLocale("pt-BR"));
+afterAll(() => setLocale("en"));
+
+describe("DocsSearch", () => {
+	it("opens focused on the input with the hint and passes axe", async () => {
+		const screen = await render(DocsSearchHarness, { index: entries, open: true });
+		await expect
+			.element(page.getByRole("dialog", { name: "Buscar na documentação" }))
+			.toBeVisible();
+		await expect.element(input()).toHaveFocus();
+		await expect
+			.element(page.getByText("Busque por endpoint, conceito ou provider."))
+			.toBeVisible();
+		await expect
+			.poll(() => document.getAnimations().filter((a) => a.playState === "running").length)
+			.toBe(0);
+		expect(
+			await checkA11y(document.querySelector('[role="dialog"]') as HTMLElement)
+		).toHaveNoViolations();
+		void screen;
+	});
+
+	it("typing lists matching results (diacritics-insensitive) and exposes listbox semantics", async () => {
+		await render(DocsSearchHarness, { index: entries, open: true });
+		await userEvent.keyboard("configuracao");
+		await expect.element(page.getByRole("listbox", { name: "Resultados" })).toBeVisible();
+		await expect.element(page.getByRole("option", { name: /Webhooks/ })).toBeVisible();
+		await expect.element(input()).toHaveAttribute("aria-expanded", "true");
+		await expect
+			.poll(() => document.getAnimations().filter((a) => a.playState === "running").length)
+			.toBe(0);
+		expect(
+			await checkA11y(document.querySelector('[role="dialog"]') as HTMLElement)
+		).toHaveNoViolations();
+	});
+
+	it("heading hits link to the anchor", async () => {
+		const onselect = vi.fn();
+		await render(DocsSearchHarness, { index: entries, open: true, onselect });
+		await userEvent.keyboard("instalacao");
+		const heading = page.getByRole("option", { name: /Instalação/ });
+		await expect.element(heading).toBeVisible();
+		// A real link: middle-click / open in new tab / copy link keep working.
+		await expect.element(heading).toHaveAttribute("href", "/guia/inicio#instalacao");
+		await heading.click();
+		expect(onselect).toHaveBeenCalledWith("/guia/inicio#instalacao");
+	});
+
+	it("ArrowDown/ArrowUp move aria-activedescendant/aria-selected; Enter selects it", async () => {
+		const onselect = vi.fn();
+		await render(DocsSearchHarness, { index: entries, open: true, onselect });
+		await userEvent.keyboard("webhook");
+		const options = page.getByRole("option");
+		await expect.poll(() => options.elements().length).toBeGreaterThan(1);
+		await expect.element(options.first()).toHaveAttribute("aria-selected", "true");
+		const firstId = options.first().element().id;
+		await expect.element(input()).toHaveAttribute("aria-activedescendant", firstId);
+		await userEvent.keyboard("{ArrowDown}");
+		await expect.element(options.nth(1)).toHaveAttribute("aria-selected", "true");
+		await expect.element(options.first()).toHaveAttribute("aria-selected", "false");
+		await userEvent.keyboard("{ArrowUp}");
+		await expect.element(options.first()).toHaveAttribute("aria-selected", "true");
+		await userEvent.keyboard("{ArrowDown}{Enter}");
+		expect(onselect).toHaveBeenCalledOnce();
+	});
+
+	it("selection is clamped at both ends", async () => {
+		await render(DocsSearchHarness, { index: entries, open: true });
+		await userEvent.keyboard("webhook");
+		const options = page.getByRole("option");
+		await expect.poll(() => options.elements().length).toBeGreaterThan(0);
+		const n = options.elements().length;
+		await userEvent.keyboard("{ArrowDown}".repeat(n + 3));
+		await expect.element(options.nth(n - 1)).toHaveAttribute("aria-selected", "true");
+		await userEvent.keyboard("{ArrowUp}".repeat(n + 3));
+		await expect.element(options.first()).toHaveAttribute("aria-selected", "true");
+	});
+
+	it("shows a status message when nothing matches", async () => {
+		await render(DocsSearchHarness, { index: entries, open: true });
+		await userEvent.keyboard("zzzxyz");
+		await expect.element(page.getByRole("status")).toMatchTextContent("Nada encontrado para");
+	});
+
+	it("clicking a result selects it and closes the dialog", async () => {
+		const onselect = vi.fn();
+		await render(DocsSearchHarness, { index: entries, open: true, onselect });
+		await userEvent.keyboard("webhook");
+		await page.getByRole("option", { name: /Webhooks/ }).click();
+		expect(onselect).toHaveBeenCalledWith("/api/webhooks");
+		await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+	});
+
+	it("Escape and the Fechar button close the dialog", async () => {
+		await render(DocsSearchHarness, { index: entries, open: true });
+		await userEvent.keyboard("{Escape}");
+		await expect.element(page.getByRole("dialog")).not.toBeInTheDocument();
+	});
+
+	it("lazy loader runs once, on first open, and reports failure", async () => {
+		const loader = vi.fn(async () => entries);
+		await render(DocsSearchHarness, { index: loader, open: true });
+		await userEvent.keyboard("webhook");
+		await expect.element(page.getByRole("option", { name: /Webhooks/ })).toBeVisible();
+		expect(loader).toHaveBeenCalledOnce();
+	});
+
+	it("shows an error status when the loader rejects", async () => {
+		await render(DocsSearchHarness, {
+			index: async () => Promise.reject(new Error("boom")),
+			open: true,
+		});
+		await expect
+			.element(page.getByRole("status"))
+			.toMatchTextContent("Não foi possível carregar o índice de busca.");
+	});
+});

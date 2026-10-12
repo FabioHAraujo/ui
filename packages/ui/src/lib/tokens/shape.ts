@@ -1,0 +1,14 @@
+// ─── Shape / border-radius tokens ─────────────────────────────────────────────
+// Scale: 4 / 6 / 10 / 14 / 20 / 999
+// Base radius: 10px — Apple HIG-aligned.
+
+export const radius = {
+	xs: 4,
+	sm: 6,
+	md: 10, // base/default
+	lg: 14,
+	xl: 20,
+	pill: 999,
+} as const;
+
+export type RadiusKey = keyof typeof radius;

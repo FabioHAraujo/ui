@@ -1,0 +1,25 @@
+<script lang="ts">
+  import { Chip } from '@codeatlasdev/ui';
+
+  const initial = ['Design', 'Svelte', 'Glass'];
+  let tags = $state([...initial]);
+</script>
+
+{#each tags as tag (tag)}
+  <Chip label={tag} deletable ondelete={() => (tags = tags.filter((t) => t !== tag))} />
+{/each}
+{#if tags.length === 0}
+  <button class="reset" type="button" onclick={() => (tags = [...initial])}>Reset tags</button>
+{/if}
+
+<style>
+  .reset {
+    font: inherit;
+    font-size: var(--ca-font-size-caption);
+    color: var(--ca-brand-text);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>

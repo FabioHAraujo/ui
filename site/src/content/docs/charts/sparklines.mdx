@@ -1,0 +1,40 @@
+---
+title: Sparkline
+description: Inline micro charts for KPI cards, table rows and live streams.
+group: Charts
+order: 80
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import KpiCards from "~/demos/charts/sparklines/KpiCards.svelte";
+import KpiCardsSrc from "~/demos/charts/sparklines/KpiCards.svelte?raw";
+import TableRows from "~/demos/charts/sparklines/TableRows.svelte";
+import TableRowsSrc from "~/demos/charts/sparklines/TableRows.svelte?raw";
+import Bars from "~/demos/charts/sparklines/Bars.svelte";
+import BarsSrc from "~/demos/charts/sparklines/Bars.svelte?raw";
+import Live from "~/demos/charts/sparklines/Live.svelte";
+import LiveSrc from "~/demos/charts/sparklines/Live.svelte?raw";
+
+```svelte
+<script>
+  import { Sparkline } from "@codeatlasdev/ui/charts";
+</script>
+
+<Sparkline data={[42, 51, 58, 63, 72]} trend="up" height="32px" />
+```
+
+A sparkline has no axes, legend or tooltip. `trend` picks the color: success for `up`, error for `down` and a neutral tone otherwise.
+
+<Demo title="KPI cards with trend lines" src={KpiCardsSrc}><KpiCards client:visible /></Demo>
+<Demo title="Table row sparklines" src={TableRowsSrc}><TableRows client:visible /></Demo>
+<Demo title="Bar sparklines" description="variant bar draws narrow columns instead of a line." src={BarsSrc}><Bars client:visible /></Demo>
+<Demo title="Live streaming micro charts" src={LiveSrc}><Live client:visible /></Demo>
+
+<Props rows={[
+  { name: "data", type: "number[]", description: "Values to plot." },
+  { name: "variant", type: "'line' | 'bar'", default: "'line'", description: "Line with a soft area, or narrow bars." },
+  { name: "trend", type: "'up' | 'down' | 'neutral'", description: "Colors the series: success, error or neutral." },
+  { name: "color", type: "string", description: "Explicit hex or rgb color. Overrides trend. Use hex or rgb, not oklch." },
+  { name: "height", type: "string", default: "'48px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

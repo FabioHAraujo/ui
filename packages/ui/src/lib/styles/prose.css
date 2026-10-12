@@ -1,0 +1,249 @@
+/**
+ * @codeatlasdev/ui — `.ca-prose`
+ *
+ * Long-form reading typography for rendered markdown (docs, changelogs, legal).
+ * Wrap rendered HTML in `<div class="ca-prose">`. Tables wrapped in `.ca-table-wrap`
+ * scroll horizontally instead of overflowing; highlighted code goes inside `.ca-code`
+ * (see CodeTabs). Zero config: imported by global.css.
+ *
+ * Rules: 16px body on phones (no iOS zoom on inline inputs), 44px minimum targets for
+ * anchors that stand alone, AA text colours (secondary on base), reduced motion respected.
+ */
+
+.ca-prose {
+  font-size: var(--ca-font-size-body1);
+  line-height: 1.75;
+  color: var(--ca-text-secondary);
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.ca-prose > :first-child { margin-top: 0; }
+.ca-prose > :last-child { margin-bottom: 0; }
+
+.ca-prose :where(p, ul, ol, blockquote, .ca-table-wrap, .ca-code, figure, details) {
+  margin: 1rem 0;
+}
+
+/* ── Headings ───────────────────────────────────────────────────────────── */
+
+.ca-prose :where(h2, h3, h4) {
+  position: relative;
+  color: var(--ca-text-primary);
+  font-weight: 650;
+  text-wrap: balance;
+}
+
+.ca-prose :where(h2) {
+  margin: 3rem 0 1rem;
+  padding-top: 0.25rem;
+  font-size: clamp(1.3125rem, 1.15rem + 0.7vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.ca-prose :where(h3) {
+  margin: 2.25rem 0 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.ca-prose :where(h4) {
+  margin: 1.75rem 0 0.5rem;
+  font-size: var(--ca-font-size-body1);
+  line-height: 1.4;
+}
+
+/* Anchor link injected by DocsShell/consumers: <a class="ca-prose-anchor" href="#id">#</a> */
+.ca-prose .ca-prose-anchor {
+  position: absolute;
+  left: -1.25rem;
+  padding-right: 0.25rem;
+  color: var(--ca-text-hint);
+  font-weight: 500;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--ca-duration-fast) var(--ca-ease-standard);
+}
+
+.ca-prose :where(h2, h3, h4):hover .ca-prose-anchor,
+.ca-prose .ca-prose-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* Touch devices have no hover: keep the anchor visible but quiet, and out of the text column. */
+@media (hover: none) {
+  .ca-prose .ca-prose-anchor { display: none; }
+}
+
+/* ── Inline ─────────────────────────────────────────────────────────────── */
+
+.ca-prose :where(strong) {
+  color: var(--ca-text-primary);
+  font-weight: 600;
+}
+
+.ca-prose :where(ul, ol) { padding-left: 1.375rem; }
+.ca-prose :where(li) { margin: 0.375rem 0; padding-left: 0.25rem; }
+.ca-prose :where(li)::marker { color: var(--ca-text-disabled); }
+.ca-prose :where(li > ul, li > ol) { margin: 0.375rem 0; }
+
+.ca-prose :where(a:not(.ca-prose-anchor)) {
+  color: var(--ca-brand-text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--ca-brand-main) 35%, transparent);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--ca-duration-fast) var(--ca-ease-standard);
+}
+
+.ca-prose :where(a:not(.ca-prose-anchor)):hover {
+  text-decoration-color: var(--ca-brand-main);
+}
+
+.ca-prose :where(:not(pre) > code) {
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--ca-outline-subtle);
+  border-radius: var(--ca-radius-xs);
+  background: var(--ca-surface-raised);
+  font-family: var(--ca-font-mono);
+  font-size: 0.8125em;
+  color: var(--ca-text-primary);
+  /* Long identifiers and URLs wrap instead of forcing horizontal scroll on phones. */
+  overflow-wrap: anywhere;
+}
+
+.ca-prose :where(blockquote) {
+  padding-left: 1rem;
+  border-left: 3px solid var(--ca-outline-default);
+}
+
+.ca-prose :where(hr) {
+  margin: 2.5rem 0;
+  border: none;
+  border-top: 1px solid var(--ca-outline-subtle);
+}
+
+.ca-prose :where(img, video) {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--ca-radius-lg);
+}
+
+.ca-prose :where(kbd) {
+  padding: 1px 6px;
+  border: 0.5px solid var(--ca-outline-subtle);
+  border-bottom-width: 1.5px;
+  border-radius: var(--ca-radius-xs);
+  background: color-mix(in oklab, var(--ca-text-primary) 6%, transparent);
+  font: 0.8125em var(--ca-font-mono);
+  color: var(--ca-text-secondary);
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+
+.ca-table-wrap {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--ca-outline-subtle);
+  border-radius: var(--ca-radius-lg);
+  /* Keyboard users can scroll wide tables when the wrapper has tabindex="0". */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scroll affordance: edge shadows appear only while columns are hidden on that side (no JS). */
+.ca-table-wrap {
+  background:
+    linear-gradient(to right, var(--ca-surface-base) 30%, transparent) left center / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--ca-surface-base) 30%, transparent) right center / 2rem 100% no-repeat local,
+    linear-gradient(to right, oklch(0 0 0 / 0.14), transparent) left center / 0.75rem 100% no-repeat scroll,
+    linear-gradient(to left, oklch(0 0 0 / 0.14), transparent) right center / 0.75rem 100% no-repeat scroll;
+}
+
+.ca-table-wrap:focus-visible {
+  outline: 2px solid var(--ca-brand-main);
+  outline-offset: 2px;
+}
+
+.ca-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ca-font-size-body2);
+  line-height: 1.55;
+}
+
+.ca-table-wrap th {
+  padding: 0.625rem 1rem;
+  background: var(--ca-surface-raised);
+  text-align: left;
+  font-size: var(--ca-font-size-caption);
+  font-weight: 600;
+  color: var(--ca-text-primary);
+  white-space: nowrap;
+}
+
+.ca-table-wrap td {
+  padding: 0.625rem 1rem;
+  border-top: 1px solid var(--ca-outline-subtle);
+  vertical-align: top;
+}
+
+.ca-table-wrap td:first-child code { white-space: nowrap; }
+
+/* Wide tables keep a readable minimum so columns never collapse to one word per line. */
+.ca-table-wrap td { min-width: 7rem; }
+
+/* ── Code blocks (shiki dual theme: --shiki-light / --shiki-dark) ───────── */
+
+.ca-code {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--ca-outline-subtle);
+  border-radius: var(--ca-radius-lg);
+  background: var(--ca-surface-raised);
+  overflow: hidden;
+}
+
+.ca-code pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  background: transparent !important;
+  font: 0.8125rem / 1.7 var(--ca-font-mono);
+  tab-size: 2;
+}
+
+.ca-code pre:focus-visible {
+  outline: 2px solid var(--ca-brand-main);
+  outline-offset: -2px;
+}
+
+.ca-code .shiki span { color: var(--shiki-light); }
+.dark .ca-code .shiki span { color: var(--shiki-dark); }
+
+/* Code with a language label above it (standalone blocks outside CodeTabs). */
+.ca-code[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
+  display: block;
+  padding: 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--ca-outline-subtle);
+  font: 500 var(--ca-font-size-caption) / 1.5 var(--ca-font-mono);
+  color: var(--ca-text-secondary);
+  text-transform: lowercase;
+}
+
+/* Inside CodeTabs the tab already names the language. */
+.ca-codetabs .ca-code[data-lang]::before { display: none; }
+
+@media (max-width: 767px) {
+  .ca-prose { line-height: 1.7; }
+  .ca-code pre { padding: 0.875rem 1rem; }
+  .ca-table-wrap th,
+  .ca-table-wrap td { padding: 0.5rem 0.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ca-prose * { transition-duration: 0.001ms !important; }
+}

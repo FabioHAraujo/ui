@@ -1,0 +1,136 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      update-snapshots:
+        description: "Regenerate visual baselines and commit them"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz | tar -xz gitleaks
+          ./gitleaks git --no-banner --redact --config .gitleaks.toml .
+
+  validate:
+    name: Types, lint, unit
+    if: ${{ !inputs.update-snapshots }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: bun install --frozen-lockfile
+      - run: bun run build:pkg
+      - run: bun run validate
+
+  browser:
+    name: Component tests (Chromium)
+    if: ${{ !inputs.update-snapshots }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run build:pkg
+      - run: bun run test:browser
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: vitest-traces
+          include-hidden-files: true
+          path: |
+            packages/ui/.vitest/
+            packages/ui/src/**/__traces__/
+
+  e2e:
+    name: Site E2E, a11y, visual (Linux baselines)
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --ipc=host --init
+    permissions:
+      contents: write
+    env:
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v7
+      - run: npm i -g bun
+      - run: bun install --frozen-lockfile
+      - run: bun run build:pkg
+      - run: bun run --cwd packages/ui test:vrt ${{ inputs.update-snapshots && '--update' || '' }}
+      - run: bun run --cwd site test:e2e ${{ inputs.update-snapshots && '--project=visual-desktop --project=visual-mobile --update-snapshots' || '' }}
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          include-hidden-files: true
+          path: |
+            site/playwright-report/
+            site/test-results/
+            packages/ui/.vitest/
+      - name: Commit updated baselines
+        if: ${{ inputs.update-snapshots }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A '**/__screenshots__/**'
+          git diff --cached --quiet || (git commit -m "test: update visual baselines" && git push)
+
+  preview:
+    name: Site preview
+    # Fork PRs get no secrets; they still get the full test matrix above.
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+    needs: [validate]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: site
+          command: pages deploy dist --project-name codeatlas-ui --branch pr-${{ github.event.pull_request.number }}
+      - name: Comment preview URL
+        env:
+          GH_TOKEN: ${{ github.token }}
+          URL: https://pr-${{ github.event.pull_request.number }}.codeatlas-ui.pages.dev
+        run: |
+          body="Site preview: $URL"
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last --body "$body" 2>/dev/null \
+            || gh pr comment ${{ github.event.pull_request.number }} --body "$body"

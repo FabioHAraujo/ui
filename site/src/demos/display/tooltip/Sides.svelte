@@ -1,0 +1,22 @@
+<script lang="ts">
+  import { Tooltip, Button } from '@codeatlasdev/ui';
+</script>
+
+<div class="grid">
+  <Tooltip content="Tooltip on top" side="top">
+    {#snippet triggerChild(props)}<Button variant="outlined" {...props}>Top</Button>{/snippet}
+  </Tooltip>
+  <Tooltip content="Tooltip on right" side="right">
+    {#snippet triggerChild(props)}<Button variant="outlined" {...props}>Right</Button>{/snippet}
+  </Tooltip>
+  <Tooltip content="Tooltip on bottom" side="bottom">
+    {#snippet triggerChild(props)}<Button variant="outlined" {...props}>Bottom</Button>{/snippet}
+  </Tooltip>
+  <Tooltip content="Tooltip on left" side="left">
+    {#snippet triggerChild(props)}<Button variant="outlined" {...props}>Left</Button>{/snippet}
+  </Tooltip>
+</div>
+
+<style>
+  .grid { display: flex; flex-wrap: wrap; gap: var(--ca-space-3); padding: var(--ca-space-6); align-items: center; justify-content: center; width: 100%; }
+</style>

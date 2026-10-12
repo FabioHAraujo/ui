@@ -1,0 +1,24 @@
+---
+// Tabbed code block for MDX: highlights each tab at build time and hands the HTML to the
+// package CodeTabs (tabs-as-data, since Svelte context cannot cross into MDX children).
+import { CodeTabs } from "@codeatlasdev/ui";
+import { codeToHtml } from "shiki";
+
+interface Props {
+	tabs: { label: string; code: string; lang?: string }[];
+	/** Tabs with the same sync key remember the chosen label across the site. */
+	sync?: string;
+}
+const { tabs, sync } = Astro.props;
+const items = await Promise.all(
+	tabs.map(async (t) => ({
+		label: t.label,
+		html: await codeToHtml(t.code.trim(), {
+			lang: t.lang ?? "sh",
+			themes: { light: "github-light-high-contrast", dark: "github-dark-high-contrast" },
+			defaultColor: false,
+		}),
+	})),
+);
+---
+<CodeTabs client:visible tabs={items} {sync} />

@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AdminApp from "~/templates/admin/AdminApp.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="Admin reports template" description="Revenue, profit and conversion charts with tabs and breakdown tables." noindex>
+	<AdminApp client:load page="reports" {pathname} />
+</TemplateLayout>

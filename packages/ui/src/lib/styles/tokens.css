@@ -1,0 +1,236 @@
+/* ── Static design tokens
+ * Mode-invariant :root values + .dark overrides.
+ * NO hue-specific tokens here — those live in themes/.
+ * ──────────────────────────────────────────────────── */
+
+:root {
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  --ca-font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --ca-font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+
+  --ca-font-size-h1:      2.25rem;    /* 36px */
+  --ca-font-size-h2:      1.875rem;   /* 30px */
+  --ca-font-size-h3:      1.5rem;     /* 24px */
+  --ca-font-size-h4:      1.25rem;    /* 20px */
+  --ca-font-size-h5:      1.0625rem;  /* 17px */
+  --ca-font-size-h6:      0.9375rem;  /* 15px */
+  --ca-font-size-body1:   0.9375rem;  /* 15px */
+  --ca-font-size-body2:   0.8125rem;  /* 13px */
+  --ca-font-size-caption: 0.75rem;    /* 12px */
+  --ca-font-size-label:   0.8125rem;  /* 13px */
+  --ca-font-size-button:  0.875rem;   /* 14px */
+  --ca-font-size-micro:   0.6875rem;  /* 11px — badges, eyebrows, overlines */
+  --ca-font-size-nano:    0.625rem;   /* 10px — badge counts, tiny labels */
+  --ca-font-size-dialog:  1rem;       /* 16px — dialog/drawer titles */
+  --ca-font-size-lg:      1.125rem;   /* 18px — logo names, large UI labels */
+  --ca-font-size-xl:      1.375rem;   /* 22px — auth headings, quote text */
+
+  /* ── Border radius ───────────────────────────────────────────────────── */
+  --ca-radius-xs:   4px;
+  --ca-radius-sm:   6px;
+  --ca-radius-md:   10px;
+  --ca-radius-lg:   14px;
+  --ca-radius-xl:   20px;
+  --ca-radius-pill: 999px;
+
+  /* ── Z-index ─────────────────────────────────────────────────────────── */
+  --ca-z-nav:      100;
+  --ca-z-dropdown: 1000;
+  --ca-z-sticky:   1020;
+  --ca-z-fixed:    1030;
+  --ca-z-drawer:   1200;
+  --ca-z-modal:    1300;
+  --ca-z-snackbar: 1400;
+  --ca-z-tooltip:  1500;
+
+  /* ── Transitions ─────────────────────────────────────────────────────── */
+  --ca-ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ca-ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ca-ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --ca-ease-spring:     cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ca-duration-fast:   150ms;
+  --ca-duration-base:   240ms;
+  --ca-duration-slow:   320ms;
+
+  /* ── Focus, selection, scrollbars ────────────────────────────────────── */
+  --ca-focus-ring:        var(--ca-brand-main);
+  --ca-focus-ring-offset: 2px;
+  --ca-selection-bg:      color-mix(in oklab, var(--ca-brand-main) 28%, transparent);
+  --ca-scrollbar-thumb:       oklch(0.50 0 0 / 0.25);
+  --ca-scrollbar-thumb-hover: oklch(0.50 0 0 / 0.40);
+  /* Opaque surface for chrome that touches a viewport edge on mobile (MobileHeader,
+   * BottomNav). Browsers tint their status bar / toolbar from it (Safari 26 samples
+   * fixed/sticky edge elements; chromeSync feeds theme-color elsewhere). */
+  --ca-chrome-surface: var(--ca-surface-raised);
+
+  /* ── Touch target (applied under @media (pointer: coarse)) ───────────── */
+  --ca-touch-target: 44px;
+  /* ── Viewport (safe areas, dynamic height, on-screen keyboard) ───────── */
+  --ca-safe-top:    env(safe-area-inset-top, 0px);
+  --ca-safe-right:  env(safe-area-inset-right, 0px);
+  --ca-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ca-safe-left:   env(safe-area-inset-left, 0px);
+  --ca-vh: 100vh;
+  /* Written by the viewport store while a virtual keyboard covers the page. */
+  --ca-kb-inset: 0px;
+  --ca-bottom-nav-h: 56px;
+  /* Text-entry controls. iOS Safari zooms into focused fields under 16px (see media query below). */
+  --ca-input-font-size: var(--ca-font-size-body2);
+  --ca-input-font-size-sm: var(--ca-font-size-caption);
+
+  /* ── Shell layout ────────────────────────────────────────────────────── */
+  --ca-header-height: 52px;
+  --ca-rail-width:    52px;
+  --ca-panel-width:   192px;
+
+  /* ── Spacing scale (base 4 px — igual MUI) ──────────────────────────── */
+  --ca-space-1:  4px;
+  --ca-space-2:  8px;
+  --ca-space-3:  12px;
+  --ca-space-4:  16px;
+  --ca-space-5:  20px;
+  --ca-space-6:  24px;
+  --ca-space-7:  28px;
+  --ca-space-8:  32px;
+  --ca-space-10: 40px;
+  --ca-space-12: 48px;
+  --ca-space-16: 64px;
+
+  /* ── Page layout tokens ──────────────────────────────────────────────── */
+  /* Padding horizontal padrão de todas as páginas — muda só em 1 lugar   */
+  --ca-page-px:    24px;
+  --ca-page-px-sm: 16px;   /* mobile */
+  /* Padding vertical do topo das páginas */
+  --ca-page-pt:    20px;
+  --ca-page-pt-sm: 14px;
+  /* Gap entre seções dentro de uma página */
+  --ca-page-gap:   20px;
+
+  /* ── Card tokens ─────────────────────────────────────────────────────────── */
+  /* Padding padrão de GlassCard — não passe padding= explícito, use este token */
+  --ca-card-padding: 20px;
+
+  /* ── Preset swatches (for colour pickers) ────────────────────────────── */
+  --ca-preset-swatch-amber:   oklch(0.54 0.21 55);
+  --ca-preset-swatch-ocean:   oklch(0.50 0.22 260);
+  --ca-preset-swatch-crimson: oklch(0.44 0.23 26);
+  --ca-preset-swatch-cyan:    oklch(0.48 0.22 193);
+  --ca-preset-swatch-violet:  oklch(0.47 0.24 295);
+  --ca-preset-swatch-emerald: oklch(0.46 0.20 152);
+  --ca-preset-swatch-rose:    oklch(0.50 0.22 350);
+  --ca-preset-swatch-slate:   oklch(0.48 0.10 220);
+
+  /* ── Base element defaults ───────────────────────────────────────────── */
+  color: var(--ca-text-primary);
+  font-family: var(--ca-font-sans);
+  font-size: var(--ca-font-size-body1);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@supports (height: 100dvh) {
+  :root { --ca-vh: 100dvh; }
+}
+
+@media (pointer: coarse), (max-width: 767px) {
+  :root {
+    --ca-input-font-size: max(16px, var(--ca-font-size-body2));
+    --ca-input-font-size-sm: max(16px, var(--ca-font-size-caption));
+  }
+}
+
+/* Reduced motion: every token-driven transition becomes instant (no global * hammer). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ca-duration-fast: 0ms;
+    --ca-duration-base: 0ms;
+    --ca-duration-slow: 0ms;
+  }
+}
+
+/* ── Mode-dependent statics (light). [data-theme-scope] re-applies them in theme islands. */
+:root,
+[data-theme-scope="light"] {
+  /* Tooltip: inverse surface in light mode, raised overlay in dark (pairs with --ca-tooltip-fg). */
+  --ca-tooltip-bg: color-mix(in oklab, var(--ca-text-primary) 94%, transparent);
+
+  /* Brand colour for TEXT on tinted/glass surfaces (>= 4.5:1). brand-main is for fills and large UI. */
+  --ca-brand-text: var(--ca-brand-dark);
+
+  /* ── Shadows (light) ─────────────────────────────────────────────────── */
+  --ca-shadow-xs: 0 1px 2px oklch(0.25 0.008 70 / 0.07);
+  --ca-shadow-sm: 0 2px 4px oklch(0.25 0.008 70 / 0.09);
+  --ca-shadow-md: 0 4px 16px oklch(0.25 0.008 70 / 0.12);
+  --ca-shadow-lg: 0 8px 32px oklch(0.25 0.008 70 / 0.15);
+  --ca-shadow-xl: 0 16px 48px oklch(0.25 0.008 70 / 0.19);
+
+  /* ── Semantic colours (light) ────────────────────────────────────────── */
+  --ca-semantic-secondary: oklch(0.910 0.005 88);
+  --ca-semantic-success:   oklch(0.44 0.155 150);
+  --ca-semantic-warning:   oklch(0.51 0.155 88);
+  --ca-semantic-info:      oklch(0.47 0.140 235);
+  --ca-semantic-error:     oklch(0.52 0.200 22);
+  /* Solid fill that carries white text (error itself is lightened in dark mode for use as text). */
+  --ca-semantic-error-fill: oklch(0.52 0.200 22);
+
+  /* ── Action states (light) ───────────────────────────────────────────── */
+  --ca-action-hover:       oklch(0.2 0 0 / 0.055);
+  --ca-action-selected:    oklch(0.2 0 0 / 0.09);
+  --ca-action-disabled:    oklch(0.2 0 0 / 0.30);
+  --ca-action-disabled-bg: oklch(0.2 0 0 / 0.08);
+  --ca-action-focus:       oklch(0.2 0 0 / 0.12);
+
+  /* ── Glass optical constants (light) ─────────────────────────────────── */
+  --ca-glass-rim:         oklch(1 0 0 / 0.70);
+  --ca-glass-rim-opacity: 0.70;
+  --ca-glass-frost:       18;
+  --ca-glass-highlight:   oklch(1 0 0 / 0.60);
+  --ca-blur-ultra-thin:   blur(8px) saturate(160%);
+  --ca-blur-thin:         blur(14px) saturate(175%);
+  --ca-blur-regular:      blur(22px) saturate(190%);
+  --ca-blur-thick:        blur(32px) saturate(200%);
+  --ca-blur-chrome:       blur(44px) saturate(210%);
+  --ca-scrim-blur:        none;
+  --ca-glass-separator:   inset -1px 0 0 rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.60);
+
+}
+
+/* ── Dark mode static overrides (no hue — those live in themes/) ─────────── */
+.dark,
+[data-theme-scope="dark"] {
+  --ca-brand-text: var(--ca-brand-light);
+  --ca-tooltip-bg: color-mix(in oklab, var(--ca-surface-overlay) 96%, transparent);
+  /* Shadows */
+  --ca-shadow-xs: 0 1px 3px oklch(0 0 0 / 0.30);
+  --ca-shadow-sm: 0 2px 6px oklch(0 0 0 / 0.35);
+  --ca-shadow-md: 0 4px 20px oklch(0 0 0 / 0.40);
+  --ca-shadow-lg: 0 8px 36px oklch(0 0 0 / 0.45);
+  --ca-shadow-xl: 0 16px 56px oklch(0 0 0 / 0.50);
+
+  /* Semantic */
+  --ca-semantic-secondary: oklch(0.250 0.005 88);
+  --ca-semantic-success:   oklch(0.73 0.165 150);
+  --ca-semantic-warning:   oklch(0.86 0.155 88);
+  --ca-semantic-info:      oklch(0.74 0.145 235);
+  --ca-semantic-error:     oklch(0.78 0.190 22);
+  --ca-semantic-error-fill: oklch(0.52 0.200 22);
+
+  /* Action states */
+  --ca-action-hover:       oklch(1 0 0 / 0.075);
+  --ca-action-selected:    oklch(1 0 0 / 0.13);
+  --ca-action-disabled:    oklch(1 0 0 / 0.30);
+  --ca-action-disabled-bg: oklch(1 0 0 / 0.10);
+  --ca-action-focus:       oklch(1 0 0 / 0.14);
+
+  /* Glass optical constants */
+  --ca-glass-rim:         oklch(1 0 0 / 0.22);
+  --ca-glass-rim-opacity: 0.22;
+  --ca-glass-highlight:   oklch(1 0 0 / 0.08);
+  --ca-blur-ultra-thin:   blur(8px) saturate(150%) brightness(1.02);
+  --ca-blur-thin:         blur(14px) saturate(165%) brightness(1.02);
+  --ca-blur-regular:      blur(22px) saturate(180%) brightness(1.02);
+  --ca-blur-thick:        blur(32px) saturate(200%) brightness(1.01);
+  --ca-blur-chrome:       blur(44px) saturate(210%) brightness(1.01);
+  --ca-glass-separator:   inset -1px 0 0 rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 40px rgba(0,0,0,0.50);
+}

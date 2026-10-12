@@ -1,0 +1,35 @@
+---
+title: Colors
+description: Brand, surface, text, outline and semantic color tokens, all defined in OKLCH and swapped per preset and scheme.
+group: Foundation
+order: 1
+---
+import Demo from "~/components/docs/Demo.astro";
+import Brand from "~/demos/foundation/colors/Brand.svelte";
+import BrandSrc from "~/demos/foundation/colors/Brand.svelte?raw";
+import Surfaces from "~/demos/foundation/colors/Surfaces.svelte";
+import SurfacesSrc from "~/demos/foundation/colors/Surfaces.svelte?raw";
+import Text from "~/demos/foundation/colors/Text.svelte";
+import TextSrc from "~/demos/foundation/colors/Text.svelte?raw";
+import Semantic from "~/demos/foundation/colors/Semantic.svelte";
+import SemanticSrc from "~/demos/foundation/colors/Semantic.svelte?raw";
+import Outline from "~/demos/foundation/colors/Outline.svelte";
+import OutlineSrc from "~/demos/foundation/colors/Outline.svelte?raw";
+
+Every color is a CSS custom property. Components never hardcode a color, so changing the preset, the scheme or a single token restyles the whole app.
+
+```css
+.badge {
+  color: var(--ca-brand-text);
+  background: color-mix(in oklab, var(--ca-brand-main) 14%, var(--ca-surface-base));
+  border: 1px solid var(--ca-outline-default);
+}
+```
+
+The swatches below read the live tokens, so they follow the theme switcher in the header. Use `--ca-brand-text` for brand-colored text and `--ca-brand-fill` for filled brand surfaces: both are tuned to keep contrast in light and dark.
+
+<Demo title="Brand" description="Derived from the active preset. brand-fill and brand-text keep contrast in both schemes." src={BrandSrc}><Brand /></Demo>
+<Demo title="Surfaces" description="A layered scale for depth: sunken, base, raised, overlay." src={SurfacesSrc}><Surfaces /></Demo>
+<Demo title="Text" description="text-hint is the lowest readable tier (4.5:1). text-disabled is for inactive controls only." src={TextSrc}><Text /></Demo>
+<Demo title="Semantic" description="Success, warning, error and info. Semantic colors never change with the preset." src={SemanticSrc}><Semantic /></Demo>
+<Demo title="Outline" description="Border and divider scale." src={OutlineSrc}><Outline /></Demo>

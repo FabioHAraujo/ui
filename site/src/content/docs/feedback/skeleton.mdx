@@ -1,0 +1,38 @@
+---
+title: Skeleton
+description: Loading placeholders that match the shape of the real content.
+group: Feedback
+order: 5
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import TextLines from "~/demos/feedback/skeleton/TextLines.svelte";
+import TextLinesSrc from "~/demos/feedback/skeleton/TextLines.svelte?raw";
+import CardLayout from "~/demos/feedback/skeleton/CardLayout.svelte";
+import CardLayoutSrc from "~/demos/feedback/skeleton/CardLayout.svelte?raw";
+import Image from "~/demos/feedback/skeleton/Image.svelte";
+import ImageSrc from "~/demos/feedback/skeleton/Image.svelte?raw";
+
+```svelte
+<script>
+  import { Skeleton } from "@codeatlasdev/ui";
+</script>
+
+<Skeleton height="20px" width="60%" />
+<Skeleton variant="circular" width={48} height={48} />
+<Skeleton rows={3} />
+```
+
+Skeletons are `aria-hidden`. Announce the loading state on the container (for example `aria-busy="true"`) rather than on each placeholder.
+
+<Demo title="Text lines" description="With rows, the last line is shortened to 60% for a natural paragraph." src={TextLinesSrc}><TextLines /></Demo>
+<Demo title="Card layout" src={CardLayoutSrc}><CardLayout /></Demo>
+<Demo title="Image placeholder" src={ImageSrc}><Image /></Demo>
+
+<Props rows={[
+  { name: "variant", type: "'text' | 'circular' | 'rectangular' | 'rounded'", default: "'text'", description: "Shape of the placeholder." },
+  { name: "width", type: "string | number", description: "CSS width. Numbers are treated as pixels." },
+  { name: "height", type: "string | number", description: "CSS height. Numbers are treated as pixels." },
+  { name: "rows", type: "number", default: "1", description: "Renders several stacked lines. For the text variant the last one is 60% wide." },
+  { name: "class", type: "string", default: "''", description: "Extra CSS classes." },
+]} />

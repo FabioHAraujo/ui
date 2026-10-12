@@ -1,0 +1,7 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import ServerError from "~/templates/error/ServerError.svelte";
+---
+<TemplateLayout title="500 error page template" description="Internal server error layout with retry and home actions.">
+	<ServerError client:load />
+</TemplateLayout>

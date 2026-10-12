@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/codeatlasdev/ui/discussions
+    about: Ask questions and discuss ideas
+  - name: npm package
+    url: https://www.npmjs.com/package/@codeatlasdev/ui
+    about: View on npm

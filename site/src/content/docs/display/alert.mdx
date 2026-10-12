@@ -1,0 +1,37 @@
+---
+title: Alert
+description: "Inline status messages for success, warning, error and info states, with an optional title and close action."
+group: Display
+order: 1
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Severities from "~/demos/display/alert/Severities.svelte";
+import SeveritiesSrc from "~/demos/display/alert/Severities.svelte?raw";
+import WithTitle from "~/demos/display/alert/WithTitle.svelte";
+import WithTitleSrc from "~/demos/display/alert/WithTitle.svelte?raw";
+import Closable from "~/demos/display/alert/Closable.svelte";
+import ClosableSrc from "~/demos/display/alert/Closable.svelte?raw";
+
+```svelte
+<script>
+  import { Alert } from "@codeatlasdev/ui";
+</script>
+
+<Alert severity="success" title="Saved">Your changes were saved.</Alert>
+```
+
+The parent owns visibility: render the alert conditionally and hide it from `onclose`. Alerts are announced by assistive technology as status messages.
+
+<Demo title="Severities" description={"All four semantic variants."} src={SeveritiesSrc}><Severities /></Demo>
+<Demo title="With title" description={"An optional title adds a bold heading above the message."} src={WithTitleSrc}><WithTitle /></Demo>
+<Demo title="Closable" description={"Shows a dismiss button. The parent hides the alert in `onclose`."} src={ClosableSrc}><Closable client:visible /></Demo>
+
+<Props rows={[
+  { name: "severity", type: "'success' | 'warning' | 'error' | 'info'", description: "Semantic color and icon. Required." },
+  { name: "title", type: "string", default: "undefined", description: "Bold heading above the message." },
+  { name: "closable", type: "boolean", default: "false", description: "Shows a dismiss button." },
+  { name: "onclose", type: "() => void", default: "undefined", description: "Called when the close button is clicked." },
+  { name: "class", type: "string", default: "''", description: "Extra class names on the root element." },
+  { name: "children", type: "Snippet", default: "undefined", description: "Alert body content." },
+]} />

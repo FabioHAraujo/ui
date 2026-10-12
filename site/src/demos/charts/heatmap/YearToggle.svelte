@@ -1,0 +1,37 @@
+<script lang="ts">
+  import { GlassCard, Row, Button } from '@codeatlasdev/ui';
+  import { HeatmapChart, type CalendarHeatmapPoint } from '@codeatlasdev/ui/charts';
+
+  function gen(year: number, count: number, seed: number): CalendarHeatmapPoint[] {
+    return Array.from({ length: count }, (_, i) => {
+      const d = new Date(Date.UTC(year, 0, 1 + i));
+      const weekend = d.getUTCDay() === 0 || d.getUTCDay() === 6;
+      const v = weekend
+        ? Math.max(0, Math.round(Math.sin(i * 0.3 + seed) * 2 + 1))
+        : Math.max(0, Math.min(20, Math.round(Math.sin(i * 0.08 + seed) * 5 + Math.sin(i * 0.21 + seed * 1.3) * 3 + 8)));
+      return [d.toISOString().slice(0, 10), v];
+    });
+  }
+
+  const data = { 2026: gen(2026, 258, 1.4), 2025: gen(2025, 365, 2.1) };
+  const ranges: Record<2025 | 2026, [string, string]> = {
+    2026: ['2026-01-01', '2026-09-15'],
+    2025: ['2025-01-01', '2025-12-31'],
+  };
+
+  let year = $state<2025 | 2026>(2026);
+</script>
+
+<div class="wrap">
+  <Row gap={8}>
+    <Button variant={year === 2026 ? 'filled' : 'glass'} size="sm" onclick={() => (year = 2026)}>2026</Button>
+    <Button variant={year === 2025 ? 'filled' : 'glass'} size="sm" onclick={() => (year = 2025)}>2025</Button>
+  </Row>
+  <GlassCard full>
+    <HeatmapChart variant="calendar" data={data[year]} range={ranges[year]} tooltipFormatter={(v) => `${v} commits`} height="160px" />
+  </GlassCard>
+</div>
+
+<style>
+  .wrap { width: 100%; display: flex; flex-direction: column; gap: var(--ca-space-3); }
+</style>

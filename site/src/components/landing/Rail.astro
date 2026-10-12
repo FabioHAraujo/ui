@@ -1,0 +1,25 @@
+---
+// Fixed chapter rail (desktop). Real sequence of anchors, so numbering is not decoration.
+import { Brush, Bot, ChartNoAxesCombined, Rocket, ShieldCheck, Smartphone } from "@lucide/svelte";
+const items = [
+	{ id: "theme", label: "Theme engine", icon: Brush },
+	{ id: "mobile", label: "Native mobile", icon: Smartphone },
+	{ id: "agents", label: "Agent first", icon: Bot },
+	{ id: "data", label: "Charts and data", icon: ChartNoAxesCombined },
+	{ id: "quality", label: "Accessibility and speed", icon: ShieldCheck },
+	{ id: "start", label: "Quick start", icon: Rocket },
+];
+---
+<nav class="rail" aria-label="Chapters">
+	<span class="rail__line" aria-hidden="true"></span>
+	<ol>
+		{items.map(({ id, label, icon: Icon }) => (
+			<li>
+				<a href={`#${id}`} data-rail={id} aria-label={label}>
+					<Icon size={16} aria-hidden="true" />
+					<span class="rail__tip" aria-hidden="true">{label}</span>
+				</a>
+			</li>
+		))}
+	</ol>
+</nav>

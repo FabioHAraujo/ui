@@ -1,0 +1,38 @@
+---
+title: ToggleGroup
+description: A set of toggle buttons with single or multiple selection, roving focus and arrow-key navigation.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Selection from "~/demos/inputs/toggle-group/Selection.svelte";
+import SelectionSrc from "~/demos/inputs/toggle-group/Selection.svelte?raw";
+import Variants from "~/demos/inputs/toggle-group/Variants.svelte";
+import VariantsSrc from "~/demos/inputs/toggle-group/Variants.svelte?raw";
+
+```svelte
+<script>
+  import { ToggleGroup } from "@codeatlasdev/ui";
+  let format = $state(["bold"]);
+</script>
+
+<ToggleGroup type="multiple" aria-label="Text formatting" bind:value={format} items={items} />
+```
+
+In `single` mode the user can press the active item again to clear the selection, so `value` can be an empty string. Use [SegmentedControl](/docs/inputs/segmented-control/) when a choice is required. Icon-only items need an `aria-label`.
+
+<Demo title="Single and multiple" description="type=&quot;single&quot; binds a string. type=&quot;multiple&quot; binds a string array." src={SelectionSrc}><Selection client:visible /></Demo>
+<Demo title="Variants and orientation" description="outlined and ghost variants, sizes, a disabled item and a vertical layout." src={VariantsSrc}><Variants client:visible /></Demo>
+
+<Props rows={[
+  { name: "type", type: "'single' | 'multiple'", default: "'single'", description: "Selection mode." },
+  { name: "value", type: "string | string[]", description: "Bindable. A string for single, an array for multiple." },
+  { name: "items", type: "ToggleGroupItem[]", description: "{ value, label?, icon?, disabled?, 'aria-label'? }. Icon-only items need aria-label." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Item height." },
+  { name: "variant", type: "'outlined' | 'ghost'", default: "'outlined'", description: "Container style." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the whole group." },
+  { name: "orientation", type: "'horizontal' | 'vertical'", default: "'horizontal'", description: "Layout and arrow-key axis." },
+  { name: "aria-label", type: "string", description: "Accessible name of the group." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "onchange", type: "(value: string | string[]) => void", description: "Called on every change." },
+]} />

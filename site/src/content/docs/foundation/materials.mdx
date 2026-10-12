@@ -1,0 +1,40 @@
+---
+title: Materials
+description: Liquid Glass material tiers from ultra-thin translucency to opaque chrome, plus tint, glow and button variants.
+group: Foundation
+order: 4
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Tiers from "~/demos/foundation/materials/Tiers.svelte";
+import TiersSrc from "~/demos/foundation/materials/Tiers.svelte?raw";
+import GlassButtons from "~/demos/foundation/materials/GlassButtons.svelte";
+import GlassButtonsSrc from "~/demos/foundation/materials/GlassButtons.svelte?raw";
+import Tinted from "~/demos/foundation/materials/Tinted.svelte";
+import TintedSrc from "~/demos/foundation/materials/Tinted.svelte?raw";
+
+Materials are CSS classes (`glass-ultra-thin`, `glass-thin`, `glass-regular`, `glass-thick`, `glass-chrome`) backed by `backdrop-filter`. `GlassSurface` applies them for you and can add a refraction layer.
+
+```svelte
+<script>
+  import { GlassSurface } from "@codeatlasdev/ui";
+</script>
+
+<GlassSurface thickness="thick" tinted>Content</GlassSurface>
+```
+
+The surface style on `<html data-style>` changes every material at once: `glass` (default), `frosted` (less blur), `solid` and `flat` (no blur, no mesh). Switch it with `colorScheme.setStyle()`, see [Theming](/docs/getting-started/theming/#surface-styles). Browsers with `prefers-reduced-transparency: reduce` automatically get opaque surfaces.
+
+<Demo title="Glass tiers" description="All five thickness levels on a gradient backdrop." src={TiersSrc}><Tiers /></Demo>
+<Demo title="Button glass variants" description="glass-btn, glass-btn-prominent and glass-btn-clear for custom controls." src={GlassButtonsSrc}><GlassButtons /></Demo>
+<Demo title="Tinted and glowing" description="glass-tinted adds an accent gradient, glass-glow adds a backlit halo." src={TintedSrc}><Tinted /></Demo>
+
+<Props title="GlassSurface props" rows={[
+  { name: "thickness", type: "'ultra-thin' | 'thin' | 'regular' | 'thick' | 'chrome'", default: "'regular'", description: "Material tier." },
+  { name: "tinted", type: "boolean", default: "false", description: "Adds an accent gradient (glass-tinted)." },
+  { name: "glowing", type: "boolean", default: "false", description: "Adds a backlit halo (glass-glow)." },
+  { name: "refraction", type: "boolean", default: "true", description: "Renders the LiquidGlass refraction layer behind the content." },
+  { name: "class", type: "string", default: "''", description: "Extra classes." },
+  { name: "style", type: "string", default: "''", description: "Inline style string, for dynamic custom properties only." },
+  { name: "children", type: "Snippet", description: "Surface content." },
+]} />

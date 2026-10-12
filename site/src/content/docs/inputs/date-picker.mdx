@@ -1,0 +1,66 @@
+---
+title: Date and time
+description: DatePicker, DateRangePicker, DateField, TimeField, Calendar and RangeCalendar, fully keyboard operable.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Pickers from "~/demos/inputs/date-picker/Pickers.svelte";
+import PickersSrc from "~/demos/inputs/date-picker/Pickers.svelte?raw";
+import Fields from "~/demos/inputs/date-picker/Fields.svelte";
+import FieldsSrc from "~/demos/inputs/date-picker/Fields.svelte?raw";
+import Calendars from "~/demos/inputs/date-picker/Calendars.svelte";
+import CalendarsSrc from "~/demos/inputs/date-picker/Calendars.svelte?raw";
+import Constraints from "~/demos/inputs/date-picker/Constraints.svelte";
+import ConstraintsSrc from "~/demos/inputs/date-picker/Constraints.svelte?raw";
+
+```svelte
+<script>
+  import { DatePicker, CalendarDate } from "@codeatlasdev/ui";
+  let date = $state(new CalendarDate(2026, 10, 10));
+</script>
+
+<DatePicker label="Delivery date" bind:value={date} />
+```
+
+Values are `@internationalized/date` objects. `CalendarDate`, `Time`, `today`, `getLocalTimeZone` and the `DateValue`, `DateRange` and `TimeValue` types are re-exported from `@codeatlasdev/ui`, so you do not need that package as a direct dependency.
+
+The default `locale` is `pt-BR` with Monday-first weeks. The demos below pass `locale="en-US"` and `weekStartsOn={0}` to show the English format.
+
+**Keyboard.** In field segments, type digits or use the up and down arrows to change a value, and the left and right arrows or Tab to move between segments. In a calendar, the arrows move by day, PageUp and PageDown by month, Shift with PageUp or PageDown by year, Home and End to the week edges, Enter or Space selects, and Escape closes the popover.
+
+An `error` is rendered with `role="alert"` and sets `aria-invalid` and `aria-describedby`. Clicking a field `label` focuses its first segment.
+
+<Demo title="DatePicker and DateRangePicker" description="Editable segments plus a calendar popover. The range picker shows two months." src={PickersSrc}><Pickers client:visible /></Demo>
+<Demo title="DateField and TimeField" description="Segments only, no popover. granularity=&quot;minute&quot; adds a time, and hourCycle switches between 12h and 24h." src={FieldsSrc}><Fields client:visible /></Demo>
+<Demo title="Calendar and RangeCalendar" description="Inline calendars. Click a start date, then an end date for the range." src={CalendarsSrc}><Calendars client:visible /></Demo>
+<Demo title="Min, max, error and disabled" description="Only the next 30 days are selectable. Out-of-range days are disabled and typed values become invalid." src={ConstraintsSrc}><Constraints client:visible /></Demo>
+
+<Props title="Shared props" rows={[
+  { name: "label", type: "string", description: "Field label. On Calendar and RangeCalendar it is the screen-reader label." },
+  { name: "description", type: "string", description: "Hint below the field (aria-describedby). Pickers and fields only." },
+  { name: "error", type: "string", description: "Error message (role=\"alert\"). Sets aria-invalid and the error style. Pickers and fields only." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the field and popover." },
+  { name: "readonly", type: "boolean", default: "false", description: "Shows the value without allowing edits." },
+  { name: "required", type: "boolean", default: "false", description: "Marks the field as required. Pickers and fields only." },
+  { name: "value", type: "DateValue | DateRange | Time", description: "Bindable. DateValue for DatePicker, DateField and Calendar, DateRange for the range components, Time for TimeField." },
+  { name: "placeholder", type: "DateValue | TimeValue", description: "Bindable. Controls the visible month, or the starting point of an empty field." },
+  { name: "locale", type: "string", default: "'pt-BR'", description: "Intl locale for segments, month and weekday names." },
+  { name: "weekStartsOn", type: "0 | 1 | 2 | 3 | 4 | 5 | 6", default: "1", description: "First day of the week (0 is Sunday). Calendars and pickers." },
+  { name: "minValue", type: "DateValue", description: "Lower bound. Out-of-range days are disabled and typed values become invalid." },
+  { name: "maxValue", type: "DateValue", description: "Upper bound." },
+  { name: "granularity", type: "'day' | 'hour' | 'minute' | 'second'", default: "'day' (TimeField: 'minute')", description: "Which segments are shown. TimeField accepts hour, minute and second." },
+  { name: "hourCycle", type: "12 | 24", description: "DateField and TimeField. Defaults to the locale (pt-BR is 24h)." },
+  { name: "open", type: "boolean", default: "false", description: "Bindable popover state. DatePicker and DateRangePicker." },
+  { name: "numberOfMonths", type: "number", default: "1 (range components: 2)", description: "Months shown side by side." },
+  { name: "fixedWeeks", type: "boolean", default: "false", description: "Always render six weeks. Calendar and RangeCalendar." },
+  { name: "isDateDisabled", type: "(d: DateValue) => boolean", description: "Disables matching dates. Calendars and pickers." },
+  { name: "isDateUnavailable", type: "(d: DateValue) => boolean", description: "Marks matching dates as unavailable. Calendars and pickers." },
+  { name: "closeOnDateSelect", type: "boolean", default: "true", description: "DatePicker: close the popover after picking a date." },
+  { name: "closeOnRangeSelect", type: "boolean", default: "true", description: "DateRangePicker: close the popover once the range is complete." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Field height. Pickers and fields." },
+  { name: "name", type: "string", description: "Name of the hidden input (ISO string) for native forms. DatePicker, DateField and TimeField." },
+  { name: "triggerLabel", type: "string", default: "'Open calendar' (localized)", description: "aria-label of the calendar button. Pickers." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "onchange", type: "(value) => void", description: "Called when the value changes. Receives DateValue | undefined, DateRange or Time | undefined depending on the component." },
+]} />

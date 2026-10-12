@@ -1,0 +1,344 @@
+<script lang="ts">
+  import { t } from '../../i18n/state.svelte.js';
+	import { X } from "@lucide/svelte";
+	import { Dialog } from "bits-ui";
+	import type { Snippet } from "svelte";
+	import { Spring } from "svelte/motion";
+	import { reducedMotion } from "../../stores/reduced-motion.svelte";
+	import "../Dialog/dialog.css";
+
+	/**
+	 * Sheet — mobile-first bottom sheet.
+	 *
+	 * Below 768px it slides up from the bottom edge (drag handle, safe-area padding, rounded top);
+	 * from 768px up it renders as a centered dialog. bits-ui Dialog supplies the focus trap, focus
+	 * restore, Escape, backdrop dismissal and scroll lock. Motion is off under reduced-motion.
+	 *
+	 * Swipe to dismiss: drag the handle or header down on the bottom sheet. Past 30% of the panel
+	 * height, or a release faster than 0.5 px/ms, closes it; otherwise it springs back.
+	 * Disabled under reduced-motion and in the centered desktop layout (tap/close button still work).
+	 *
+	 * Usage:
+	 *   <Sheet bind:open title="Trocar sessão" description="Escolha a conta ativa">
+	 *     …list…
+	 *     {#snippet footer()}<Button fullWidth>Nova sessão</Button>{/snippet}
+	 *   </Sheet>
+	 */
+	interface Props {
+		open?: boolean;
+		title?: string;
+		description?: string;
+		onclose?: () => void;
+		children: Snippet;
+		footer?: Snippet;
+		/** Drag the handle/header down to dismiss (bottom-sheet layout only). Default: true. */
+		swipeToDismiss?: boolean;
+	}
+
+	let {
+		open = $bindable(false),
+		title,
+		description,
+		onclose,
+		children,
+		footer,
+		swipeToDismiss = true,
+	}: Props = $props();
+
+	const DISMISS_RATIO = 0.3;
+	const DISMISS_VELOCITY = 0.5; // px/ms
+
+	const offset = new Spring(0, { stiffness: 0.25, damping: 0.8 });
+	let dragging = $state(false);
+	let panel = $state<HTMLElement | null>(null);
+	let startY = 0;
+	let lastY = 0;
+	let lastT = 0;
+	let velocity = 0;
+
+	const canSwipe = $derived(swipeToDismiss && !reducedMotion.value);
+
+	/** Same path as the close button: flips `open` and fires bits-ui's `onOpenChange`. */
+	function dismiss() {
+		open = false;
+		onclose?.();
+	}
+
+	function onDragStart(e: PointerEvent) {
+		// Swipe only applies to the bottom-sheet layout (handle is display:none on desktop).
+		if (!canSwipe || !e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+		const target = e.target as HTMLElement;
+		if (target.closest("button, a, input, textarea, select")) return;
+		if (!(e.currentTarget as HTMLElement).offsetParent) return;
+		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+		dragging = true;
+		startY = lastY = e.clientY;
+		lastT = e.timeStamp;
+		velocity = 0;
+		offset.set(0, { instant: true });
+	}
+
+	function onDragMove(e: PointerEvent) {
+		if (!dragging) return;
+		const dt = e.timeStamp - lastT;
+		if (dt > 0) velocity = (e.clientY - lastY) / dt;
+		lastY = e.clientY;
+		lastT = e.timeStamp;
+		offset.set(Math.max(0, e.clientY - startY), { instant: true });
+	}
+
+	function onDragEnd(e: PointerEvent) {
+		if (!dragging) return;
+		dragging = false;
+		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+		const height = panel?.getBoundingClientRect().height ?? 0;
+		// Distance comes from the pointer, not `offset.current`: the Spring only advances on the next frame.
+		if (lastY - startY > height * DISMISS_RATIO || velocity > DISMISS_VELOCITY) {
+			dismiss();
+		}
+		offset.target = 0;
+	}
+
+	function onOpenChange(next: boolean) {
+		if (!next) onclose?.();
+	}
+</script>
+
+<Dialog.Root bind:open {onOpenChange}>
+	<Dialog.Portal>
+		<Dialog.Overlay class="ca-overlay ca-sheet__overlay" />
+		<Dialog.Content
+			bind:ref={panel}
+			class="ca-sheet"
+			aria-label={title ? undefined : t().sheet.panel}
+			aria-describedby={description ? undefined : null}
+			style={offset.current > 0 ? `translate: 0 ${offset.current}px` : undefined}
+		>
+			<!-- Pointer-only gesture surface; keyboard users dismiss with Escape or the close button. -->
+			<div
+				role="presentation"
+				class="ca-sheet__grab"
+				class:ca-sheet__grab--active={canSwipe}
+				onpointerdown={onDragStart}
+				onpointermove={onDragMove}
+				onpointerup={onDragEnd}
+				onpointercancel={onDragEnd}
+			>
+				<div class="ca-sheet__handle" aria-hidden="true"></div>
+				{#if title || description}
+					<div class="ca-sheet__header">
+						<div class="ca-sheet__meta">
+							{#if title}
+								<Dialog.Title class="ca-sheet__title">{title}</Dialog.Title>
+							{/if}
+							{#if description}
+								<Dialog.Description class="ca-sheet__description">{description}</Dialog.Description>
+							{/if}
+						</div>
+						<Dialog.Close class="ca-layer-close ca-sheet__close" aria-label={t().sheet.close}>
+							<X size={16} stroke-width={2} />
+						</Dialog.Close>
+					</div>
+				{/if}
+			</div>
+			<div class="ca-sheet__body">
+				{@render children()}
+			</div>
+			{#if footer}
+				<div class="ca-sheet__footer">{@render footer()}</div>
+			{/if}
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
+
+<style>
+	:global(.ca-overlay.ca-sheet__overlay) {
+		z-index: var(--ca-z-modal, 1300);
+	}
+
+	/* Mobile: bottom sheet */
+	:global(.ca-sheet) {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: calc(var(--ca-z-modal, 1300) + 1);
+		display: flex;
+		flex-direction: column;
+		max-height: min(calc(var(--ca-vh) * 0.88), 720px);
+		background: var(--ca-surface-overlay);
+		border: 1px solid var(--ca-outline-subtle);
+		border-bottom: none;
+		border-radius: var(--ca-radius-xl) var(--ca-radius-xl) 0 0;
+		box-shadow:
+			0 0 0 1px oklch(0 0 0 / 0.04),
+			0 -8px 32px oklch(0 0 0 / 0.14),
+			0 -32px 80px oklch(0 0 0 / 0.2);
+		overflow: hidden;
+	}
+
+	:global(.ca-sheet[data-state="open"]) {
+		animation: ca-sheet-in 280ms var(--ca-ease-decelerate, cubic-bezier(0.05, 0.7, 0.1, 1)) both;
+	}
+	:global(.ca-sheet[data-state="closed"]) {
+		animation: ca-sheet-out 200ms var(--ca-ease-standard, ease) both;
+	}
+
+	/* Handle + header: the swipe-to-dismiss grab region. */
+	:global(.ca-sheet__grab) {
+		flex-shrink: 0;
+	}
+	:global(.ca-sheet__grab--active) {
+		touch-action: none;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	/* Swiping only exists in the bottom-sheet layout (the handle is hidden on desktop). */
+	@media (min-width: 768px) {
+		:global(.ca-sheet__grab--active) {
+			touch-action: auto;
+			user-select: auto;
+			-webkit-user-select: auto;
+		}
+	}
+
+	:global(.ca-sheet__handle) {
+		flex-shrink: 0;
+		width: 36px;
+		height: 4px;
+		margin: 8px auto 4px;
+		border-radius: var(--ca-radius-pill, 999px);
+		background: var(--ca-outline-default, oklch(0.5 0 0 / 0.3));
+	}
+
+	:global(.ca-sheet__header) {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 8px 20px 12px;
+		flex-shrink: 0;
+	}
+
+	:global(.ca-sheet__meta) {
+		flex: 1;
+		min-width: 0;
+	}
+
+	:global(.ca-sheet__title) {
+		margin: 0;
+		font-size: var(--ca-font-size-h6);
+		font-weight: 600;
+		line-height: 1.3;
+		letter-spacing: -0.01em;
+		color: var(--ca-text-primary);
+	}
+
+	:global(.ca-sheet__description) {
+		margin: 2px 0 0;
+		font-size: var(--ca-font-size-body2);
+		line-height: 1.45;
+		color: var(--ca-text-secondary);
+	}
+
+	:global(.ca-sheet__close) {
+		margin-top: 2px;
+	}
+
+	:global(.ca-sheet__body) {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding: 4px 20px 16px;
+	}
+
+	:global(.ca-sheet__footer) {
+		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 12px 20px calc(12px + var(--ca-safe-bottom));
+		border-top: 1px solid var(--ca-outline-subtle);
+	}
+
+	/* Without a footer the body itself pads for the home indicator. */
+	:global(.ca-sheet__body:last-child) {
+		padding-bottom: calc(20px + var(--ca-safe-bottom));
+	}
+
+	/* Desktop: centered dialog */
+	@media (min-width: 768px) {
+		:global(.ca-sheet) {
+			inset: 0;
+			margin: auto;
+			width: min(480px, calc(100vw - 32px));
+			height: fit-content;
+			max-height: calc(var(--ca-vh) * 0.85);
+			border: 1px solid var(--ca-outline-subtle);
+			border-radius: var(--ca-radius-xl);
+		}
+		:global(.ca-sheet[data-state="open"]) {
+			animation: ca-sheet-fade-in 180ms var(--ca-ease-decelerate, ease-out) both;
+		}
+		:global(.ca-sheet[data-state="closed"]) {
+			animation: ca-sheet-fade-out 140ms var(--ca-ease-standard, ease) both;
+		}
+		:global(.ca-sheet__handle) {
+			display: none;
+		}
+		:global(.ca-sheet__header) {
+			padding-top: 18px;
+		}
+		:global(.ca-sheet__footer) {
+			flex-direction: row;
+			justify-content: flex-end;
+			padding-bottom: 12px;
+		}
+		:global(.ca-sheet__body:last-child) {
+			padding-bottom: 20px;
+		}
+	}
+
+	@keyframes ca-sheet-in {
+		from {
+			transform: translateY(100%);
+		}
+		to {
+			transform: translateY(0);
+		}
+	}
+	@keyframes ca-sheet-out {
+		from {
+			transform: translateY(0);
+		}
+		to {
+			transform: translateY(100%);
+		}
+	}
+	@keyframes ca-sheet-fade-in {
+		from {
+			opacity: 0;
+			transform: scale(0.97);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+	@keyframes ca-sheet-fade-out {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		:global(.ca-sheet[data-state="open"]),
+		:global(.ca-sheet[data-state="closed"]) {
+			animation: none;
+		}
+	}
+</style>

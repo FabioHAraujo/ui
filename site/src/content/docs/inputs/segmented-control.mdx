@@ -1,0 +1,40 @@
+---
+title: SegmentedControl
+description: Single-choice control with a sliding thumb. It always has a selection and honors prefers-reduced-motion.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Default from "~/demos/inputs/segmented-control/Default.svelte";
+import DefaultSrc from "~/demos/inputs/segmented-control/Default.svelte?raw";
+import Sizes from "~/demos/inputs/segmented-control/Sizes.svelte";
+import SizesSrc from "~/demos/inputs/segmented-control/Sizes.svelte?raw";
+
+```svelte
+<script>
+  import { SegmentedControl } from "@codeatlasdev/ui";
+  let period = $state("month");
+</script>
+
+<SegmentedControl
+  aria-label="Period"
+  bind:value={period}
+  items={[{ value: "week", label: "Week" }, { value: "month", label: "Month" }]}
+/>
+```
+
+Unlike [ToggleGroup](/docs/inputs/toggle-group/), exactly one item is always selected: when `value` is unset it starts on the first enabled item. Give the control an `aria-label` since it has no visible heading, and an `aria-label` on every icon-only item. Arrow keys move between items.
+
+<Demo title="Default" description="Text items, and text items with icons." src={DefaultSrc}><Default client:visible /></Demo>
+<Demo title="Small, full width, disabled item" src={SizesSrc}><Sizes client:visible /></Demo>
+
+<Props rows={[
+  { name: "value", type: "string", default: "first enabled item", description: "Bindable selected value." },
+  { name: "items", type: "ToggleGroupItem[]", description: "{ value, label?, icon?, disabled?, 'aria-label'? }." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Item height." },
+  { name: "fullWidth", type: "boolean", default: "false", description: "Stretches the control to the container width." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the whole control." },
+  { name: "aria-label", type: "string", description: "Accessible name of the control." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "onchange", type: "(value: string) => void", description: "Called when the selection changes." },
+]} />

@@ -1,0 +1,34 @@
+---
+title: Spinner
+description: An inline loading indicator for buttons, sections and overlays.
+group: Feedback
+order: 6
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Sizes from "~/demos/feedback/spinner/Sizes.svelte";
+import SizesSrc from "~/demos/feedback/spinner/Sizes.svelte?raw";
+import InButton from "~/demos/feedback/spinner/InButton.svelte";
+import InButtonSrc from "~/demos/feedback/spinner/InButton.svelte?raw";
+import SectionLoader from "~/demos/feedback/spinner/SectionLoader.svelte";
+import SectionLoaderSrc from "~/demos/feedback/spinner/SectionLoader.svelte?raw";
+
+```svelte
+<script>
+  import { Spinner } from "@codeatlasdev/ui";
+</script>
+
+<Spinner size={24} />
+```
+
+The spinner has `role="status"` and a localized `aria-label`. Under `prefers-reduced-motion` it slows down instead of stopping. For buttons, prefer `Button`'s `loading` prop, which swaps the leading icon for a spinner and sets `aria-busy`.
+
+<Demo title="Sizes" description="The size prop takes a number of pixels or any CSS length." src={SizesSrc}><Sizes /></Demo>
+<Demo title="In a button" description="Use the loading prop of Button instead of placing a Spinner by hand." src={InButtonSrc}><InButton client:visible /></Demo>
+<Demo title="Section loader" src={SectionLoaderSrc}><SectionLoader /></Demo>
+
+<Props rows={[
+  { name: "size", type: "number | string", default: "24", description: "Diameter. Numbers are pixels; strings are any CSS length." },
+  { name: "label", type: "string", default: "'Loading…' (localized)", description: "Accessible label. Defaults to the active locale's string." },
+  { name: "class", type: "string", default: "''", description: "Extra CSS classes." },
+]} />

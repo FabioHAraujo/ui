@@ -1,0 +1,75 @@
+---
+title: MaskedField
+description: Text input with live formatting for Brazilian documents, phone numbers, CEP and dates.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Documents from "~/demos/inputs/masked-field/Documents.svelte";
+import DocumentsSrc from "~/demos/inputs/masked-field/Documents.svelte?raw";
+import PhoneCep from "~/demos/inputs/masked-field/PhoneCep.svelte";
+import PhoneCepSrc from "~/demos/inputs/masked-field/PhoneCep.svelte?raw";
+import MaskAction from "~/demos/inputs/masked-field/MaskAction.svelte";
+import MaskActionSrc from "~/demos/inputs/masked-field/MaskAction.svelte?raw";
+
+```svelte
+<script>
+  import { MaskedField, maskCPF, isValidCPF } from "@codeatlasdev/ui/forms";
+  let cpf = $state("");
+</script>
+
+<MaskedField
+  label="CPF"
+  mask={maskCPF}
+  validate={(v) => (isValidCPF(v) ? undefined : "Invalid CPF")}
+  bind:value={cpf}
+/>
+```
+
+These components live in the `@codeatlasdev/ui/forms` subpath. A `mask` is a pure function from raw text to formatted text, so you can write your own. `MaskedField` renders a [TextField](/docs/inputs/text-field/) and forwards its props. Digit-only masks set `inputmode="numeric"` automatically.
+
+The package never makes network requests. `CepField` only calls the `onlookup` function you inject (for example a ViaCEP client) once 8 digits are typed.
+
+Documents try these values: CPF `123.456.789-09` is valid and `111.111.111-11` is invalid. Validation runs on blur.
+
+<Demo title="Documents and dates" description="CPF, CNPJ, a mask that switches after 11 digits, a birth date and RG." src={DocumentsSrc}><Documents client:visible /></Demo>
+<Demo title="Phone and CEP" description="PhoneField binds E.164 (+55...) while showing the masked form. CepField resolves an address through onlookup. Try 01310-100." src={PhoneCepSrc}><PhoneCep client:visible /></Demo>
+<Demo title="use:mask action" description="Apply any pure mask to a plain input. The caret stays on the same digit." src={MaskActionSrc}><MaskAction client:visible /></Demo>
+
+<Props title="MaskedField props" rows={[
+  { name: "mask", type: "(raw: string) => string", description: "Required. Pure formatter applied while typing, for example maskCPF." },
+  { name: "validate", type: "(value: string) => string | undefined", description: "Returns an error message on blur for non-empty values, or undefined when valid." },
+  { name: "inputmode", type: "HTMLInputAttributes['inputmode']", default: "auto", description: "Defaults to 'numeric' for digit-only masks and 'text' otherwise." },
+  { name: "value", type: "string", default: "''", description: "Bindable masked value (what the user sees)." },
+  { name: "error", type: "string", description: "External error. Takes precedence over the validate result." },
+  { name: "label", type: "string", description: "Label text." },
+  { name: "placeholder", type: "string", description: "Input placeholder." },
+  { name: "description", type: "string", description: "Hint shown below the field." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the input." },
+  { name: "required", type: "boolean", default: "false", description: "Marks the field as required." },
+  { name: "readonly", type: "boolean", default: "false", description: "Makes the input read-only." },
+  { name: "autocomplete", type: "HTMLInputAttributes['autocomplete']", description: "Native autocomplete hint." },
+  { name: "leading / trailing", type: "Snippet", description: "Content before or after the input." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Field height." },
+  { name: "name", type: "string", description: "Native name, for form submission." },
+  { name: "oninput / onchange", type: "(value: string) => void", description: "Called with the masked value." },
+  { name: "onblur", type: "(e: FocusEvent) => void", description: "Called when the input loses focus." },
+]} />
+
+<Props title="PhoneField and CepField props" rows={[
+  { name: "PhoneField.value", type: "string", default: "''", description: "Bindable E.164 value (+5511987654321). Empty while the number is incomplete or empty." },
+  { name: "PhoneField.country", type: "'BR'", default: "'BR'", description: "Only BR is supported today." },
+  { name: "PhoneField.placeholder", type: "string", default: "'(11) 98765-4321'", description: "Input placeholder." },
+  { name: "CepField.value", type: "string", default: "''", description: "Bindable masked CEP (01310-100)." },
+  { name: "CepField.onlookup", type: "(cep: string) => Promise<CepAddress | null>", description: "Injected lookup. Receives 8 digits. Return null for an unknown CEP." },
+  { name: "CepField.onresolve", type: "(address: CepAddress) => void", description: "Called with the address after a successful lookup." },
+  { name: "CepField.lookupPending", type: "boolean", default: "false", description: "Bindable. True while onlookup is in flight." },
+  { name: "CepField.placeholder", type: "string", default: "'00000-000'", description: "Input placeholder." },
+]} />
+
+<Props title="Exports" rows={[
+  { name: "maskCPF / maskCNPJ / maskCPFCNPJ", type: "(raw: string) => string", description: "Document masks. maskCPFCNPJ switches after 11 digits." },
+  { name: "maskDateBR / maskRG / maskCEP / maskPhoneBR", type: "(raw: string) => string", description: "Date (dd/mm/yyyy), RG, CEP and Brazilian phone masks." },
+  { name: "isValidCPF / isValidCNPJ / isValidDateBR", type: "(value: string) => boolean", description: "Validators for use in validate." },
+  { name: "mask", type: "Action<HTMLInputElement, (raw: string) => string>", description: "Svelte action that applies a mask to any input." },
+]} />

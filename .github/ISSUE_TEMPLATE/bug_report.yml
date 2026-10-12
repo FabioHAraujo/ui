@@ -1,0 +1,92 @@
+name: Bug report
+description: Report something that isn't working correctly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Please fill out as much detail as you can. It helps us reproduce and fix the issue faster.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How do we reproduce this?
+      placeholder: |
+        1. Import `...` from `@codeatlasdev/ui`
+        2. Render with props `...`
+        3. Click / hover / resize to `...`
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happens? Include error messages or screenshots if relevant.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: "@codeatlasdev/ui version"
+      placeholder: "e.g. 0.4.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: svelte_version
+    attributes:
+      label: Svelte version
+      options:
+        - 5.33 – 5.50
+        - 5.51 – 5.57
+        - other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options:
+        - SvelteKit
+        - plain Vite + Svelte
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link to a StackBlitz, SvelteKit playground, or REPL that reproduces the issue. Reports without a reproduction are harder to prioritize.
+      placeholder: "https://stackblitz.com/..."
+
+  - type: checkboxes
+    id: validations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this hasn't been reported yet
+          required: true
+        - label: I read the docs and confirmed this is unexpected behavior
+          required: true

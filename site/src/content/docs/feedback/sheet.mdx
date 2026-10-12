@@ -1,0 +1,41 @@
+---
+title: Sheet
+description: A mobile-first bottom sheet with swipe to dismiss that becomes a centered dialog from 768px.
+group: Feedback
+order: 4
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Swipe from "~/demos/feedback/sheet/Swipe.svelte";
+import SwipeSrc from "~/demos/feedback/sheet/Swipe.svelte?raw";
+import Footer from "~/demos/feedback/sheet/Footer.svelte";
+import FooterSrc from "~/demos/feedback/sheet/Footer.svelte?raw";
+
+```svelte
+<script>
+  import { Sheet, Button } from "@codeatlasdev/ui";
+  let open = $state(false);
+</script>
+
+<Sheet bind:open title="Switch session" description="Choose the active account">
+  ...
+  {#snippet footer()}<Button>New session</Button>{/snippet}
+</Sheet>
+```
+
+Below 768px the sheet rises from the bottom edge with a drag handle, safe-area padding and rounded top corners. From 768px up it renders as a centered dialog. Focus trap, focus restore, Escape, overlay dismissal and scroll lock come from the Bits UI Dialog.
+
+**Swipe to dismiss.** Drag the handle or the header down. Releasing past 30% of the panel height, or faster than 0.5 px/ms, closes the sheet; otherwise it springs back. The gesture is off under `prefers-reduced-motion` and in the centered desktop layout. Keyboard users close it with Escape or the close button. Open the demos below on a phone or in a mobile viewport to try the gesture.
+
+<Demo title="Swipe to dismiss" description="Drag the handle or header down on a viewport below 768px. Above that, it is a centered dialog." src={SwipeSrc}><Swipe client:visible /></Demo>
+<Demo title="Footer and swipeToDismiss" description="A pinned footer, and swipeToDismiss set to false so only the close button, Escape and the overlay dismiss it." src={FooterSrc}><Footer client:visible /></Demo>
+
+<Props rows={[
+  { name: "open", type: "boolean", default: "false", description: "Bindable open state." },
+  { name: "title", type: "string", description: "Header title. Without it the panel falls back to a localized generic aria-label." },
+  { name: "description", type: "string", description: "Supporting text under the title." },
+  { name: "swipeToDismiss", type: "boolean", default: "true", description: "Drag the handle or header down to dismiss in the bottom-sheet layout. Ignored under reduced motion and on desktop." },
+  { name: "onclose", type: "() => void", description: "Called when the sheet closes by swipe, close button, Escape or overlay." },
+  { name: "children", type: "Snippet", description: "Required. Scrollable body." },
+  { name: "footer", type: "Snippet", description: "Pinned footer below the body." },
+]} />

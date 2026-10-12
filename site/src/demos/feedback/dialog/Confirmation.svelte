@@ -1,0 +1,30 @@
+<script lang="ts">
+  import { Dialog, Button } from '@codeatlasdev/ui';
+  import { Trash2 } from '@lucide/svelte';
+
+  let open = $state(false);
+  let confirmed = $state(false);
+</script>
+
+<Button variant="destructive" onclick={() => ((confirmed = false), (open = true))}>
+  {#snippet leading()}<Trash2 size={14} />{/snippet}
+  Delete item
+</Button>
+
+<Dialog
+  bind:open
+  title="Delete this item?"
+  description="This action cannot be undone. The item will be permanently removed from your workspace."
+  size="sm"
+>
+  {#snippet actions()}
+    <Button variant="ghost" onclick={() => (open = false)}>Cancel</Button>
+    <Button variant="destructive" onclick={() => { confirmed = true; open = false; }}>Delete</Button>
+  {/snippet}
+</Dialog>
+
+{#if confirmed}<p class="feedback" aria-live="polite">Item deleted.</p>{/if}
+
+<style>
+  .feedback { margin: 0; font-size: 13px; color: var(--ca-semantic-error); font-style: italic; }
+</style>

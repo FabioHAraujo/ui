@@ -1,0 +1,171 @@
+---
+title: Theming
+description: Define a theme with defineTheme, derive a brand preset from one hex color, switch schemes and surface styles, and override tokens through the cascade.
+group: Getting started
+order: 2
+---
+import { Callout } from "@codeatlasdev/ui";
+
+A theme is a plain object. The library compiles it to CSS once at build time (the same object always gives the same CSS) and injects it before any stylesheet, so there is no per-render style work and no flash.
+
+```ts
+// src/lib/theme.ts
+import type { ThemeOptions } from "@codeatlasdev/ui";
+
+export const theme: ThemeOptions = {
+  presets: [{ id: "acme", color: "#2563eb" }],
+  defaultPreset: "acme",
+  defaultScheme: "system",
+  defaultStyle: "glass",
+  fonts: { body: "Geist, system-ui, sans-serif" },
+  radius: 1,
+  density: "comfortable",
+  overrides: { light: { "--ca-card-padding": "16px" } },
+};
+```
+
+Pass the same object to `caThemeHandle` and `caThemePlugin` (SvelteKit), `caUI` (Astro) or `themeHead` (custom setups), see [Installation](/docs/getting-started/installation/). `ThemeOptions` is `Partial<ThemeDefinition>`, so every field is optional.
+
+## Options
+
+| Option | Default | Description |
+|---|---|---|
+| `presets` | `[]` | Brand presets generated from a hex color. Built-in presets are always available. |
+| `defaultPreset` | `"amber"` | Preset used until the user picks one. Must be a built-in or one of `presets`. |
+| `defaultScheme` | `"dark"` | `"light"`, `"dark"` or `"system"`. |
+| `defaultStyle` | `"glass"` | `"glass"`, `"frosted"`, `"solid"` or `"flat"`. |
+| `fonts` | `{}` | `body`, `mono` and `display` font stacks. They set `--ca-font-sans`, `--ca-font-mono` and `--ca-font-display`. |
+| `radius` | `1` | Multiplier applied to the `--ca-radius-xs` to `--ca-radius-xl` scale. |
+| `density` | `"comfortable"` | `"compact"` tightens card padding and page gaps. |
+| `overrides` | `{}` | Raw `--ca-*` token overrides, per scheme (`light`, `dark`). |
+
+`defineTheme(options)` resolves the options (defaults, validation) and `themeCSS(resolved)` returns the CSS string. You rarely call them yourself; the integrations do. Invalid input fails the build: a preset `id` that clashes with a built-in, a color that is not `#rrggbb`, or a `defaultPreset` that does not exist.
+
+## Presets
+
+Eight OKLCH presets ship with the package: `amber`, `ocean`, `crimson`, `cyan`, `violet`, `emerald`, `rose` and `slate`. One attribute switches the whole app:
+
+```html
+<html data-preset="ocean" class="dark">
+```
+
+In code, use the store:
+
+```ts
+import { colorScheme } from "@codeatlasdev/ui";
+
+colorScheme.setPreset("violet");
+colorScheme.presets; // every valid id: built-ins plus your brand presets
+```
+
+### Brand preset from a hex color
+
+Give the library your logo color and it derives hue, chroma and lightness in OKLCH, then emits the complete light and dark token set (brand, surfaces, text, outlines, glass tints). Charts use the hex as their first series color.
+
+```ts
+export const theme: ThemeOptions = {
+  presets: [{ id: "acme", color: "#2563eb", label: "Acme" }],
+  defaultPreset: "acme",
+};
+```
+
+<Callout type="caution">
+  Values stored by the user that your theme does not know are discarded and removed from storage. If you rename or delete a brand preset, returning users fall back to `defaultPreset` instead of seeing a broken theme.
+</Callout>
+
+## Schemes
+
+`defaultScheme: "system"` follows the operating system, including live changes while the page is open. The init script also keeps `<meta name="theme-color">` in sync with the preset's surface color.
+
+```ts
+colorScheme.preference; // "light" | "dark" | "system"
+colorScheme.resolved;   // "light" | "dark" (system already resolved)
+colorScheme.isDark;     // boolean
+colorScheme.setPreference("system");
+colorScheme.toggle();   // flips resolved light and dark
+```
+
+## Surface styles
+
+`data-style` on `<html>` swaps the material of every surface at once.
+
+| Style | Look |
+|---|---|
+| `glass` | Liquid Glass: strong blur and saturation, translucent tints. Default. |
+| `frosted` | Less blur, calmer mesh background. |
+| `solid` | No blur, opaque surfaces, no mesh background. Keeps soft shadows. |
+| `flat` | No blur, no mesh, no drop shadows: separation comes from borders. |
+
+```ts
+colorScheme.setStyle("solid");
+```
+
+Users on `prefers-reduced-transparency: reduce` get opaque surfaces regardless of the style.
+
+## The colorScheme store
+
+Call `colorScheme.init()` once in the root layout (inside `onMount`). It re-applies the state to `<html>`, follows OS scheme changes and keeps the browser chrome color in sync. It is idempotent and returns a cleanup function.
+
+| Member | Description |
+|---|---|
+| `preference`, `resolved`, `preset`, `style`, `isDark`, `presets` | Reactive getters (Svelte 5 `$state`). |
+| `setPreference(pref)`, `toggle()` | Change the scheme. |
+| `setPreset(id)`, `setStyle(style)` | Change preset or surface style. |
+| `setTokens(vars)` | Runtime token overrides, see below. |
+| `init()` | Start listeners. Returns cleanup. |
+
+All choices persist in `localStorage` (`ca-scheme`, `ca-preset`, `ca-style`). Storage errors in private mode are ignored, and the values are validated against the theme before use.
+
+### Runtime tokens
+
+`setTokens` writes your `--ca-*` variables to a single `<style id="ca-runtime-tokens">`, persists them and replays them in the init script before first paint. Use it for user-defined themes such as an imported editor theme. Keys must match `--ca-*`; values containing `{`, `}`, `<` or `;` are dropped.
+
+```ts
+colorScheme.setTokens({ "--ca-brand-main": "#ff5500", "--ca-radius-md": "14px" });
+colorScheme.setTokens({}); // clear
+```
+
+## Theme islands
+
+Put `data-theme-scope="light"` or `"dark"` on any element to re-apply that scheme's tokens inside it, regardless of the page scheme. Useful for a dark hero on a light page or a light preview inside a dark editor.
+
+```svelte
+<section data-theme-scope="dark">
+  <!-- dark tokens here, on any page -->
+</section>
+```
+
+Islands also feed the browser chrome color when they touch the top edge, see [Mobile](/docs/getting-started/mobile/#browser-chrome-color).
+
+## Cascade and overriding tokens
+
+`global.css` declares its layers up front:
+
+```css
+@layer ca.reset, ca.tokens, ca.themes, ca.base, ca.components, ca.materials, ca.utilities;
+```
+
+Component styles and your app CSS are **unlayered**, so they always win over the package layers, regardless of specificity or import order. That makes overriding predictable:
+
+```css
+/* app.css: no !important needed */
+:root {
+  --ca-card-padding: 16px;
+  --ca-radius-lg: 18px;
+}
+```
+
+For per-scheme overrides prefer `overrides` in the theme object, which is emitted for both `:root` and theme islands.
+
+<Callout type="note">
+  The `ca-*` BEM classes (`.ca-btn`, `.ca-dialog__body`, ...) are public API. Targeting them from app CSS is supported, and renaming one is a breaking change.
+</Callout>
+
+## Do not break the glass
+
+Two CSS properties silently kill `backdrop-filter` on glass surfaces:
+
+- `will-change: transform` on the same element or an ancestor.
+- `position: absolute` children inside an `isolation: isolate` parent.
+
+Keep `backdrop-filter` on the element that composites directly against the page.

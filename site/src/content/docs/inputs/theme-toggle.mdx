@@ -1,0 +1,27 @@
+---
+title: ThemeToggle
+description: Switches between light and dark through the colorScheme store. Built for the AppShell railBottom slot.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Basic from "~/demos/inputs/theme-toggle/Basic.svelte";
+import BasicSrc from "~/demos/inputs/theme-toggle/Basic.svelte?raw";
+
+```svelte
+<script>
+  import { ThemeToggle } from "@codeatlasdev/ui";
+</script>
+
+<ThemeToggle />
+```
+
+The toggle reads and writes the `colorScheme` store, so call `colorScheme.init()` once in your root layout. The choice is saved to localStorage and applied before first paint by the theme script. The default name is localized.
+
+<Demo title="Basic" description="Click it: the whole site flips between light and dark." src={BasicSrc}><Basic client:visible /></Demo>
+
+<Props rows={[
+  { name: "label", type: "string", default: "'Toggle color scheme' (localized)", description: "Accessible name and tooltip." },
+  { name: "size", type: "number", default: "18", description: "Icon size in px." },
+  { name: "class", type: "string", description: "Extra classes on the button." },
+]} />

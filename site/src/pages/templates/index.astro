@@ -1,0 +1,113 @@
+---
+import { CardGrid, LinkCard } from "@codeatlasdev/ui";
+import Base from "~/layouts/Base.astro";
+
+const groups = [
+	{
+		title: "Admin app",
+		lead: "A complete admin built on AppShellLayout with a demo sign-in guard. Credentials are shown on the sign-in page.",
+		items: [
+			{ title: "Sign in", href: "/templates/admin/sign-in/", description: "Entry point. Signs in with the public demo account." },
+			{ title: "Dashboard", href: "/templates/admin/dashboard/", description: "KPI cards, revenue chart, traffic sources and recent signups." },
+			{ title: "Users", href: "/templates/admin/users/", description: "Filterable table with selection, pagination and row actions." },
+			{ title: "New user", href: "/templates/admin/users/new/", description: "Create form built from AppForm and FormSection." },
+			{ title: "Reports", href: "/templates/admin/reports/", description: "Revenue, profit and conversion charts with breakdowns." },
+			{ title: "Activity", href: "/templates/admin/activity/", description: "Event timeline and login audit table." },
+			{ title: "Settings", href: "/templates/admin/settings/", description: "General, notifications, members and security tabs." },
+			{ title: "Billing", href: "/templates/admin/billing/", description: "Plan, usage, pricing cards and invoices." },
+			{ title: "Profile", href: "/templates/admin/profile/", description: "Profile form with notification and security preferences." },
+		],
+	},
+	{
+		title: "App pages",
+		lead: "The same shell without auth, with lean English demo data. Good starting points to copy.",
+		items: [
+			{ title: "Dashboard", href: "/templates/app/dashboard/", description: "KPIs, revenue line chart, traffic donut and recent signups." },
+			{ title: "Users (CRUD)", href: "/templates/app/users/", description: "List with filters, search and inline actions." },
+			{ title: "Products", href: "/templates/app/products/", description: "Catalog list with search, filters and pagination." },
+			{ title: "Reports", href: "/templates/app/reports/", description: "Revenue, profit and conversion charts." },
+			{ title: "Activity feed", href: "/templates/app/activity/", description: "Timeline with a login audit table." },
+			{ title: "Settings", href: "/templates/app/settings/", description: "General, notifications, members and security." },
+			{ title: "Billing", href: "/templates/app/billing/", description: "Plan, usage bars, pricing cards and invoices." },
+			{ title: "Profile", href: "/templates/app/profile/", description: "Profile form with notifications and security." },
+		],
+	},
+	{
+		title: "Auth",
+		lead: "Split-screen authentication pages on AuthLayout and AuthCard.",
+		items: [
+			{ title: "Sign in", href: "/templates/auth/sign-in/", description: "Email and password with OAuth options." },
+			{ title: "Sign up", href: "/templates/auth/sign-up/", description: "Registration with inline validation." },
+			{ title: "Forgot password", href: "/templates/auth/forgot-password/", description: "Email recovery flow with a confirmation state." },
+		],
+	},
+	{
+		title: "Error and status",
+		lead: "Full-page states for missing pages, failures and planned downtime.",
+		items: [
+			{ title: "404 not found", href: "/templates/error/404/", description: "Page not found." },
+			{ title: "500 server error", href: "/templates/error/500/", description: "Internal server error." },
+			{ title: "Maintenance", href: "/templates/error/maintenance/", description: "Under maintenance with a live countdown." },
+		],
+	},
+	{
+		title: "Documentation",
+		lead: "A DocsShell reference page with sidebar, table of contents, code tabs and steps.",
+		items: [{ title: "API docs", href: "/templates/docs/", description: "Endpoint reference layout built with the docs kit." }],
+	},
+];
+---
+<Base
+	title="Templates"
+	description="Full-page templates built with CodeAtlas UI: admin app, auth flows, error pages and a documentation layout. Open them live and copy what you need."
+>
+	<main id="main" tabindex="-1" class="templates">
+		<header class="templates__head">
+			<a class="templates__back" href="/docs/">&larr; Documentation</a>
+			<h1>Templates</h1>
+			<p>Full pages ready to open, inspect and copy. Each one is a single Svelte component from <code>@codeatlasdev/ui</code> primitives.</p>
+		</header>
+		{groups.map((group) => (
+			<section class="templates__group" aria-labelledby={`g-${group.title}`}>
+				<h2 id={`g-${group.title}`}>{group.title}</h2>
+				<p class="templates__lead">{group.lead}</p>
+				<CardGrid>
+					{group.items.map((item) => (
+						<LinkCard title={item.title} href={item.href} description={item.description} />
+					))}
+				</CardGrid>
+			</section>
+		))}
+	</main>
+</Base>
+
+<style>
+	.templates {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: calc(var(--ca-space-10) + var(--ca-safe-top)) max(var(--ca-space-5), var(--ca-safe-left)) calc(var(--ca-space-16) + var(--ca-safe-bottom));
+		outline: none;
+	}
+	.templates__back {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: var(--ca-text-secondary);
+		text-decoration: none;
+	}
+	.templates__back:hover { color: var(--ca-brand-text); }
+	.templates__head h1 {
+		margin: var(--ca-space-2) 0 var(--ca-space-3);
+		font-size: var(--ca-font-size-h2);
+		letter-spacing: -0.02em;
+		color: var(--ca-text-primary);
+	}
+	.templates__head p { margin: 0; color: var(--ca-text-secondary); max-width: 40rem; }
+	.templates__group { margin-top: var(--ca-space-12); }
+	.templates__group h2 {
+		margin: 0 0 var(--ca-space-1);
+		font-size: var(--ca-font-size-h5);
+		color: var(--ca-text-primary);
+	}
+	.templates__lead { margin: 0; color: var(--ca-text-secondary); max-width: 46rem; }
+</style>

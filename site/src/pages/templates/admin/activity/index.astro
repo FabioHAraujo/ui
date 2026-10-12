@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AdminApp from "~/templates/admin/AdminApp.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="Admin activity template" description="Event timeline with category filter and a recent logins audit table." noindex>
+	<AdminApp client:load page="activity" {pathname} />
+</TemplateLayout>

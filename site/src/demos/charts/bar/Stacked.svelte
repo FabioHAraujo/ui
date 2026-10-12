@@ -1,0 +1,22 @@
+<script lang="ts">
+  import { GlassCard } from '@codeatlasdev/ui';
+  import { BarChart } from '@codeatlasdev/ui/charts';
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+  const fmt = (v: number) => `$${(v / 1000).toFixed(0)}k`;
+</script>
+
+<GlassCard full>
+  <BarChart
+    series={[
+      { name: 'Organic', data: [12400, 14800, 18200, 16600, 21200, 24800] },
+      { name: 'Paid', data: [8200, 9600, 11800, 10400, 13600, 15200] },
+      { name: 'Referral', data: [4800, 5600, 7200, 6400, 8800, 10400] },
+      { name: 'Direct', data: [3200, 4000, 5200, 4600, 6200, 7600] },
+    ]}
+    categories={months}
+    valueFormatter={fmt}
+    stacked
+    height="300px"
+  />
+</GlassCard>

@@ -1,0 +1,39 @@
+---
+title: ScatterChart
+description: Correlation plots, bubble charts and clustered scatter by group.
+group: Charts
+order: 40
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Basic from "~/demos/charts/scatter/Basic.svelte";
+import BasicSrc from "~/demos/charts/scatter/Basic.svelte?raw";
+import Bubble from "~/demos/charts/scatter/Bubble.svelte";
+import BubbleSrc from "~/demos/charts/scatter/Bubble.svelte?raw";
+import Clusters from "~/demos/charts/scatter/Clusters.svelte";
+import ClustersSrc from "~/demos/charts/scatter/Clusters.svelte?raw";
+
+```svelte
+<script>
+  import { ScatterChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<ScatterChart series={[{ name: "Accounts", data: [[1200, 3.4], [4800, 5.1]] }]} yName="Conversion %" />
+```
+
+Points are `[x, y]` or `[x, y, size]`. When any point has a third value the chart switches to bubble mode automatically and scales the symbols by size.
+
+<Demo title="Basic scatter" description="Visits against conversion rate." src={BasicSrc}><Basic client:visible /></Demo>
+<Demo title="Bubble chart" description="The third value of each point sets the bubble size." src={BubbleSrc}><Bubble client:visible /></Demo>
+<Demo title="Clustered by tier" description="One series per group, each with its own palette color." src={ClustersSrc}><Clusters client:visible /></Demo>
+
+<Props rows={[
+  { name: "series", type: "ScatterSeries[]", description: "Named series as { name, data: [x, y] | [x, y, size][], color? }." },
+  { name: "xName", type: "string", description: "Label of the x axis." },
+  { name: "yName", type: "string", description: "Label of the y axis." },
+  { name: "xFormatter", type: "(v: number) => string", description: "Formats x ticks and tooltip. Overrides valueFormatter for x." },
+  { name: "yFormatter", type: "(v: number) => string", description: "Formats y ticks and tooltip. Overrides valueFormatter for y." },
+  { name: "valueFormatter", type: "(v: number) => string", description: "Fallback formatter used for both axes." },
+  { name: "height", type: "string", default: "'320px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

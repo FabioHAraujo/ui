@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AdminApp from "~/templates/admin/AdminApp.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="Admin users template" description="Searchable, filterable users table with selection, pagination and row actions." noindex>
+	<AdminApp client:load page="users" {pathname} />
+</TemplateLayout>

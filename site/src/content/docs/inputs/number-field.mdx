@@ -1,0 +1,41 @@
+---
+title: NumberField
+description: Stepper input for numeric values with optional min, max and step.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Basic from "~/demos/inputs/number-field/Basic.svelte";
+import BasicSrc from "~/demos/inputs/number-field/Basic.svelte?raw";
+import States from "~/demos/inputs/number-field/States.svelte";
+import StatesSrc from "~/demos/inputs/number-field/States.svelte?raw";
+
+```svelte
+<script>
+  import { NumberField } from "@codeatlasdev/ui";
+  let qty = $state(1);
+</script>
+
+<NumberField label="Quantity" bind:value={qty} min={0} max={99} />
+```
+
+The plus and minus buttons stop at `min` and `max`. Typing a value does not clamp it, so validate on your side if a typed value can leave the range.
+
+<Demo title="Basic" description="Integer and decimal steps with bounds." src={BasicSrc}><Basic client:visible /></Demo>
+<Demo title="States" description="Helper text, error, disabled and the small size." src={StatesSrc}><States client:visible /></Demo>
+
+<Props rows={[
+  { name: "value", type: "number", default: "0", description: "Bindable numeric value." },
+  { name: "min", type: "number", description: "Minimum value. The decrement button disables at this value." },
+  { name: "max", type: "number", description: "Maximum value. The increment button disables at this value." },
+  { name: "step", type: "number", default: "1", description: "Increment applied by the plus and minus buttons." },
+  { name: "label", type: "string", description: "Label text." },
+  { name: "description", type: "string", description: "Hint shown below the field." },
+  { name: "error", type: "string", description: "Error message. Puts the field in the error state." },
+  { name: "required", type: "boolean", default: "false", description: "Marks the field as required." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the field and its buttons." },
+  { name: "name", type: "string", description: "Native name, for form submission." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Field height." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "onchange", type: "(value: number) => void", description: "Called on every change, from the buttons or from typing a valid number." },
+]} />

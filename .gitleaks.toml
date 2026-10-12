@@ -1,0 +1,7 @@
+# Docs demos show API calls with an obvious placeholder key.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Documentation placeholders"
+regexes = ['''YOUR_API_KEY''']

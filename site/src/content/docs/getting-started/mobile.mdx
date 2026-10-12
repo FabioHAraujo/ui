@@ -1,0 +1,186 @@
+---
+title: Mobile
+description: Safe areas, dynamic viewport height, the on-screen keyboard, the iOS keyboard pattern, browser chrome color and the mobile layout components.
+group: Getting started
+order: 3
+---
+import { Callout } from "@codeatlasdev/ui";
+
+The package is built so apps feel native in Safari and Chrome on phones. Most of it is automatic once `global.css` is imported; this page lists what you need to set up and what each piece does.
+
+## Viewport meta
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+```
+
+| Part | Why |
+|---|---|
+| `viewport-fit=cover` | Draws under the notch and home indicator. Required for the safe-area tokens to be non-zero. |
+| `interactive-widget=resizes-content` | On Chromium the on-screen keyboard resizes the layout viewport instead of overlaying it. |
+
+Never add `maximum-scale` or `user-scalable=no`. Zoom is an accessibility feature, and the package avoids iOS focus zoom a different way (see [Input font size](#input-font-size)).
+
+## Safe areas and viewport height
+
+`tokens.css` exposes the environment insets and a height that works everywhere:
+
+| Token | Value |
+|---|---|
+| `--ca-safe-top`, `--ca-safe-right`, `--ca-safe-bottom`, `--ca-safe-left` | `env(safe-area-inset-*, 0px)` |
+| `--ca-vh` | `100vh`, upgraded to `100dvh` where supported. Use it instead of a literal `100vh` or `100dvh`. |
+| `--ca-kb-inset` | Height covered by the on-screen keyboard, `0px` when closed. Written by the viewport store. |
+| `--ca-touch-target` | `44px`, applied to controls under `(pointer: coarse)`. |
+| `--ca-chrome-surface` | Opaque surface for bars that touch a screen edge, see [below](#browser-chrome-color). |
+
+```css
+.fullscreen-panel {
+  position: fixed;
+  inset: 0;
+  height: var(--ca-vh);
+  padding: var(--ca-safe-top) var(--ca-safe-right) var(--ca-safe-bottom) var(--ca-safe-left);
+}
+```
+
+## The on-screen keyboard
+
+`viewport.keyboardInset` is the number of pixels of the layout viewport covered by the virtual keyboard. It is computed from `visualViewport` against `document.documentElement.clientHeight`, never from `window.innerHeight`: on iOS `innerHeight` changes with the URL bar, which would read as a phantom keyboard. Changes under 80px (browser toolbars) and pinch zoom are ignored. The store mirrors the value to `--ca-kb-inset` on `<html>`.
+
+```svelte
+<script>
+  import { viewport } from "@codeatlasdev/ui";
+  import { onMount } from "svelte";
+
+  onMount(() => viewport.init()); // returns cleanup
+</script>
+
+{viewport.keyboardInset > 0 ? "keyboard open" : "keyboard closed"}
+```
+
+For most cases use the `keyboardAware` action, which starts the store for you. It pads the element's bottom by `--ca-kb-inset` and scrolls the focused field back into view when the keyboard resizes the viewport:
+
+```svelte
+<script>
+  import { keyboardAware } from "@codeatlasdev/ui/actions";
+</script>
+
+<form use:keyboardAware>
+  <textarea></textarea>
+  <button>Send</button>
+</form>
+```
+
+`StickyActions` and `MobilePane` already use it.
+
+## Opening the keyboard on iOS
+
+iOS Safari only opens the keyboard for a `focus()` call made synchronously inside a user gesture. Focus moved later (on mount, in `requestAnimationFrame`, after a transition) lands on the field without a keyboard and makes Safari scroll and zoom toward it. The package ships a small pattern for dialogs, sheets and search overlays:
+
+1. In the tap handler, call `primeKeyboard()`. It focuses an invisible 16px proxy input so the keyboard opens. It does nothing on devices without a coarse pointer.
+2. In the opened view, mark the real field with `use:autofocus` or call `focusTextField(el)`. iOS keeps the keyboard up while focus moves between text fields.
+
+```svelte
+<script>
+  import { autofocus, primeKeyboard } from "@codeatlasdev/ui/actions";
+  import { Button, Dialog } from "@codeatlasdev/ui";
+
+  let open = $state(false);
+</script>
+
+<Button onclick={() => { primeKeyboard(); open = true; }}>Search</Button>
+
+<Dialog bind:open title="Search">
+  <input use:autofocus placeholder="Type to search" />
+</Dialog>
+```
+
+On a touch device, `autofocus` and `focusTextField` only focus when the keyboard was primed in the opening gesture, so a field is never half-focused without a keyboard. Pass `{ touch: true }` (or `force` to `focusTextField`) to focus anyway, for example with a hardware keyboard. `DocsShell`, `Combobox` and `CommandPalette` use this pattern internally.
+
+## Input font size
+
+Safari zooms the page when a focused field computes under 16px. `base.css` raises every text-entry control (`input`, `textarea`, `select`, `[contenteditable]`) to `max(16px, 1em)` under `(pointer: coarse), (max-width: 767px)`, with zero specificity (`:where()`) so an app can still opt a field out. Package controls read `--ca-input-font-size`, which does the same. In your own fields, use the token:
+
+```css
+.my-field input {
+  font-size: var(--ca-input-font-size);
+}
+```
+
+## Browser chrome color
+
+Mobile browsers tint their status bar and toolbar from the page. The package feeds each engine what it reads:
+
+- **`<html>` has a solid background.** `base.css` sets `html { background-color: var(--ca-surface-base) }` and keeps `body` transparent. The decorative mesh lives in `body::before`, because browsers sample the real background and never pseudo-elements. The same color shows in the overscroll area.
+- **`--ca-chrome-surface` is opaque.** `MobileHeader` and `BottomNav` use it as `background-color`, so the strip under the notch and the home indicator matches the bar.
+- **`<meta name="theme-color">` follows what is painted.** The init script sets it from the preset before first paint. After `colorScheme.init()`, a small sync keeps it equal to the opaque color under the top edge of the screen: an opaque header, a [theme island](/docs/getting-started/theming/#theme-islands) or the page itself. It updates on theme changes, route changes and scroll. This is what Chrome and Samsung Internet on Android, Safari 18 and earlier, and installed PWAs use.
+- **Safari 26** ignores `theme-color` and instead samples the background of the root and of fixed or sticky elements at the screen edges. Because those are solid colors, both paths show the same result.
+
+<Callout type="caution" title="Keep edge elements opaque">
+  A translucent glass header at the top edge cannot be sampled correctly. Use `--ca-chrome-surface` (or any opaque color) for fixed bars on the top and bottom edges, and keep `backdrop-filter` for surfaces inside the page.
+</Callout>
+
+## Layout components
+
+### BottomNav and AppShellLayout
+
+Below 900px `AppShellLayout` swaps the Rail and Panel for a `MobileHeader` and a `BottomNav` (up to five modules). The bar is `--ca-bottom-nav-h` (56px) plus `--ca-safe-bottom`, and the content area reserves exactly that space.
+
+### MobilePane
+
+A full-screen layer above the shell for drill-down views (chat thread, history, detail), instead of a hand-written `position: fixed`. It has a header with a back button, its own scroll with `overscroll-behavior: contain`, safe areas on every side and keyboard awareness. Escape closes it, focus moves in on open and returns on close.
+
+```svelte
+<script>
+  import { MobilePane, IconButton } from "@codeatlasdev/ui";
+  let open = $state(false);
+</script>
+
+<MobilePane bind:open title="Maria" onback={() => (chatId = null)}>
+  {#snippet actions()}<IconButton aria-label="More">…</IconButton>{/snippet}
+  <Messages />
+</MobilePane>
+```
+
+Use `scroll={false}` when the body has its own scroll area and a fixed composer (chat).
+
+### StickyActions
+
+A bar for form actions that sticks to the bottom of the scroll container, with glass chrome, safe-area padding and keyboard awareness. On wide screens it becomes an inline row.
+
+```svelte
+<StickyActions align="stretch" show={dirty}>
+  <Button variant="ghost">Cancel</Button>
+  <Button variant="filled">Save</Button>
+</StickyActions>
+```
+
+`align="end"` (default) pushes buttons to the right; `"stretch"` makes them fill the width on touch screens. `show` renders the bar only while there is something to confirm.
+
+### Sheet
+
+A bottom sheet below 768px and a centered dialog from 768px up. It keeps the focus trap, Escape, backdrop dismissal and scroll lock of the underlying dialog. In the bottom layout, dragging the handle or header down dismisses it (`swipeToDismiss`, default `true`). It closes past 30% of the sheet height or a fast fling, animates with a spring, and is disabled when the user prefers reduced motion.
+
+```svelte
+<Sheet bind:open title="Switch account" description="Choose the active session">
+  …
+  {#snippet footer()}<Button fullWidth>New session</Button>{/snippet}
+</Sheet>
+```
+
+### AuthLayout
+
+Shows a brand strip below 768px (`mobileBrand`, default `true`). Do not build a local brand header for small screens.
+
+## Native feel
+
+`nativeFeel()` from `@codeatlasdev/ui/kit` makes an app shell behave like an app instead of a page. Call it once; it returns a cleanup function.
+
+```ts
+import { nativeFeel } from "@codeatlasdev/ui/kit";
+
+onMount(() => nativeFeel());
+```
+
+It shows focus rings only while the user navigates with the keyboard (`html[data-kbd]`), removes the context menu and text selection on chrome (buttons, nav, tabs) while keeping them in fields and in `.ca-selectable` content, and blocks dragging links and images. `blockZoom: true` also blocks page zoom, meant for desktop shells such as Tauri only: on the web, zoom is an accessibility feature.
+
+Controls already apply `touch-action: manipulation` and a transparent tap highlight, grow to 44px under `(pointer: coarse)`, and scale slightly on press under `(hover: none)` unless the user prefers reduced motion.

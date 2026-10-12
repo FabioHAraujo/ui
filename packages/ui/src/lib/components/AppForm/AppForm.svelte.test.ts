@@ -1,0 +1,73 @@
+import { createRawSnippet } from "svelte";
+import { describe, expect, it } from "vitest";
+import { render } from "vitest-browser-svelte";
+import { checkA11y } from "../../../../tests/a11y";
+import AppForm from "./AppForm.svelte";
+
+const snip = (html: string) => createRawSnippet(() => ({ render: () => html }));
+
+describe("AppForm", () => {
+	it("renders title (h1), description and body children", async () => {
+		const screen = await render(AppForm, {
+			title: "Novo usuário",
+			description: "Preencha os dados",
+			children: snip("<label>Nome <input /></label>"),
+		});
+		await expect
+			.element(screen.getByRole("heading", { level: 1, name: "Novo usuário" }))
+			.toBeVisible();
+		await expect.element(screen.getByText("Preencha os dados")).toBeVisible();
+		await expect.element(screen.getByRole("textbox", { name: "Nome" })).toBeVisible();
+		expect(await checkA11y(screen.container)).toHaveNoViolations();
+	});
+
+	it("omits the header entirely when no header props are given", async () => {
+		const screen = await render(AppForm, { children: snip("<p>Corpo</p>") });
+		expect(screen.getByRole("heading").elements()).toHaveLength(0);
+		expect(screen.container.querySelector(".ca-app-form__header")).toBeNull();
+	});
+
+	it("backHref renders a labelled back link (default label 'Back')", async () => {
+		const screen = await render(AppForm, { title: "Editar", backHref: "/users" });
+		await expect
+			.element(screen.getByRole("link", { name: "Back" }))
+			.toHaveAttribute("href", "/users");
+		expect(await checkA11y(screen.container)).toHaveNoViolations();
+	});
+
+	it("backLabel customises the back link name", async () => {
+		const screen = await render(AppForm, { backHref: "/users", backLabel: "Voltar" });
+		await expect.element(screen.getByRole("link", { name: "Voltar" })).toBeVisible();
+	});
+
+	it("leading snippet overrides backHref", async () => {
+		const screen = await render(AppForm, {
+			title: "Editar",
+			backHref: "/users",
+			leading: snip("<a href='/custom'>Início</a>"),
+		});
+		await expect.element(screen.getByRole("link", { name: "Início" })).toBeVisible();
+		expect(screen.getByRole("link", { name: "Back" }).elements()).toHaveLength(0);
+	});
+
+	it("renders trailing and a footer toolbar with an accessible name", async () => {
+		const screen = await render(AppForm, {
+			title: "Editar",
+			trailing: snip("<span>Rascunho</span>"),
+			footer: snip(
+				"<div><button type='button'>Cancelar</button><button type='button'>Salvar</button></div>"
+			),
+		});
+		await expect.element(screen.getByText("Rascunho")).toBeVisible();
+		const bar = screen.getByRole("toolbar", { name: "Form actions" });
+		await expect.element(bar).toBeVisible();
+		await expect.element(bar.getByRole("button", { name: "Salvar" })).toBeVisible();
+		await expect.element(bar.getByRole("button", { name: "Cancelar" })).toBeVisible();
+		expect(await checkA11y(screen.container)).toHaveNoViolations();
+	});
+
+	it("renders no footer toolbar without a footer snippet", async () => {
+		const screen = await render(AppForm, { title: "Editar" });
+		expect(screen.getByRole("toolbar").elements()).toHaveLength(0);
+	});
+});

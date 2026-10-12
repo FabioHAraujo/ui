@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AppDemo from "~/templates/app/AppDemo.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="App new user template" description="New user form with AppForm, FormSection, Select and Switch.">
+	<AppDemo client:load page="users-new" {pathname} />
+</TemplateLayout>

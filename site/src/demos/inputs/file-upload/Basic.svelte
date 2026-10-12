@@ -1,0 +1,30 @@
+<script lang="ts">
+  import { FileUpload } from '@codeatlasdev/ui';
+
+  let files = $state<File[]>([]);
+</script>
+
+<div class="wrap">
+  <FileUpload
+    bind:files
+    multiple
+    hint="PNG, JPG, PDF up to 10 MB"
+    maxSize={10 * 1024 * 1024}
+  />
+  {#if files.length > 0}
+    <p class="out">{files.length} file{files.length > 1 ? 's' : ''} selected</p>
+  {/if}
+</div>
+
+<style>
+  .wrap {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .out {
+    margin: var(--ca-space-2) 0 0;
+    font-size: var(--ca-font-size-body2);
+    color: var(--ca-text-secondary);
+  }
+</style>

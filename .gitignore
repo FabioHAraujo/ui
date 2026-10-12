@@ -1,0 +1,31 @@
+node_modules
+dist
+build
+.turbo
+*.local
+.DS_Store
+*.log
+.svelte-kit
+
+# env
+.env
+.env.*
+!.env.example
+
+# test coverage
+coverage/
+.nyc_output/
+
+# npm pack artifacts
+*.tgz
+
+# tests
+.vitest/
+__traces__/
+site/test-results/
+site/playwright-report/
+site/.astro/
+
+# Internal planning notes (consumer migration guides, roadmap) stay local.
+/docs/*
+!/docs/css-api.md

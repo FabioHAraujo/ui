@@ -1,0 +1,52 @@
+---
+title: Tabs
+description: Keyboard-navigable tab panels backed by Bits UI, controlled or uncontrolled.
+group: Navigation
+order: 4
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Default from "~/demos/navigation/tabs/Default.svelte";
+import DefaultSrc from "~/demos/navigation/tabs/Default.svelte?raw";
+import Controlled from "~/demos/navigation/tabs/Controlled.svelte";
+import ControlledSrc from "~/demos/navigation/tabs/Controlled.svelte?raw";
+
+```svelte
+<script>
+  import { Tabs, TabsList, TabsTrigger, TabsContent } from "@codeatlasdev/ui";
+</script>
+
+<Tabs value="overview">
+  <TabsList>
+    <TabsTrigger value="overview">Overview</TabsTrigger>
+    <TabsTrigger value="props">Props</TabsTrigger>
+  </TabsList>
+  <TabsContent value="overview">...</TabsContent>
+  <TabsContent value="props">...</TabsContent>
+</Tabs>
+```
+
+Arrow keys move between tabs, Home and End jump to the first and last, and the panels use the `tabpanel` role. Each `TabsTrigger` and `TabsContent` pair must share a `value`.
+
+<Demo title="Default" description="Three tabs with content panels." src={DefaultSrc}><Default client:visible /></Demo>
+<Demo title="Controlled" description="The parent owns the active tab with bind:value." src={ControlledSrc}><Controlled client:visible /></Demo>
+
+<Props title="Tabs" rows={[
+  { name: "value", type: "string", description: "Bindable active tab value." },
+  { name: "onchange", type: "(v: string) => void", description: "Fires when the active tab changes." },
+  { name: "children", type: "Snippet", description: "TabsList and TabsContent children." },
+  { name: "class", type: "string", default: "''", description: "Extra classes on the root." },
+]} />
+
+<Props title="TabsTrigger" rows={[
+  { name: "value", type: "string", description: "Required. Links the trigger to its TabsContent." },
+  { name: "disabled", type: "boolean", default: "false", description: "Prevents selecting the tab." },
+  { name: "children", type: "Snippet", description: "Trigger label." },
+  { name: "class", type: "string", default: "''", description: "Extra CSS classes." },
+]} />
+
+<Props title="TabsContent" rows={[
+  { name: "value", type: "string", description: "Required. Shown while the matching trigger is active." },
+  { name: "children", type: "Snippet", description: "Panel content." },
+  { name: "class", type: "string", default: "''", description: "Extra CSS classes." },
+]} />

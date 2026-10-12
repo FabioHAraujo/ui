@@ -1,0 +1,312 @@
+---
+import { codeToHtml } from "shiki";
+import { Button } from "@codeatlasdev/ui";
+import FinaleActions from "~/components/landing/FinaleActions.svelte";
+import Chapter from "~/components/landing/Chapter.astro";
+import DataShowcase from "~/components/landing/DataShowcase.svelte";
+import HeroStage from "~/components/landing/HeroStage.svelte";
+import QuickStart from "~/components/landing/QuickStart.svelte";
+import Rail from "~/components/landing/Rail.astro";
+import ThemeLab from "~/components/landing/ThemeLab.svelte";
+import Logo from "~/components/Logo.svelte";
+import Base from "~/layouts/Base.astro";
+import "~/styles/landing.css";
+import "@fontsource-variable/funnel-display";
+import displayFont from "@fontsource-variable/funnel-display/files/funnel-display-latin-wght-normal.woff2?url";
+
+const REPO = "https://github.com/codeatlasdev/ui";
+const NPM = "https://www.npmjs.com/package/@codeatlasdev/ui";
+const SITE = "https://ui.codeatlas.com.br";
+
+const hl = (code: string, lang: string) =>
+	codeToHtml(code.trim(), { lang, themes: { light: "github-light-high-contrast", dark: "github-dark-high-contrast" }, defaultColor: false });
+
+const agentSnippet = await hl(
+	`<AppList title="Users" data={users} searchKeys={['name', 'email']} perPage={8}>
+  {#snippet actions()}
+    <Button variant="filled" href="/users/new">New user</Button>
+  {/snippet}
+
+  {#snippet children(list)}
+    <SimpleTable>
+      {#each list.rows as u (u.id)}
+        <tr><td><UserCell name={u.name} email={u.email} /></td></tr>
+      {/each}
+    </SimpleTable>
+  {/snippet}
+</AppList>`,
+	"svelte",
+);
+
+const install = await Promise.all(
+	[
+		["bun", "bun add @codeatlasdev/ui"],
+		["npm", "npm install @codeatlasdev/ui"],
+		["pnpm", "pnpm add @codeatlasdev/ui"],
+	].map(async ([label, cmd]) => ({ label, html: await hl(cmd, "bash") })),
+);
+
+const setup = await Promise.all(
+	[
+		[
+			"SvelteKit",
+			`// vite.config.ts
+import { sveltekit } from "@sveltejs/kit/vite";
+import { caThemePlugin } from "@codeatlasdev/ui/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({ plugins: [sveltekit(), caThemePlugin()] });
+
+// src/hooks.server.ts
+import { sequence } from "@sveltejs/kit/hooks";
+import { caThemeHandle } from "@codeatlasdev/ui/kit";
+
+export const handle = sequence(caThemeHandle());`,
+		],
+		[
+			"Astro",
+			`// astro.config.mjs
+import svelte from "@astrojs/svelte";
+import { caUI } from "@codeatlasdev/ui/astro";
+import { defineConfig } from "astro/config";
+
+export default defineConfig({
+  integrations: [svelte(), caUI({ defaultPreset: "ocean" })],
+});`,
+		],
+	].map(async ([label, code]) => ({ label, html: await hl(code, "ts") })),
+);
+
+const title = "CodeAtlas UI";
+const description =
+	"Svelte 5 UI library with a glass material system, an OKLCH theme engine, native-feeling mobile components and typed props that AI agents get right the first time.";
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "WebSite",
+			"@id": `${SITE}/#website`,
+			url: `${SITE}/`,
+			name: "CodeAtlas UI",
+			description,
+			inLanguage: "en",
+		},
+		{
+			"@type": "SoftwareSourceCode",
+			"@id": `${SITE}/#code`,
+			name: "@codeatlasdev/ui",
+			description,
+			codeRepository: REPO,
+			programmingLanguage: ["Svelte", "TypeScript", "CSS"],
+			runtimePlatform: "Svelte 5",
+			license: "https://opensource.org/licenses/MIT",
+			url: NPM,
+			isPartOf: { "@id": `${SITE}/#website` },
+		},
+	],
+};
+import SendPrompt from "~/components/landing/SendPrompt.svelte";
+---
+<Base title={title} description={description} jsonLd={jsonLd}>
+	<Fragment slot="head">
+		<script is:inline>
+			(function () {
+				var d = document.documentElement;
+				if (matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("calm");
+				if (matchMedia("(pointer: coarse)").matches || matchMedia("(max-width: 900px)").matches) d.classList.add("touch");
+			})();
+		</script>
+		<link rel="preload" as="font" type="font/woff2" crossorigin href={displayFont} />
+	</Fragment>
+
+	<header class="bar">
+		<a class="bar__brand" href="/" aria-label="CodeAtlas UI home">
+			<Logo />
+			<span>CodeAtlas UI</span>
+		</a>
+		<nav class="bar__nav" aria-label="Primary">
+			<a href="/docs/">Docs</a>
+			<a href={REPO} rel="noopener">GitHub</a>
+			<Button size="sm" href="/docs/">Get started</Button>
+		</nav>
+	</header>
+
+	<Rail />
+
+	<main id="main" tabindex="-1" class="landing">
+		<section class="hero" aria-labelledby="hero-h">
+			<div class="hero__copy">
+				<h1 id="hero-h" class="hero__title">
+					<span class="rewrite">
+						<s class="rewrite__old" data-old>Prompt a UI kit.</s>
+						<span class="rewrite__new" data-new>UI your agent already knows.</span>
+					</span>
+				</h1>
+				<p class="hero__lead" data-hero-in>
+					CodeAtlas UI is a Svelte 5 library of full screens, not loose bricks. Component names say what the screen is,
+					props are data, and every color comes from a token. An agent writes it right the first time, and it looks
+					native on a phone.
+				</p>
+				<div class="hero__actions" data-hero-in>
+					<Button size="lg" href="/docs/">Read the docs</Button>
+					<Button size="lg" variant="glass" href={REPO}>Star on GitHub</Button>
+				</div>
+				<div class="hero__prompt" data-hero-in>
+					<SendPrompt client:visible />
+				</div>
+			</div>
+			<div class="hero__stage" data-hero-in>
+				<HeroStage client:load />
+				<p class="hero__caption">
+					This is not a screenshot. It is a live composition of package components, retheming itself with
+					&#32;<code>data-preset</code>, <code>data-style</code> and <code>data-theme-scope</code>.
+				</p>
+			</div>
+		</section>
+
+		<Chapter
+			id="theme"
+			title="One hex in, a whole theme out."
+			lead="Themes are typed objects compiled once to CSS. Eight presets ship built in, and a brand preset is generated from a single hex color in OKLCH. Light, dark and system modes paint before first frame with no flash, and any element can become a theme island."
+		>
+			<ThemeLab client:visible />
+			<div slot="copy" class="chapter__facts" data-reveal>
+				<ul>
+					<li><code>defineTheme()</code> resolves one typed object, same input always yields the same CSS.</li>
+					<li><code>data-style</code> switches glass, frosted, solid and flat without touching a component.</li>
+					<li><code>data-theme-scope="dark"</code> turns any subtree into a dark island.</li>
+				</ul>
+			</div>
+		</Chapter>
+
+		<Chapter
+			id="mobile"
+			title="Feels installed, not responsive."
+			lead="Safe areas, the on-screen keyboard and 44px touch targets are handled inside the components. This phone is a real document at 390 pixels: tap the tabs, open the bell for a swipe-to-dismiss sheet, open a thread for a full-screen pane."
+			flip
+		>
+			<div class="phone" data-reveal="0.1">
+				<div class="phone__frame">
+					<iframe
+						class="phone__screen"
+						data-src="/landing-embed/mobile/"
+						title="Interactive mobile demo built from CodeAtlas UI components"
+						width="390"
+						height="760"
+					></iframe>
+				</div>
+				<p class="phone__fallback"><a href="/landing-embed/mobile/">Open the mobile demo in its own page</a></p>
+			</div>
+			<div slot="copy" class="chapter__facts" data-reveal>
+				<ul>
+					<li><code>BottomNav</code>, <code>Sheet</code> with swipe to dismiss, <code>MobilePane</code> and <code>StickyActions</code>.</li>
+					<li>A <code>viewport</code> store reads the visual viewport, so the keyboard never fakes the layout.</li>
+					<li>Form controls stay at 16px on touch, so iOS never zooms on focus.</li>
+				</ul>
+			</div>
+		</Chapter>
+
+		<Chapter
+			id="agents"
+			title="An agent gets it right on the first try."
+			lead="Component names say what the screen is. Props are data. Snippets are the holes you fill. There are no styling decisions left for a model to hallucinate."
+			layout="wide"
+		>
+			<div class="agents">
+				<div class="agents__code" set:html={agentSnippet} />
+				<ul class="agents__list">
+					<li>
+						<strong>Typed props</strong>
+						<span>Every component ships its prop types, so an editor or a model sees the contract.</span>
+					</li>
+					<li>
+						<strong>llms.txt</strong>
+						<span><a href="/llms.txt">A plain index</a> of the library for any model to read.</span>
+					</li>
+					<li>
+						<strong>AGENTES.md</strong>
+						<span>
+							<a href={`${REPO}/blob/main/AGENTES.md`} rel="noopener">The rules file</a>: layouts, tokens and the mistakes to avoid.
+						</span>
+					</li>
+					<li>
+						<strong>Agent skills</strong>
+						<span>Three skills install with <code>npx skills add codeatlasdev/ui</code>.</span>
+					</li>
+				</ul>
+			</div>
+		</Chapter>
+
+		<Chapter
+			id="data"
+			title="Charts and tables that already match."
+			lead="Pass data, not options. Charts read the active theme and re-theme when the preset, scheme or surface style changes. Both ship as opt-in subpaths, so the core stays light."
+			layout="wide"
+		>
+			<div class="data">
+				<DataShowcase client:visible />
+			</div>
+		</Chapter>
+
+		<Chapter
+			id="quality"
+			title="Accessible by construction."
+			lead="Primitives come from bits-ui, which handles focus traps, keyboard maps and ARIA. Components are tested with axe in a real browser, and the page you are reading uses the same components."
+			layout="wide"
+		>
+			<dl class="facts">
+				<div>
+					<dt>Browser tests with axe</dt>
+					<dd>80 component suites</dd>
+				</div>
+				<div>
+					<dt>Visual regression</dt>
+					<dd>77 component screenshot suites</dd>
+				</div>
+				<div>
+					<dt>Built-in presets</dt>
+					<dd>8, plus a brand preset from one hex</dd>
+				</div>
+				<div>
+					<dt>Charts, table, code</dt>
+					<dd>Subpath imports, so unused ones are never bundled</dd>
+				</div>
+			</dl>
+		</Chapter>
+
+		<Chapter
+			id="start"
+			title="Three files and you are live."
+			lead="Works in SvelteKit and Astro. Add the theme hook, import the stylesheet once, and start with a layout."
+			layout="wide"
+		>
+			<QuickStart client:visible {install} {setup} />
+		</Chapter>
+
+		<section class="finale" aria-labelledby="finale-h">
+			<h2 id="finale-h" class="display" data-rise>Build the screen, skip the CSS.</h2>
+			<div class="finale__actions" data-reveal>
+				<FinaleActions repo={REPO} npm={NPM} />
+			</div>
+		</section>
+	</main>
+
+	<footer class="foot">
+		<p>MIT licensed. Built with Svelte 5 and bits-ui.</p>
+		<nav aria-label="Footer">
+			<a href="/docs/">Docs</a>
+			<a href={REPO} rel="noopener">GitHub</a>
+			<a href={NPM} rel="noopener">npm</a>
+			<a href="/llms.txt">llms.txt</a>
+		</nav>
+	</footer>
+
+	<script>
+		import { boot, lazyFrames } from "~/lib/landing";
+		lazyFrames();
+		const run = () => boot();
+		if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 600 });
+		else setTimeout(run, 120);
+	</script>
+</Base>

@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AppDemo from "~/templates/app/AppDemo.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="App settings template" description="Workspace settings with general, notification, member and security tabs.">
+	<AppDemo client:load page="settings" {pathname} />
+</TemplateLayout>

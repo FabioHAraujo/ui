@@ -1,0 +1,27 @@
+<script lang="ts">
+  import { SimpleTable, GlassCard } from '@codeatlasdev/ui';
+
+  const rows = [
+    { name: 'Ana Souza', email: 'ana@example.com', role: 'Admin', status: 'Active' },
+    { name: 'Bruno Lima', email: 'bruno@example.com', role: 'Editor', status: 'Invited' },
+    { name: 'Carla Dias', email: 'carla@example.com', role: 'Viewer', status: 'Active' },
+  ];
+</script>
+
+<GlassCard flush full>
+  <SimpleTable responsive="cards">
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      {#each rows as r}
+        <tr>
+          <td class="primary" data-label="Name">{r.name}</td>
+          <td data-label="Email">{r.email}</td>
+          <td data-label="Role">{r.role}</td>
+          <td data-label="Status">{r.status}</td>
+        </tr>
+      {/each}
+    </tbody>
+  </SimpleTable>
+</GlassCard>

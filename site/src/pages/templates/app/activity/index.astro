@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AppDemo from "~/templates/app/AppDemo.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="App activity template" description="Activity feed timeline with category filter and login audit table.">
+	<AppDemo client:load page="activity" {pathname} />
+</TemplateLayout>

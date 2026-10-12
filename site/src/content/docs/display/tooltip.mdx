@@ -1,0 +1,44 @@
+---
+title: Tooltip
+description: "Floating label shown on hover and focus, backed by Bits UI, with four placements and a configurable delay."
+group: Display
+order: 13
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Sides from "~/demos/display/tooltip/Sides.svelte";
+import SidesSrc from "~/demos/display/tooltip/Sides.svelte?raw";
+import OnIcons from "~/demos/display/tooltip/OnIcons.svelte";
+import OnIconsSrc from "~/demos/display/tooltip/OnIcons.svelte?raw";
+import Delay from "~/demos/display/tooltip/Delay.svelte";
+import DelaySrc from "~/demos/display/tooltip/Delay.svelte?raw";
+import Children from "~/demos/display/tooltip/Children.svelte";
+import ChildrenSrc from "~/demos/display/tooltip/Children.svelte?raw";
+
+```svelte
+<script>
+  import { Tooltip, Button } from "@codeatlasdev/ui";
+</script>
+
+<Tooltip content="Save changes">
+  {#snippet triggerChild(props)}
+    <Button {...props}>Save</Button>
+  {/snippet}
+</Tooltip>
+```
+
+When the trigger is an interactive control, use `triggerChild` and spread the received `props` onto it so no extra wrapper button is created. `children` is for non-interactive content such as text, which the tooltip wraps in its own button. Tooltips open on keyboard focus too, but never put essential information only in a tooltip, because touch devices have no hover.
+
+<Demo title="All sides" description={"top, right, bottom and left placement."} src={SidesSrc}><Sides client:visible /></Demo>
+<Demo title="On icon buttons" description={"Gives icon-only buttons a visible label."} src={OnIconsSrc}><OnIcons client:visible /></Demo>
+<Demo title="Custom delay" description={"`delay={0}` opens immediately. The default is 500ms."} src={DelaySrc}><Delay client:visible /></Demo>
+<Demo title="Text trigger" description={"`children` for non-interactive content."} src={ChildrenSrc}><Children client:visible /></Demo>
+
+<Props rows={[
+  { name: "content", type: "string", description: "Text shown in the tooltip. Required." },
+  { name: "side", type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: "Preferred placement side." },
+  { name: "delay", type: "number", default: "500", description: "Open delay in milliseconds." },
+  { name: "class", type: "string", default: "''", description: "Extra classes on the tooltip content." },
+  { name: "children", type: "Snippet", default: "undefined", description: "Non-interactive trigger content, wrapped in the tooltip's own button." },
+  { name: "triggerChild", type: "Snippet<[props]>", default: "undefined", description: "Interactive trigger. Receives the trigger `props` to spread onto a Button or IconButton." },
+]} />

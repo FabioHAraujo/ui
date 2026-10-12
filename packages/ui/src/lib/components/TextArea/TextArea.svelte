@@ -1,0 +1,182 @@
+<script lang="ts">
+  import { uid } from '../../utils/index.js';
+
+  interface Props {
+    label?:       string;
+    placeholder?: string;
+    value?:       string;
+    rows?:        number;
+    minRows?:     number;
+    error?:       string;
+    description?: string;
+    /** @deprecated Use `description` instead */
+    helperText?:  string;
+    disabled?:    boolean;
+    required?:    boolean;
+    readonly?:    boolean;
+    resize?:      'none' | 'vertical' | 'horizontal' | 'both';
+    class?:       string;
+    name?:        string;
+    oninput?:     (value: string) => void;
+    onchange?:    (value: string) => void;
+    onblur?:      (e: FocusEvent) => void;
+  }
+
+  let {
+    label,
+    placeholder = '',
+    value        = $bindable(''),
+    rows         = 4,
+    minRows,
+    error,
+    description,
+    helperText,
+    disabled     = false,
+    required     = false,
+    readonly     = false,
+    resize       = 'vertical',
+    class: className = '',
+    name,
+    oninput,
+    onchange,
+    onblur,
+  }: Props = $props();
+
+  let focused = $state(false);
+  const id    = uid('ta');
+  const hint  = $derived(description ?? helperText);
+
+  // min-height based on rows: ~24px per row + 16px vertical padding
+  const effectiveMinRows = $derived(minRows ?? rows);
+  const minHeight        = $derived(`${effectiveMinRows * 24 + 16}px`);
+</script>
+
+<div
+  class="ca-ta {className}"
+  class:ca-ta--error={!!error}
+  class:ca-ta--disabled={disabled}
+>
+  {#if label}
+    <label for={id} class="ca-ta__label">
+      {label}{#if required}<span class="ca-ta__req" aria-hidden="true"> *</span>{/if}
+    </label>
+  {/if}
+
+  <div class="ca-ta__wrap" class:ca-ta__wrap--focused={focused} class:ca-ta__wrap--error={!!error}>
+    <textarea
+      {id}
+      {name}
+      {placeholder}
+      {rows}
+      {disabled}
+      {required}
+      {readonly}
+      bind:value
+      class="ca-ta__input"
+      style="--ta-resize:{resize}; --ta-min-height:{minHeight}"
+      aria-describedby={error ? `${id}-err` : hint ? `${id}-hint` : undefined}
+      aria-invalid={error ? 'true' : undefined}
+      onfocus={() => (focused = true)}
+      onblur={(e) => { focused = false; onblur?.(e); }}
+      oninput={(e) => oninput?.((e.target as HTMLTextAreaElement).value)}
+      onchange={(e) => onchange?.((e.target as HTMLTextAreaElement).value)}
+    ></textarea>
+  </div>
+
+  {#if error}
+    <p id="{id}-err" class="ca-ta__hint ca-ta__hint--error" role="alert">{error}</p>
+  {:else if hint}
+    <p id="{id}-hint" class="ca-ta__hint">{hint}</p>
+  {/if}
+</div>
+
+<style>
+  /* ── Root ──────────────────────────────────────────────────── */
+  .ca-ta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ca-space-1, 4px);
+    width: 100%;
+  }
+
+  /* ── Label ─────────────────────────────────────────────────── */
+  .ca-ta__label {
+    font-size: var(--ca-font-size-body2);
+    font-weight: 500;
+    color: var(--ca-text-primary);
+    line-height: 1.4;
+    user-select: none;
+  }
+
+  .ca-ta__req {
+    color: var(--ca-semantic-error);
+  }
+
+  /* ── Textarea wrapper ──────────────────────────────────────── */
+  .ca-ta__wrap {
+    border-radius: var(--ca-radius-md);
+    background: var(--ca-surface-raised);
+    border: 1px solid var(--ca-outline-subtle);
+    transition:
+      border-color var(--ca-duration-fast) var(--ca-ease-standard),
+      box-shadow   var(--ca-duration-fast) var(--ca-ease-standard);
+    overflow: hidden;
+  }
+
+  .ca-ta__wrap--focused {
+    border-color: var(--ca-brand-main);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ca-brand-main) 18%, transparent);
+  }
+
+  .ca-ta__wrap--error {
+    border-color: var(--ca-semantic-error) !important;
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ca-semantic-error) 18%, transparent) !important;
+  }
+
+  .ca-ta--disabled .ca-ta__wrap {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* ── Textarea ──────────────────────────────────────────────── */
+  .ca-ta__input {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--ca-font-sans);
+    font-size: var(--ca-input-font-size);
+    color: var(--ca-text-primary);
+    box-sizing: border-box;
+    line-height: 1.5;
+    -webkit-text-fill-color: var(--ca-text-primary);
+    resize: var(--ta-resize, vertical);
+    min-height: var(--ta-min-height, auto);
+  }
+
+  .ca-ta__input::placeholder {
+    color: var(--ca-text-hint);
+    -webkit-text-fill-color: var(--ca-text-hint);
+  }
+
+  .ca-ta__input:disabled {
+    cursor: not-allowed;
+    color: var(--ca-text-disabled);
+    -webkit-text-fill-color: var(--ca-text-disabled);
+  }
+
+  /* ── Helper / error text ───────────────────────────────────── */
+  .ca-ta__hint {
+    font-size: var(--ca-font-size-caption);
+    color: var(--ca-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .ca-ta__hint--error {
+    color: var(--ca-semantic-error);
+  }
+
+</style>

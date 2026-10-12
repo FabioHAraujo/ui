@@ -1,0 +1,48 @@
+---
+title: MoneyInput
+description: BRL currency field. The bound value is integer cents and the display is formatted as you type.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Default from "~/demos/inputs/money-input/Default.svelte";
+import DefaultSrc from "~/demos/inputs/money-input/Default.svelte?raw";
+import Constraints from "~/demos/inputs/money-input/Constraints.svelte";
+import ConstraintsSrc from "~/demos/inputs/money-input/Constraints.svelte?raw";
+import Helpers from "~/demos/inputs/money-input/Helpers.svelte";
+import HelpersSrc from "~/demos/inputs/money-input/Helpers.svelte?raw";
+
+```svelte
+<script>
+  import { MoneyInput } from "@codeatlasdev/ui/forms";
+  let price = $state(123456); // R$ 1.234,56
+</script>
+
+<MoneyInput label="Price" bind:value={price} />
+```
+
+Import from the `@codeatlasdev/ui/forms` subpath. The value is always an integer number of cents, so there is no floating-point rounding. Digits shift in from the right: typing `123456` gives `R$ 1.234,56`. `min` and `max` clamp the value, and an out-of-range value set from outside is clamped back into `value`.
+
+<Demo title="Default" description="Type 123456 to get R$ 1.234,56." src={DefaultSrc}><Default client:visible /></Demo>
+<Demo title="Min, max, negative, error and disabled" description="Deposit is clamped between R$ 10,00 and R$ 100,00. Include a minus sign to toggle the sign when allowNegative is set." src={ConstraintsSrc}><Constraints client:visible /></Demo>
+<Demo title="Helpers" description="Pure functions exported from @codeatlasdev/ui/forms." src={HelpersSrc}><Helpers /></Demo>
+
+<Props rows={[
+  { name: "value", type: "number", default: "0", description: "Bindable amount in integer cents." },
+  { name: "min", type: "number", description: "Minimum value in cents." },
+  { name: "max", type: "number", description: "Maximum value in cents." },
+  { name: "allowNegative", type: "boolean", default: "false", description: "Accepts negative amounts. Type a minus sign to toggle." },
+  { name: "label", type: "string", description: "Label text." },
+  { name: "placeholder", type: "string", default: "centsToDisplay(0)", description: "Input placeholder." },
+  { name: "error", type: "string", description: "Error message. Puts the field in the error state." },
+  { name: "description", type: "string", description: "Hint shown below the field." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the input." },
+  { name: "required", type: "boolean", default: "false", description: "Marks the field as required." },
+  { name: "readonly", type: "boolean", default: "false", description: "Makes the input read-only." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Field height." },
+  { name: "name", type: "string", description: "Native name, for form submission." },
+  { name: "leading / trailing", type: "Snippet", description: "Content before or after the input." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "onchange", type: "(cents: number) => void", description: "Called on every edit with the new cents value." },
+  { name: "onblur", type: "(e: FocusEvent) => void", description: "Called when the input loses focus. The display is re-formatted first." },
+]} />

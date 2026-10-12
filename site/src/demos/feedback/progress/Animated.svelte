@@ -1,0 +1,46 @@
+<script lang="ts">
+  import { Progress, Button } from '@codeatlasdev/ui';
+  import { onDestroy } from 'svelte';
+
+  let value = $state(0);
+  let running = $state(false);
+  let timer: ReturnType<typeof setInterval> | undefined;
+
+  function start() {
+    if (running) return;
+    value = 0;
+    running = true;
+    timer = setInterval(() => {
+      value = Math.min(100, value + 5);
+      if (value >= 100) {
+        clearInterval(timer);
+        running = false;
+      }
+    }, 100);
+  }
+
+  onDestroy(() => clearInterval(timer));
+</script>
+
+<div class="col">
+  <div class="row">
+    <span class="label">{value}%</span>
+    <Progress {value} label="Upload progress" />
+  </div>
+  <Button variant="outlined" size="sm" disabled={running} onclick={start}>
+    {running ? 'Uploading…' : 'Start upload'}
+  </Button>
+</div>
+
+<style>
+  .col { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 480px; }
+  .row { display: flex; align-items: center; gap: 14px; }
+  .label {
+    font-size: var(--ca-font-size-caption);
+    font-family: var(--ca-font-mono);
+    color: var(--ca-text-secondary);
+    min-width: 64px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+</style>

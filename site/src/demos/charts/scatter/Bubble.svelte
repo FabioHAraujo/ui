@@ -1,0 +1,15 @@
+<script lang="ts">
+  import { GlassCard } from '@codeatlasdev/ui';
+  import { ScatterChart } from '@codeatlasdev/ui/charts';
+
+  // The third value of each point is the bubble size.
+  const data = Array.from({ length: 50 }, (_, i): [number, number, number] => [
+    Math.round(1000 + 13000 * (0.5 + 0.5 * Math.sin(i * 0.43 + 0.6)) * (0.65 + 0.35 * Math.cos(i * 0.19))),
+    parseFloat((1 + 12 * (0.5 + 0.5 * Math.cos(i * 0.37 + 1.1)) * (0.7 + 0.3 * Math.sin(i * 0.53))).toFixed(2)),
+    Math.round(1000 + 49000 * Math.abs(Math.sin(i * 0.29 + 0.4)) * Math.abs(Math.cos(i * 0.11))),
+  ]);
+</script>
+
+<GlassCard full>
+  <ScatterChart series={[{ name: 'Accounts', data }]} yName="Conversion %" yFormatter={(v) => `${v.toFixed(1)}%`} height="340px" />
+</GlassCard>

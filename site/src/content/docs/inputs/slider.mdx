@@ -1,0 +1,41 @@
+---
+title: Slider
+description: Range input built on Bits UI with a single thumb or two thumbs, plus min, max and step.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Single from "~/demos/inputs/slider/Single.svelte";
+import SingleSrc from "~/demos/inputs/slider/Single.svelte?raw";
+import Range from "~/demos/inputs/slider/Range.svelte";
+import RangeSrc from "~/demos/inputs/slider/Range.svelte?raw";
+import StepDisabled from "~/demos/inputs/slider/StepDisabled.svelte";
+import StepDisabledSrc from "~/demos/inputs/slider/StepDisabled.svelte?raw";
+
+```svelte
+<script>
+  import { Slider } from "@codeatlasdev/ui";
+  let volume = $state(60);
+  let range = $state([20, 75]);
+</script>
+
+<Slider bind:value={volume} />
+<Slider bind:values={range} />
+```
+
+`value` and `values` are independent: bind one or the other. The slider has no built-in label or value readout, so render those next to it as the demos do. Arrow keys move by `step`, Home and End jump to the bounds.
+
+<Demo title="Single value" description="Binds a plain number. Default range is 0 to 100." src={SingleSrc}><Single client:visible /></Demo>
+<Demo title="Range" description="Bind a [min, max] tuple to values for two thumbs." src={RangeSrc}><Range client:visible /></Demo>
+<Demo title="Step and disabled" description="step={10} snaps to increments of 10." src={StepDisabledSrc}><StepDisabled client:visible /></Demo>
+
+<Props rows={[
+  { name: "value", type: "number", description: "Single-value mode: bind a plain number. Defaults to the midpoint when neither value nor values is set." },
+  { name: "values", type: "[number, number]", description: "Range mode: bind a [min, max] tuple." },
+  { name: "min", type: "number", default: "0", description: "Minimum value." },
+  { name: "max", type: "number", default: "100", description: "Maximum value." },
+  { name: "step", type: "number", default: "1", description: "Step increment." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the slider." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "onchange", type: "(value: number[]) => void", description: "Called on change. Always receives an array: one number in single mode, two in range mode." },
+]} />

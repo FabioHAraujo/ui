@@ -1,0 +1,34 @@
+---
+title: Command Palette
+description: A spotlight-style navigation overlay opened with Cmd+K or Ctrl+K from anywhere.
+group: Navigation
+order: 1
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Palette from "~/demos/navigation/command-palette/Palette.svelte";
+import PaletteSrc from "~/demos/navigation/command-palette/Palette.svelte?raw";
+import Keys from "~/demos/navigation/command-palette/Keys.svelte";
+import KeysSrc from "~/demos/navigation/command-palette/Keys.svelte?raw";
+
+```svelte
+<script>
+  import { CommandPalette } from "@codeatlasdev/ui";
+  import { goto } from "$app/navigation";
+  let open = $state(false);
+</script>
+
+<CommandPalette modules={NAV} onNavigate={(path) => goto(path)} bind:open />
+```
+
+The palette searches the same `NavModule[]` you pass to [AppShellLayout](/docs/layout/app-shell/). It registers `Cmd+K` and `Ctrl+K` itself, so mount it once near the root. Results are a listbox: arrow keys move the selection, Enter confirms and Escape closes.
+
+<Demo title="Open the palette" description="Click the button or press Cmd+K / Ctrl+K while this page is focused. Picking an item shows its path instead of navigating." src={PaletteSrc}><Palette client:visible /></Demo>
+<Demo title="Keyboard" description="Type to filter across every module. Queries shorter than minQueryLength keep the full grouped list." src={KeysSrc}><Keys /></Demo>
+
+<Props rows={[
+  { name: "modules", type: "NavModule[]", description: "Navigation tree to search. Same format as AppShellLayout." },
+  { name: "onNavigate", type: "(path: string) => void", description: "Called with the selected item's path. Use goto() in SvelteKit or location in static sites." },
+  { name: "open", type: "boolean", default: "false", description: "Bindable. Controls visibility. Cmd+K and Ctrl+K also toggle it." },
+  { name: "minQueryLength", type: "number", default: "1", description: "Trimmed characters needed before the list is filtered. Shorter queries keep the full grouped list." },
+]} />

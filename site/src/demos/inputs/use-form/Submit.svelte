@@ -1,0 +1,89 @@
+<script lang="ts">
+  import { Button, TextArea, TextField, useForm } from '@codeatlasdev/ui';
+
+  const form = useForm(
+    { title: '', notes: '' },
+    {
+      schema: (data) => {
+        const errs: Partial<Record<'title' | 'notes', string>> = {};
+        if (!data.title.trim()) errs.title = 'Title is required.';
+        return errs;
+      },
+    },
+  );
+
+  let result = $state('');
+
+  async function submit() {
+    if (!form.validate()) return;
+    form.submitting = true;
+    result = '';
+    await new Promise((r) => setTimeout(r, 1200));
+    form.submitting = false;
+    result = `Submitted: "${form.fields.title.value}"`;
+    form.reset();
+  }
+</script>
+
+<div class="col">
+  <TextField
+    label="Title"
+    placeholder="My item title"
+    value={form.fields.title.value}
+    error={form.fields.title.error}
+    oninput={(v) => form.set('title', v)}
+    onblur={() => form.touch('title')}
+    disabled={form.submitting}
+  />
+  <TextArea
+    label="Notes"
+    placeholder="Optional notes…"
+    value={form.fields.notes.value}
+    error={form.fields.notes.error}
+    oninput={(v) => form.set('notes', v)}
+    onblur={() => form.touch('notes')}
+    disabled={form.submitting}
+  />
+  <div class="row">
+    <Button onclick={submit} loading={form.submitting}>
+      {form.submitting ? 'Saving…' : 'Submit'}
+    </Button>
+    <Button
+      variant="outlined"
+      onclick={() => {
+        form.reset();
+        result = '';
+      }}
+    >
+      Reset
+    </Button>
+  </div>
+  {#if result}
+    <p class="hint hint--success" role="status">{result}</p>
+  {/if}
+</div>
+
+<style>
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ca-space-4);
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .row {
+    display: flex;
+    gap: var(--ca-space-2);
+  }
+
+  .hint {
+    margin: 0;
+    font-size: var(--ca-font-size-caption);
+    color: var(--ca-text-secondary);
+  }
+
+  .hint--success {
+    color: var(--ca-brand-text);
+  }
+</style>

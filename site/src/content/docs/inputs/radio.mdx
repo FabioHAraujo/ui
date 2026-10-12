@@ -1,0 +1,37 @@
+---
+title: RadioGroup
+description: Single-selection radio group built on Bits UI with roving focus and arrow-key navigation.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Vertical from "~/demos/inputs/radio/Vertical.svelte";
+import VerticalSrc from "~/demos/inputs/radio/Vertical.svelte?raw";
+import Horizontal from "~/demos/inputs/radio/Horizontal.svelte";
+import HorizontalSrc from "~/demos/inputs/radio/Horizontal.svelte?raw";
+import Disabled from "~/demos/inputs/radio/Disabled.svelte";
+import DisabledSrc from "~/demos/inputs/radio/Disabled.svelte?raw";
+
+```svelte
+<script>
+  import { RadioGroup } from "@codeatlasdev/ui";
+  let plan = $state("pro");
+</script>
+
+<RadioGroup items={[{ value: "free", label: "Free" }, { value: "pro", label: "Pro" }]} bind:value={plan} />
+```
+
+Arrow keys move focus and selection inside the group, Tab leaves it. The group has no visible title of its own, so wrap it in a `fieldset` with a `legend` when the choice needs a heading.
+
+<Demo title="Vertical" description="The default layout." src={VerticalSrc}><Vertical client:visible /></Demo>
+<Demo title="Horizontal" description="orientation=&quot;horizontal&quot; lays the options out in a row." src={HorizontalSrc}><Horizontal client:visible /></Demo>
+<Demo title="Disabled" description="Disable a single item, or the whole group." src={DisabledSrc}><Disabled client:visible /></Demo>
+
+<Props rows={[
+  { name: "value", type: "string", default: "''", description: "Bindable selected value." },
+  { name: "items", type: "RadioItem[]", description: "Options: { value, label, disabled? }." },
+  { name: "orientation", type: "'vertical' | 'horizontal'", default: "'vertical'", description: "Layout direction and arrow-key axis." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the entire group." },
+  { name: "class", type: "string", description: "Extra classes on the group." },
+  { name: "onchange", type: "(value: string) => void", description: "Called when the selection changes." },
+]} />

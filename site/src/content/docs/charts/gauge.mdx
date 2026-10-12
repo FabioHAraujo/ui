@@ -1,0 +1,45 @@
+---
+title: GaugeChart
+description: KPI gauges, progress rings and animated counters.
+group: Charts
+order: 60
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Simple from "~/demos/charts/gauge/Simple.svelte";
+import SimpleSrc from "~/demos/charts/gauge/Simple.svelte?raw";
+import Ring from "~/demos/charts/gauge/Ring.svelte";
+import RingSrc from "~/demos/charts/gauge/Ring.svelte?raw";
+import Zones from "~/demos/charts/gauge/Zones.svelte";
+import ZonesSrc from "~/demos/charts/gauge/Zones.svelte?raw";
+import Counter from "~/demos/charts/gauge/Counter.svelte";
+import CounterSrc from "~/demos/charts/gauge/Counter.svelte?raw";
+
+```svelte
+<script>
+  import { GaugeChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<GaugeChart value={78} label="Score" />
+<GaugeChart value={65} variant="ring" />
+```
+
+The default gauge colors its arc in three zones (error, warning, success). Override them with `zones`, where `until` is a fraction of `min` to `max`.
+
+<Demo title="Simple gauge" src={SimpleSrc}><Simple client:visible /></Demo>
+<Demo title="Progress ring" description="variant ring draws a single brand-colored arc with the value in the center." src={RingSrc}><Ring client:visible /></Demo>
+<Demo title="Custom zones" description="Reverse the default zones when a high value is bad, such as CPU load." src={ZonesSrc}><Zones client:visible /></Demo>
+<Demo title="Animated counter" description="Updating value animates the ring and the number." src={CounterSrc}><Counter client:visible /></Demo>
+
+<Props rows={[
+  { name: "value", type: "number", description: "Current value." },
+  { name: "min", type: "number", default: "0", description: "Lower bound of the scale." },
+  { name: "max", type: "number", default: "100", description: "Upper bound of the scale." },
+  { name: "variant", type: "'default' | 'ring'", default: "'default'", description: "'default' is a speedometer arc with a pointer. 'ring' is a full progress ring." },
+  { name: "zones", type: "GaugeZone[]", default: "error to 0.3, warning to 0.7, success to 1", description: "Colored arc zones as { until, color }. until is a fraction of min to max; color is success, warning, error, info, brand or any CSS color." },
+  { name: "label", type: "string", description: "Caption shown above the value in the default variant." },
+  { name: "formatter", type: "(value: number) => string", default: "v => `${v}%`", description: "Formats the displayed value." },
+  { name: "animated", type: "boolean", default: "true", description: "Animates the displayed value between updates." },
+  { name: "height", type: "string", default: "'280px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

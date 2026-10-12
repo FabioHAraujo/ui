@@ -1,0 +1,22 @@
+---
+title: Drawer (navigation)
+description: A sliding panel anchored to the left or right edge, used for navigation and settings.
+group: Navigation
+order: 8
+---
+import Demo from "~/components/docs/Demo.astro";
+import Sides from "~/demos/navigation/drawer/Sides.svelte";
+import SidesSrc from "~/demos/navigation/drawer/Sides.svelte?raw";
+
+```svelte
+<script>
+  import { Drawer } from "@codeatlasdev/ui";
+  let open = $state(false);
+</script>
+
+<Drawer bind:open side="left" title="Navigation">...</Drawer>
+```
+
+This is the same component as the [Drawer in Feedback](/docs/feedback/drawer/), shown here with the two navigation patterns: a left menu and a right settings panel. See that page for the full props table, the bottom side and the footer `actions` snippet.
+
+<Demo title="Left and right" description="Left for navigation, right for settings or details." src={SidesSrc}><Sides client:visible /></Demo>

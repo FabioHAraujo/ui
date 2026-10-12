@@ -1,0 +1,9 @@
+---
+// Rendered inside the phone frame on the landing page. A real document at a real phone width, so BottomNav,
+// Sheet, MobilePane and StickyActions behave exactly as they would in an installed app.
+import PhoneApp from "~/components/landing/PhoneApp.svelte";
+import Base from "~/layouts/Base.astro";
+---
+<Base title="Mobile demo" description="Embedded mobile demo of CodeAtlas UI components." noindex>
+	<PhoneApp client:load />
+</Base>

@@ -1,0 +1,42 @@
+---
+title: LineChart
+description: Temporal trends, multi-series comparisons, gradient area fills and live data.
+group: Charts
+order: 10
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Simple from "~/demos/charts/line/Simple.svelte";
+import SimpleSrc from "~/demos/charts/line/Simple.svelte?raw";
+import Multi from "~/demos/charts/line/Multi.svelte";
+import MultiSrc from "~/demos/charts/line/Multi.svelte?raw";
+import Area from "~/demos/charts/line/Area.svelte";
+import AreaSrc from "~/demos/charts/line/Area.svelte?raw";
+import Stream from "~/demos/charts/line/Stream.svelte";
+import StreamSrc from "~/demos/charts/line/Stream.svelte?raw";
+
+```svelte
+<script>
+  import { LineChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<LineChart
+  series={[{ name: "Revenue", data: revenue }]}
+  categories={months}
+  valueFormatter={(v) => `$${v / 1000}k`}
+/>
+```
+
+<Demo title="Simple line" src={SimpleSrc}><Simple client:visible /></Demo>
+<Demo title="Multi-line comparison" description="Each series gets its own palette color." src={MultiSrc}><Multi client:visible /></Demo>
+<Demo title="Area with gradient fill" description="area fills under each line with a gradient that fades to transparent." src={AreaSrc}><Area client:visible /></Demo>
+<Demo title="Real-time stream" description="Replace the data array and the chart updates in place." src={StreamSrc}><Stream client:visible /></Demo>
+
+<Props rows={[
+  { name: "series", type: "ChartSeries[]", description: "Named series sharing one category axis. Each is { name, data: number[], color? }." },
+  { name: "categories", type: "string[]", description: "X-axis labels, one per data point." },
+  { name: "valueFormatter", type: "(value: number) => string", description: "Formats y-axis ticks and tooltip values." },
+  { name: "area", type: "boolean", default: "false", description: "Fills the area under each line with a gradient." },
+  { name: "height", type: "string", default: "'320px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

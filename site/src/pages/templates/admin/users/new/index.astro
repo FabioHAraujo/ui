@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AdminApp from "~/templates/admin/AdminApp.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="Admin new user template" description="Create-user form built from AppForm and FormSection." noindex>
+	<AdminApp client:load page="users-new" {pathname} />
+</TemplateLayout>

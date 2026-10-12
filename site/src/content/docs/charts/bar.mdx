@@ -1,0 +1,41 @@
+---
+title: BarChart
+description: Vertical, horizontal, stacked and grouped bars.
+group: Charts
+order: 20
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Vertical from "~/demos/charts/bar/Vertical.svelte";
+import VerticalSrc from "~/demos/charts/bar/Vertical.svelte?raw";
+import Horizontal from "~/demos/charts/bar/Horizontal.svelte";
+import HorizontalSrc from "~/demos/charts/bar/Horizontal.svelte?raw";
+import Stacked from "~/demos/charts/bar/Stacked.svelte";
+import StackedSrc from "~/demos/charts/bar/Stacked.svelte?raw";
+import Toggle from "~/demos/charts/bar/Toggle.svelte";
+import ToggleSrc from "~/demos/charts/bar/Toggle.svelte?raw";
+
+```svelte
+<script>
+  import { BarChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<BarChart series={[{ name: "Revenue", data: [38400, 54200, 71600, 89800] }]} categories={["Q1", "Q2", "Q3", "Q4"]} />
+```
+
+Multiple series render grouped by default. Set `stacked` to stack them into one column per category.
+
+<Demo title="Vertical bars" src={VerticalSrc}><Vertical client:visible /></Demo>
+<Demo title="Horizontal bars" description="Good for long category names and rankings." src={HorizontalSrc}><Horizontal client:visible /></Demo>
+<Demo title="Stacked bars" src={StackedSrc}><Stacked client:visible /></Demo>
+<Demo title="Grouped and stacked" description="Toggling stacked animates between both layouts." src={ToggleSrc}><Toggle client:visible /></Demo>
+
+<Props rows={[
+  { name: "series", type: "ChartSeries[]", description: "Named series sharing one category axis. Each is { name, data: number[], color? }." },
+  { name: "categories", type: "string[]", description: "Category labels, one per bar group." },
+  { name: "valueFormatter", type: "(value: number) => string", description: "Formats value-axis ticks and tooltip values." },
+  { name: "horizontal", type: "boolean", default: "false", description: "Renders bars horizontally." },
+  { name: "stacked", type: "boolean", default: "false", description: "Stacks all series into one column per category." },
+  { name: "height", type: "string", default: "'320px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

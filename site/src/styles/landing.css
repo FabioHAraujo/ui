@@ -1,0 +1,509 @@
+/* Landing only. Colors, radii, spacing and blur all come from @codeatlasdev/ui tokens.
+ * Glass rule: nothing here puts transform/will-change on an element with backdrop-filter or its ancestors.
+ * Motion targets (data-rise, data-reveal, .rewrite) are animated on inner wrappers or via opacity/clip-path. */
+
+:root {
+	--lp-display: "Funnel Display Variable", "Funnel Display", var(--ca-font-sans);
+	--lp-max: 76rem;
+	--lp-gutter: clamp(var(--ca-space-4), 4vw, var(--ca-space-12));
+	--lp-chapter-gap: clamp(5rem, 14vh, 9rem);
+}
+
+html {
+	scroll-padding-top: 5rem;
+}
+/* Lenis owns scroll on desktop; native smooth scroll would fight it. */
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+.lenis.lenis-smooth {
+	scroll-behavior: auto !important;
+}
+
+.landing {
+	display: block;
+	overflow-x: clip;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+/* Sticky, full-bleed and OPAQUE: content never scrolls behind the links, and browsers tint
+   the status bar from it (Safari 26 samples sticky edge elements; theme-color sync elsewhere). */
+.bar {
+	position: sticky;
+	top: 0;
+	z-index: var(--ca-z-sticky);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--ca-space-4);
+	padding:
+		calc(var(--ca-safe-top) + var(--ca-space-3))
+		max(var(--lp-gutter), calc((100% - var(--lp-max)) / 2 + var(--lp-gutter)))
+		var(--ca-space-3);
+	background-color: var(--ca-surface-base);
+	box-shadow: inset 0 -1px 0 var(--ca-outline-subtle);
+}
+.bar__brand {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--ca-space-2);
+	color: var(--ca-text-primary);
+	font-family: var(--lp-display);
+	font-weight: 650;
+	font-size: var(--ca-font-size-lg);
+	text-decoration: none;
+	min-block-size: 44px;
+}
+.bar__nav {
+	display: flex;
+	align-items: center;
+	gap: var(--ca-space-5);
+}
+.bar__nav a:not(.ca-btn) {
+	color: var(--ca-text-secondary);
+	text-decoration: none;
+	font-size: var(--ca-font-size-body2);
+	min-block-size: 44px;
+	display: inline-flex;
+	align-items: center;
+}
+.bar__nav a:not(.ca-btn):hover {
+	color: var(--ca-text-primary);
+}
+.bar a:focus-visible,
+.foot a:focus-visible,
+.landing a:focus-visible {
+	outline: 2px solid var(--ca-brand-main);
+	outline-offset: 3px;
+	border-radius: var(--ca-radius-sm);
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────── */
+.hero {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: clamp(var(--ca-space-8), 6vw, var(--ca-space-16));
+	align-items: center;
+	max-inline-size: var(--lp-max);
+	margin-inline: auto;
+	padding: clamp(var(--ca-space-6), 6vh, var(--ca-space-12)) var(--lp-gutter) var(--lp-chapter-gap);
+}
+@media (min-width: 62rem) {
+	.hero {
+		grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+		min-block-size: min(44rem, calc(var(--ca-vh) - 6rem));
+	}
+}
+.hero__title {
+	font-family: var(--lp-display);
+	font-weight: 700;
+	font-size: clamp(2.4rem, 5vw, 4.4rem);
+	line-height: 1;
+	letter-spacing: -0.035em;
+	text-wrap: balance;
+	margin: 0;
+}
+
+/* Strike-and-rewrite. Static HTML already reads as final: old phrase struck, new phrase shown. */
+.rewrite {
+	display: grid;
+	gap: 0.12em;
+}
+.rewrite__old {
+	--strike: 1;
+	position: relative;
+	display: block;
+	text-decoration: none;
+	color: var(--ca-text-secondary);
+	font-weight: 500;
+	font-size: 0.5em;
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+	inline-size: fit-content;
+}
+.rewrite__old::after {
+	content: "";
+	position: absolute;
+	inset-inline: -0.04em;
+	inset-block-start: 54%;
+	block-size: 0.07em;
+	min-block-size: 2px;
+	background: var(--ca-brand-main);
+	transform-origin: left center;
+	transform: scaleX(var(--strike));
+	border-radius: var(--ca-radius-pill);
+}
+.rewrite__new {
+	display: block;
+	color: var(--ca-text-primary);
+}
+.hero__lead {
+	margin: var(--ca-space-6) 0 0;
+	max-inline-size: 32rem;
+	font-size: clamp(var(--ca-font-size-body1), 2.4vw, var(--ca-font-size-lg));
+	line-height: 1.6;
+	color: var(--ca-text-secondary);
+}
+.hero__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ca-space-3);
+	margin-top: var(--ca-space-8);
+}
+.hero__prompt {
+	margin-top: var(--ca-space-6);
+}
+.hero__caption code,
+.chapter__facts code,
+.agents__list code {
+	font-family: var(--ca-font-mono);
+	font-size: 0.92em;
+	color: var(--ca-text-primary);
+	overflow-wrap: anywhere;
+}
+.hero__stage {
+	container-type: inline-size;
+	min-inline-size: 0;
+}
+.hero__caption {
+	margin: var(--ca-space-4) 0 0;
+	max-inline-size: 36rem;
+	font-size: var(--ca-font-size-body2);
+	color: var(--ca-text-secondary);
+}
+
+/* ── Chapters ────────────────────────────────────────────────────────── */
+.chapter {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--ca-space-8);
+	max-inline-size: var(--lp-max);
+	margin-inline: auto;
+	padding: 0 var(--lp-gutter);
+	margin-block-end: var(--lp-chapter-gap);
+	align-items: start;
+}
+@media (min-width: 62rem) {
+	.chapter--split {
+		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+		gap: clamp(var(--ca-space-8), 6vw, var(--ca-space-16));
+		align-items: center;
+	}
+	.chapter--split.chapter--flip {
+		grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+	}
+	.chapter--flip .chapter__copy {
+		order: 2;
+	}
+}
+.display {
+	font-family: var(--lp-display);
+	font-weight: 700;
+	font-size: clamp(2rem, 4.6vw, 3.6rem);
+	line-height: 1.02;
+	letter-spacing: -0.03em;
+	text-wrap: balance;
+	margin: 0;
+}
+/* Split words clip their own rise; the unsplit text is the aria-label on the heading. */
+.display .w {
+	display: inline-block;
+	overflow: clip;
+	vertical-align: top;
+	padding-block-end: 0.12em;
+	margin-block-end: -0.12em;
+}
+.display .w > span {
+	display: inline-block;
+}
+.chapter__lead {
+	margin: var(--ca-space-5) 0 0;
+	max-inline-size: 36rem;
+	font-size: var(--ca-font-size-lg);
+	line-height: 1.6;
+	color: var(--ca-text-secondary);
+}
+.chapter__facts ul {
+	margin: var(--ca-space-6) 0 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: var(--ca-space-3);
+	max-inline-size: 36rem;
+}
+.chapter__facts li {
+	padding-inline-start: var(--ca-space-4);
+	border-inline-start: 2px solid var(--ca-brand-main);
+	color: var(--ca-text-secondary);
+	font-size: var(--ca-font-size-body1);
+	line-height: 1.55;
+}
+.chapter__demo {
+	min-inline-size: 0;
+}
+.chapter--wide .chapter__demo {
+	margin-top: var(--ca-space-2);
+}
+
+/* ── Phone frame (hosts a real 390px document) ───────────────────────── */
+.phone {
+	display: grid;
+	place-items: center;
+}
+.phone__frame {
+	inline-size: min(100%, calc(390px + 2 * var(--ca-space-3)));
+	padding: var(--ca-space-3);
+	border-radius: 3rem;
+	background: var(--ca-surface-sunken);
+	box-shadow:
+		0 0 0 1px var(--ca-outline-default),
+		var(--ca-shadow-lg);
+}
+.phone__screen {
+	display: block;
+	inline-size: 100%;
+	block-size: 760px;
+	max-block-size: 82vh;
+	border: 0;
+	border-radius: 2.25rem;
+	background: var(--ca-surface-base);
+	color-scheme: light dark;
+}
+
+.phone__fallback {
+	margin: var(--ca-space-3) 0 0;
+	text-align: center;
+	font-size: var(--ca-font-size-body2);
+}
+.phone__fallback a {
+	color: var(--ca-brand-text);
+}
+
+/* ── Agents ──────────────────────────────────────────────────────────── */
+.agents {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--ca-space-8);
+	align-items: start;
+}
+@media (min-width: 62rem) {
+	.agents {
+		grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+	}
+}
+.agents__code {
+	min-inline-size: 0;
+	padding: var(--ca-space-5);
+	border-radius: var(--ca-radius-lg);
+	background: var(--ca-surface-sunken);
+	box-shadow: 0 0 0 1px var(--ca-outline-subtle);
+	overflow-x: auto;
+}
+
+.agents__code pre {
+	margin: 0;
+	background: transparent !important;
+	font-family: var(--ca-font-mono);
+	font-size: var(--ca-font-size-body2);
+	line-height: 1.7;
+}
+/* shiki dual theme: pick by the package's own .dark class */
+.agents__code .shiki span,
+.chapter .ca-codetab .shiki span {
+	color: var(--shiki-light);
+}
+.dark .agents__code .shiki span,
+.dark .chapter .ca-codetab .shiki span {
+	color: var(--shiki-dark);
+}
+.agents__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: var(--ca-space-5);
+}
+.agents__list li {
+	display: grid;
+	gap: var(--ca-space-1);
+	font-size: var(--ca-font-size-body1);
+}
+.agents__list strong {
+	font-family: var(--lp-display);
+	font-size: var(--ca-font-size-h5);
+	font-weight: 650;
+}
+.agents__list span {
+	color: var(--ca-text-secondary);
+	line-height: 1.55;
+}
+.agents__list a {
+	color: var(--ca-brand-text);
+}
+
+/* ── Data ────────────────────────────────────────────────────────────── */
+.data {
+	min-inline-size: 0;
+}
+
+/* ── Quality facts ───────────────────────────────────────────────────── */
+.facts {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+	gap: var(--ca-space-6) var(--ca-space-8);
+	margin: 0;
+}
+.facts > div {
+	padding-block-start: var(--ca-space-4);
+	border-block-start: 1px solid var(--ca-outline-default);
+}
+.facts dt {
+	font-size: var(--ca-font-size-body2);
+	color: var(--ca-text-secondary);
+}
+.facts dd {
+	margin: var(--ca-space-1) 0 0;
+	font-family: var(--lp-display);
+	font-weight: 650;
+	font-size: var(--ca-font-size-h4);
+	line-height: 1.25;
+}
+
+/* ── Finale + footer ─────────────────────────────────────────────────── */
+.finale {
+	max-inline-size: var(--lp-max);
+	margin-inline: auto;
+	padding: 0 var(--lp-gutter);
+	margin-block-end: var(--lp-chapter-gap);
+}
+.finale .display {
+	font-size: clamp(2.4rem, 7vw, 5.6rem);
+	max-inline-size: 16ch;
+}
+.finale__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ca-space-3);
+	margin-top: var(--ca-space-8);
+}
+.foot {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: var(--ca-space-4);
+	max-inline-size: var(--lp-max);
+	margin-inline: auto;
+	padding: var(--ca-space-6) var(--lp-gutter) calc(var(--ca-space-8) + var(--ca-safe-bottom));
+	border-block-start: 1px solid var(--ca-outline-subtle);
+	font-size: var(--ca-font-size-body2);
+	color: var(--ca-text-secondary);
+}
+.foot nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ca-space-5);
+}
+.foot a {
+	color: var(--ca-text-secondary);
+	min-block-size: 44px;
+	display: inline-flex;
+	align-items: center;
+}
+.foot a:hover {
+	color: var(--ca-text-primary);
+}
+
+/* ── Chapter rail (desktop, after the hero) ──────────────────────────── */
+.rail {
+	position: fixed;
+	inset-inline-end: var(--ca-space-5);
+	inset-block-start: 50%;
+	translate: 0 -50%;
+	z-index: var(--ca-z-fixed);
+	display: none;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity var(--ca-duration-base) var(--ca-ease-standard);
+}
+@media (min-width: 70rem) and (min-height: 34rem) {
+	.rail {
+		display: block;
+	}
+}
+.rail-on .rail,
+.rail:focus-within {
+	opacity: 1;
+	pointer-events: auto;
+}
+.rail ol {
+	list-style: none;
+	margin: 0;
+	padding: var(--ca-space-2);
+	display: grid;
+	gap: var(--ca-space-1);
+	border-radius: var(--ca-radius-pill);
+	background: var(--ca-glass-bg);
+	backdrop-filter: var(--ca-blur-chrome);
+	-webkit-backdrop-filter: var(--ca-blur-chrome);
+	box-shadow: 0 0 0 1px var(--ca-outline-subtle);
+}
+.rail__line {
+	position: absolute;
+	inset-block: var(--ca-space-4);
+	inset-inline-start: 50%;
+	inline-size: 2px;
+	translate: -50% 0;
+	border-radius: var(--ca-radius-pill);
+	background: linear-gradient(
+		to bottom,
+		var(--ca-brand-main) calc(var(--rail-progress, 0) * 100%),
+		transparent calc(var(--rail-progress, 0) * 100%)
+	);
+	opacity: 0.55;
+	pointer-events: none;
+}
+.rail a {
+	position: relative;
+	display: grid;
+	place-items: center;
+	inline-size: 36px;
+	block-size: 36px;
+	border-radius: var(--ca-radius-pill);
+	color: var(--ca-text-secondary);
+	transition: color var(--ca-duration-fast) var(--ca-ease-standard), background var(--ca-duration-fast) var(--ca-ease-standard);
+}
+.rail a:hover,
+.rail a[aria-current="true"] {
+	color: var(--ca-brand-text);
+	background: color-mix(in oklab, var(--ca-brand-main) 16%, transparent);
+}
+.rail a:focus-visible {
+	outline: 2px solid var(--ca-brand-main);
+	outline-offset: 2px;
+}
+.rail__tip {
+	position: absolute;
+	inset-inline-end: calc(100% + var(--ca-space-3));
+	padding: var(--ca-space-1) var(--ca-space-3);
+	border-radius: var(--ca-radius-md);
+	background: var(--ca-surface-overlay);
+	color: var(--ca-text-primary);
+	font-size: var(--ca-font-size-caption);
+	white-space: nowrap;
+	opacity: 0;
+	pointer-events: none;
+	box-shadow: 0 0 0 1px var(--ca-outline-subtle);
+}
+.rail a:hover .rail__tip,
+.rail a:focus-visible .rail__tip {
+	opacity: 1;
+}
+
+/* ── Reduced motion: final states, no transitions ────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	.rail,
+	.rail a {
+		transition: none;
+	}
+}

@@ -1,0 +1,16 @@
+<script lang="ts">
+  import { NotificationBell } from '@codeatlasdev/ui';
+
+  let items = $state([
+    { id: '1', title: 'Deploy succeeded', body: 'prod-api-v2.4 is live', time: '2m ago', read: false, variant: 'success' as const },
+    { id: '2', title: 'New comment', body: 'Ana replied on PR #142', time: '18m ago', read: false },
+    { id: '3', title: 'Budget alert', body: '80% of monthly quota used', time: '1h ago', read: true, variant: 'warning' as const },
+  ]);
+</script>
+
+<NotificationBell
+  notifications={items}
+  onRead={(id) => (items = items.map((n) => (n.id === id ? { ...n, read: true } : n)))}
+  onReadAll={() => (items = items.map((n) => ({ ...n, read: true })))}
+  onClear={() => (items = [])}
+/>

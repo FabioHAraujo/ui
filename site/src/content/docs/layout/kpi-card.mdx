@@ -1,0 +1,36 @@
+---
+title: KpiCard
+description: A metric card with a title, a value, an optional unit, a trend and an icon.
+group: Layout
+order: 60
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Metrics from "~/demos/layout/kpi-card/Metrics.svelte";
+import MetricsSrc from "~/demos/layout/kpi-card/Metrics.svelte?raw";
+import NoTrend from "~/demos/layout/kpi-card/NoTrend.svelte";
+import NoTrendSrc from "~/demos/layout/kpi-card/NoTrend.svelte?raw";
+import NegativeTrend from "~/demos/layout/kpi-card/NegativeTrend.svelte";
+import NegativeTrendSrc from "~/demos/layout/kpi-card/NegativeTrend.svelte?raw";
+
+```svelte
+<script>
+  import { KpiCard } from "@codeatlasdev/ui";
+  import { DollarSign } from "@lucide/svelte";
+</script>
+
+<KpiCard title="Monthly Revenue" value="$48,200" trend={12.4} icon={DollarSign} />
+```
+
+<Demo title="Basic metrics" src={MetricsSrc}><Metrics /></Demo>
+<Demo title="Without trend" description="Omit trend and the indicator disappears." src={NoTrendSrc}><NoTrend /></Demo>
+<Demo title="Negative trend" src={NegativeTrendSrc}><NegativeTrend /></Demo>
+
+<Props rows={[
+  { name: "title", type: "string", description: "Metric name." },
+  { name: "value", type: "string | number", description: "Main value." },
+  { name: "unit", type: "string", description: "Unit shown after the value (%, s, users)." },
+  { name: "trend", type: "number", description: "Percentage change. Positive is green, negative is red, zero is neutral." },
+  { name: "icon", type: "IconComponent", description: "Lucide icon. Size and color are managed by the card." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

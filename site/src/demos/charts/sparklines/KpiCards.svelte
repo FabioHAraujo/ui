@@ -1,0 +1,35 @@
+<script lang="ts">
+  import { GlassCard, Grid, Stack, Row } from '@codeatlasdev/ui';
+  import { Sparkline } from '@codeatlasdev/ui/charts';
+
+  const kpis = [
+    { label: 'Monthly Revenue', value: '$112k', change: '+18.4%', trend: 'up' as const, data: [42, 51, 58, 63, 72, 80, 88, 95, 112] },
+    { label: 'Active Users', value: '24.8k', change: '+12.1%', trend: 'up' as const, data: [18, 19, 21, 20, 22, 23, 22, 24, 25] },
+    { label: 'Churn Rate', value: '2.3%', change: '-0.4%', trend: 'down' as const, data: [3.1, 2.9, 2.8, 2.7, 2.9, 2.6, 2.5, 2.4, 2.3] },
+    { label: 'Avg Session', value: '4m 12s', change: '-8.2%', trend: 'down' as const, data: [5.1, 4.8, 4.6, 4.7, 4.4, 4.5, 4.3, 4.2, 4.2] },
+  ];
+</script>
+
+<Grid cols="repeat(auto-fill,minmax(220px,1fr))" gap={16}>
+  {#each kpis as k}
+    <GlassCard>
+      <Stack gap={8}>
+        <span class="meta">{k.label}</span>
+        <span class="value">{k.value}</span>
+        <Row justify="space-between" align="center" gap={8}>
+          <span class="change" class:up={k.trend === 'up'} class:down={k.trend === 'down'}>{k.change}</span>
+          <div class="spark"><Sparkline data={k.data} trend={k.trend} height="32px" /></div>
+        </Row>
+      </Stack>
+    </GlassCard>
+  {/each}
+</Grid>
+
+<style>
+  .meta { font-size: var(--ca-font-size-caption); color: var(--ca-text-secondary); }
+  .value { font-size: var(--ca-font-size-h5); font-weight: 700; color: var(--ca-text-primary); }
+  .change { font-size: var(--ca-font-size-caption); }
+  .up { color: var(--ca-semantic-success); }
+  .down { color: var(--ca-semantic-error); }
+  .spark { flex: 1; min-width: 0; }
+</style>

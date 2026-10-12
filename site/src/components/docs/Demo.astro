@@ -1,0 +1,27 @@
+---
+import { CodeSnippet } from "@codeatlasdev/ui/code";
+
+interface Props {
+	title: string;
+	description?: string;
+	/** Source of the demo component (import with `?raw`). */
+	src?: string;
+	/** Center the preview in a framed stage. */
+	stage?: boolean;
+}
+const { title, description, src, stage = false } = Astro.props;
+const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+---
+<section class="demo" aria-labelledby={id}>
+	<h2 id={id}>{title}</h2>
+	{description && <p class="demo__desc">{description}</p>}
+	<div class:list={["demo__preview glass-ultra-thin", { "demo__preview--stage": stage }]}>
+		<slot />
+	</div>
+	{src && (
+		<details class="demo__code">
+			<summary>Code</summary>
+			<CodeSnippet client:visible code={src.trim()} language="svelte" />
+		</details>
+	)}
+</section>

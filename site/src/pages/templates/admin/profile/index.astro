@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AdminApp from "~/templates/admin/AdminApp.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="Admin profile template" description="Profile form with notification and security preferences." noindex>
+	<AdminApp client:load page="profile" {pathname} />
+</TemplateLayout>

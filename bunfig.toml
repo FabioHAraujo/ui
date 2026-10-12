@@ -1,0 +1,7 @@
+[install]
+exact = true
+
+# `bun test` would run Bun's own runner and skip Vitest/Playwright. Point it at an
+# empty dir so an accidental `bun test` finds nothing; use `bun run test`.
+[test]
+root = "packages/ui/tests/__never__"

@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AppDemo from "~/templates/app/AppDemo.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="App users template" description="CRUD list with filter groups, search, selection and inline actions built on AppList.">
+	<AppDemo client:load page="users" {pathname} />
+</TemplateLayout>

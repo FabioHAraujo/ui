@@ -1,0 +1,19 @@
+---
+title: Shadows
+description: Elevation scale from xs to xl, tuned separately for light and dark schemes.
+group: Foundation
+order: 3
+---
+import Demo from "~/components/docs/Demo.astro";
+import Scale from "~/demos/foundation/shadows/Scale.svelte";
+import ScaleSrc from "~/demos/foundation/shadows/Scale.svelte?raw";
+
+```css
+.popover {
+  box-shadow: var(--ca-shadow-lg);
+}
+```
+
+Light mode uses soft warm shadows, dark mode uses deeper black ones, so one token works in both. Glass surfaces rely on inset highlights and borders instead of drop shadows, see [Materials](/docs/foundation/materials/).
+
+<Demo title="Shadow scale" description="xs for hairline lift up to xl for modal depth." src={ScaleSrc}><Scale /></Demo>

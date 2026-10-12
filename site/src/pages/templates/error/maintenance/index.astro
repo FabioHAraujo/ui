@@ -1,0 +1,7 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import Maintenance from "~/templates/error/Maintenance.svelte";
+---
+<TemplateLayout title="Maintenance page template" description="Scheduled maintenance page with a live countdown.">
+	<Maintenance client:load />
+</TemplateLayout>

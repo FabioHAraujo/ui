@@ -1,0 +1,426 @@
+/*
+ * CodeAtlas UI — Liquid Glass Material Utility Classes
+ * ─────────────────────────────────────────────────────
+ * Based on Apple Liquid Glass (iOS 26 / macOS 26 HIG).
+ * Pure CSS — no framework dependency. Apply these classes directly
+ * to any HTML element. Design tokens come from global.css (:root / .dark).
+ *
+ * OPTICAL MODEL (7 layers):
+ *   1. Backdrop capture
+ *   2. Lensing / refraction   → LiquidGlass.svelte SVG feDisplacementMap
+ *   3. Blur / frost           → backdrop-filter: blur + saturate + brightness
+ *   4. Adaptive tint          → background-color: var(--ca-glass-tint-*)
+ *   5. Specular rim light     → box-shadow inset top + bottom pin
+ *   6. Adaptive shadow        → box-shadow drop
+ *   7. Interaction illumination → .glass-active
+ *
+ * THICKNESS TIERS (mirrors UIBlurEffectStyle):
+ *   ultra-thin  → tooltips, transient overlays
+ *   thin        → menus, popovers, contextual panels
+ *   regular     → sidebars, inline containers
+ *   thick       → dialogs, modals, sheets
+ *   chrome      → nav bars, docks, persistent UI chrome
+ */
+
+/* ── Base reset ──────────────────────────────────────────────────────────── */
+.glass {
+  position: relative;
+  isolation: isolate;
+  /* NOTE: will-change: transform intentionally omitted — promotes to GPU layer
+   * which causes backdrop-filter to capture transparent content instead of the
+   * real page backdrop, silently killing blur/tint on every glass surface. */
+  transition:
+    border-radius 280ms cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+/* ── 1. Ultra Thin ───────────────────────────────────────────────────────── */
+.glass-ultra-thin {
+  -webkit-backdrop-filter: var(--ca-blur-ultra-thin);
+  backdrop-filter: var(--ca-blur-ultra-thin);
+  background-color: var(--ca-glass-tint-ultra-thin);
+  box-shadow:
+    0 2px 8px oklch(0.25 0.008 70 / 0.06),
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* ── 2. Thin ─────────────────────────────────────────────────────────────── */
+.glass-thin {
+  -webkit-backdrop-filter: var(--ca-blur-thin);
+  backdrop-filter: var(--ca-blur-thin);
+  background-color: var(--ca-glass-tint-thin);
+  box-shadow:
+    0 4px 16px oklch(0.25 0.008 70 / 0.10),
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* ── 3. Regular ──────────────────────────────────────────────────────────── */
+.glass-regular {
+  -webkit-backdrop-filter: var(--ca-blur-regular);
+  backdrop-filter: var(--ca-blur-regular);
+  background-color: var(--ca-glass-tint);
+  box-shadow:
+    var(--ca-glass-shadow),
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.10);
+}
+
+/* ── 4. Thick ────────────────────────────────────────────────────────────── */
+.glass-thick {
+  -webkit-backdrop-filter: var(--ca-blur-thick);
+  backdrop-filter: var(--ca-blur-thick);
+  background-color: var(--ca-glass-tint-thick);
+  box-shadow:
+    0 16px 48px oklch(0.25 0.008 70 / 0.16),
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* ── 5. Chrome ───────────────────────────────────────────────────────────── */
+.glass-chrome {
+  -webkit-backdrop-filter: var(--ca-blur-chrome);
+  backdrop-filter: var(--ca-blur-chrome);
+  background-color: var(--ca-glass-tint-chrome);
+  box-shadow:
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    inset 0 -0.5px 0 var(--ca-glass-border),
+    0 1px 0 var(--ca-glass-border);
+}
+
+/* ── Navigation layer ────────────────────────────────────────────────────── */
+.glass-nav-layer {
+  -webkit-backdrop-filter: var(--ca-blur-chrome);
+  backdrop-filter: var(--ca-blur-chrome);
+  background-color: var(--ca-glass-tint-chrome);
+  box-shadow:
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    inset 0 -0.5px 0 var(--ca-glass-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--ca-z-nav, 100);
+}
+
+/* ── Scroll edge effects ─────────────────────────────────────────────────── */
+.glass-scroll-edge-bottom::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -32px;
+  height: 32px;
+  background: linear-gradient(to bottom, var(--ca-glass-tint-chrome), transparent);
+  pointer-events: none;
+}
+.glass-scroll-edge-top::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: -32px;
+  height: 32px;
+  background: linear-gradient(to top, var(--ca-glass-tint-chrome), transparent);
+  pointer-events: none;
+}
+
+/* ── Tint + Glow modifiers ───────────────────────────────────────────────── */
+.glass-tinted {
+  background-image: linear-gradient(135deg, var(--ca-glow-primary) 0%, transparent 55%);
+}
+.glass-prominent {
+  background-image: linear-gradient(135deg, var(--ca-glow-primary-strong) 0%, transparent 55%);
+}
+.glass-glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: var(--ca-glow-primary);
+  filter: blur(16px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ── Active / selected (Layer 7) ─────────────────────────────────────────── */
+.glass-active {
+  box-shadow:
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    0 0 0 1.5px var(--ca-glow-primary-strong),
+    0 2px 12px var(--ca-glow-primary);
+}
+
+/* ── Button variants (mirrors Apple UIButton.Configuration) ──────────────── */
+.glass-btn {
+  background-color: var(--ca-glass-tint-thin);
+  -webkit-backdrop-filter: var(--ca-blur-thin);
+  backdrop-filter: var(--ca-blur-thin);
+  border: 0.5px solid var(--ca-glass-border);
+  box-shadow: inset 0 0.5px 0 var(--ca-glass-rim);
+  color: var(--ca-vibrancy-label);
+  cursor: pointer;
+}
+.glass-btn:hover  { background-color: var(--ca-glass-tint); }
+.glass-btn:active { background-color: var(--ca-glass-tint-thick); }
+
+.glass-btn-prominent {
+  background: linear-gradient(135deg, var(--ca-glow-primary-strong), var(--ca-glass-tint-thick));
+  -webkit-backdrop-filter: var(--ca-blur-thin);
+  backdrop-filter: var(--ca-blur-thin);
+  border: 0.5px solid var(--ca-glow-primary-strong);
+  box-shadow: inset 0 0.5px 0 var(--ca-glass-rim), 0 0 0 1px var(--ca-glow-primary);
+  color: var(--ca-vibrancy-label);
+  cursor: pointer;
+}
+
+.glass-btn-clear {
+  background: transparent;
+  -webkit-backdrop-filter: var(--ca-blur-ultra-thin);
+  backdrop-filter: var(--ca-blur-ultra-thin);
+  border: 0.5px solid var(--ca-glass-border);
+  color: var(--ca-vibrancy-label);
+  cursor: pointer;
+}
+.glass-btn-clear:hover { background-color: var(--ca-glass-tint-ultra-thin); }
+
+/* ── Concentric corner radius ────────────────────────────────────────────── */
+.glass-inner-sm { border-radius: max(0px, var(--ca-radius-inner, 0px) - 4px); }
+.glass-inner-md { border-radius: max(0px, var(--ca-radius-inner, 0px) - 6px); }
+.glass-inner-lg { border-radius: max(0px, var(--ca-radius-inner, 0px) - 8px); }
+
+/* ── Background extension ────────────────────────────────────────────────── */
+.glass-bg-extend {
+  -webkit-backdrop-filter: var(--ca-blur-regular);
+  backdrop-filter: var(--ca-blur-regular);
+  background-color: var(--ca-glass-tint);
+}
+
+/* ── Vibrancy label hierarchy ────────────────────────────────────────────── */
+.vibrancy-label     { color: var(--ca-vibrancy-label); }
+.vibrancy-secondary { color: var(--ca-vibrancy-secondary); }
+.vibrancy-tertiary  { color: var(--ca-vibrancy-tertiary); }
+.vibrancy-fill      { background-color: var(--ca-vibrancy-fill); }
+.vibrancy-separator { background-color: var(--ca-vibrancy-separator); }
+
+/* ── Reduced transparency fallback ──────────────────────────────────────── */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-ultra-thin, .glass-thin, .glass-regular,
+  .glass-thick, .glass-chrome, .glass-nav-layer, .glass-bg-extend {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-color: var(--ca-glass-tint-solid) !important;
+  }
+  .glass-btn, .glass-btn-prominent, .glass-btn-clear {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background-color: var(--ca-glass-tint-thick) !important;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .glass { transition: none; }
+}
+
+/* ── Surface layer tokens — override these to change component surfaces ─────
+ *
+ * Hierarchy:
+ *   overlay  → Popover, DropdownMenu, Tooltip       (thin glass, z-dropdown)
+ *   panel    → NotificationBell, CommandPalette      (thick glass, z-modal)
+ *   sheet    → Dialog, Drawer                        (solid, z-modal — no glass, overlay already blurs)
+ *   chrome   → BottomNav, Rail, Panel                (chrome glass, z-nav)
+ *   upload   → FileUpload drop zone                  (ultra-thin glass)
+ *
+ * Override example — all overlays go solid:
+ *   :root {
+ *     --ca-overlay-bg:   var(--ca-surface-overlay);
+ *     --ca-overlay-blur: none;
+ *     --ca-overlay-rim:  none;
+ *   }
+ *
+ * Override just Popover:
+ *   .ca-popover-content {
+ *     --ca-overlay-bg:   var(--ca-surface-overlay);
+ *     --ca-overlay-blur: none;
+ *   }
+ * ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* ── Overlay (Popover, DropdownMenu) — thin glass ── */
+  --ca-overlay-bg:          var(--ca-glass-tint-thin);
+  --ca-overlay-blur:        var(--ca-blur-thin);
+  --ca-overlay-border:      var(--ca-glass-border);
+  --ca-overlay-shadow:      0 4px 16px oklch(0.25 0.008 70 / 0.10),
+                            inset 0 0.5px 0 var(--ca-glass-rim);
+
+  /* ── Panel (NotificationBell, CommandPalette) — thick glass ── */
+  --ca-panel-bg:            var(--ca-glass-tint-thick);
+  --ca-panel-blur:          var(--ca-blur-thick);
+  --ca-panel-border:        var(--ca-glass-border);
+  --ca-panel-shadow:        0 16px 48px oklch(0.25 0.008 70 / 0.16),
+                            inset 0 0.5px 0 var(--ca-glass-rim);
+
+  /* ── Chrome (BottomNav, Rail, AppShell) — chrome glass ── */
+  --ca-chrome-bg:           var(--ca-glass-tint-chrome);
+  --ca-chrome-blur:         var(--ca-blur-chrome);
+  --ca-chrome-border:       var(--ca-glass-border);
+
+  /* ── Upload zone — ultra-thin glass ── */
+  --ca-upload-bg:           var(--ca-glass-tint-ultra-thin);
+  --ca-upload-blur:         var(--ca-blur-ultra-thin);
+}
+
+/* Utility classes using the layer tokens */
+.glass-overlay {
+  -webkit-backdrop-filter: var(--ca-overlay-blur);
+  backdrop-filter: var(--ca-overlay-blur);
+  background-color: var(--ca-overlay-bg);
+  border: 1px solid var(--ca-overlay-border);
+  box-shadow: var(--ca-overlay-shadow);
+}
+
+.glass-panel {
+  -webkit-backdrop-filter: var(--ca-panel-blur);
+  backdrop-filter: var(--ca-panel-blur);
+  background-color: var(--ca-panel-bg);
+  border: 1px solid var(--ca-panel-border);
+  box-shadow: var(--ca-panel-shadow);
+}
+
+.glass-chrome-layer {
+  -webkit-backdrop-filter: var(--ca-chrome-blur);
+  backdrop-filter: var(--ca-chrome-blur);
+  background-color: var(--ca-chrome-bg);
+}
+
+.glass-upload-zone {
+  -webkit-backdrop-filter: var(--ca-upload-blur);
+  backdrop-filter: var(--ca-upload-blur);
+  background-color: var(--ca-upload-bg);
+}
+
+/* ── Reduced transparency fallback for layer tokens ── */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-overlay, .glass-panel, .glass-upload-zone {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .glass-overlay    { background-color: var(--ca-glass-tint-solid) !important; }
+  .glass-panel      { background-color: var(--ca-glass-tint-solid) !important; }
+  .glass-upload-zone{ background-color: var(--ca-glass-tint-solid) !important; }
+}
+
+/* ── Surface styles — data-style attribute on <html> ──────────────────────
+ *
+ * Controls the entire visual feel from glass to flat.
+ * Default (no attribute or data-style="glass") = Liquid Glass (current).
+ *
+ * Usage:
+ *   document.documentElement.setAttribute('data-style', 'solid');
+ *   colorScheme.setStyle('solid');
+ *
+ * Override individual components:
+ *   .ca-popover-content { --ca-overlay-blur: none; --ca-overlay-bg: var(--ca-surface-overlay); }
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Frosted — reduced blur, less dramatic ── */
+[data-style="frosted"] {
+  --ca-blur-ultra-thin: blur(5px) saturate(140%);
+  --ca-blur-thin:       blur(8px) saturate(155%);
+  --ca-blur-regular:    blur(12px) saturate(165%);
+  --ca-blur-thick:      blur(18px) saturate(175%);
+  --ca-blur-chrome:     blur(24px) saturate(185%);
+
+  --ca-overlay-bg:      var(--ca-glass-tint);
+  --ca-overlay-blur:    blur(8px) saturate(155%);
+  --ca-panel-bg:        var(--ca-glass-tint-thick);
+  --ca-panel-blur:      blur(18px) saturate(175%);
+  --ca-chrome-bg:       var(--ca-glass-tint-chrome);
+  --ca-chrome-blur:     blur(24px) saturate(185%);
+}
+
+/* ── Solid — no blur, opaque surfaces, pastel-friendly ── */
+[data-style="solid"] {
+  --ca-blur-ultra-thin: none;
+  --ca-blur-thin:       none;
+  --ca-blur-regular:    none;
+  --ca-blur-thick:      none;
+  --ca-blur-chrome:     none;
+
+  --ca-overlay-bg:      var(--ca-surface-overlay);
+  --ca-overlay-blur:    none;
+  --ca-overlay-border:  var(--ca-outline-subtle);
+  --ca-overlay-shadow:  0 4px 16px oklch(0 0 0 / 0.10), 0 1px 3px oklch(0 0 0 / 0.06);
+
+  --ca-panel-bg:        var(--ca-surface-overlay);
+  --ca-panel-blur:      none;
+  --ca-panel-border:    var(--ca-outline-subtle);
+  --ca-panel-shadow:    0 8px 32px oklch(0 0 0 / 0.12), 0 2px 6px oklch(0 0 0 / 0.06);
+
+  --ca-chrome-bg:       var(--ca-surface-raised);
+  --ca-chrome-blur:     none;
+  --ca-chrome-border:   var(--ca-outline-subtle);
+
+  --ca-upload-bg:       var(--ca-surface-raised);
+  --ca-upload-blur:     none;
+
+  /* glass tints → solid equivalents */
+  --ca-glass-tint-ultra-thin: var(--ca-surface-raised);
+  --ca-glass-tint-thin:       var(--ca-surface-raised);
+  --ca-glass-tint:            var(--ca-surface-raised);
+  --ca-glass-tint-thick:      var(--ca-surface-overlay);
+  --ca-glass-tint-chrome:     var(--ca-surface-overlay);
+}
+
+/* ── Flat — no blur, no elevation, border-based separation ── */
+[data-style="flat"] {
+  --ca-blur-ultra-thin: none;
+  --ca-blur-thin:       none;
+  --ca-blur-regular:    none;
+  --ca-blur-thick:      none;
+  --ca-blur-chrome:     none;
+
+  --ca-overlay-bg:      var(--ca-surface-overlay);
+  --ca-overlay-blur:    none;
+  --ca-overlay-border:  var(--ca-outline-default);
+  --ca-overlay-shadow:  none;
+
+  --ca-panel-bg:        var(--ca-surface-overlay);
+  --ca-panel-blur:      none;
+  --ca-panel-border:    var(--ca-outline-default);
+  --ca-panel-shadow:    none;
+
+  --ca-chrome-bg:       var(--ca-surface-raised);
+  --ca-chrome-blur:     none;
+  --ca-chrome-border:   var(--ca-outline-default);
+
+  --ca-upload-bg:       var(--ca-surface-raised);
+  --ca-upload-blur:     none;
+
+  /* glass tints → flat solid */
+  --ca-glass-tint-ultra-thin: var(--ca-surface-raised);
+  --ca-glass-tint-thin:       var(--ca-surface-raised);
+  --ca-glass-tint:            var(--ca-surface-raised);
+  --ca-glass-tint-thick:      var(--ca-surface-raised);
+  --ca-glass-tint-chrome:     var(--ca-surface-raised);
+
+  /* shadows → off */
+  --ca-shadow-xs: none;
+  --ca-shadow-sm: none;
+  --ca-shadow-md: 0 0 0 1px var(--ca-outline-subtle);
+  --ca-shadow-lg: 0 0 0 1px var(--ca-outline-subtle);
+  --ca-shadow-xl: 0 0 0 1px var(--ca-outline-default);
+}
+
+/* ── No backdrop-filter (old WebViews, some Android browsers): translucent tints would
+ *    show raw page content through glass. Swap them for near-opaque surfaces.
+ *    This layer (ca.materials) comes after ca.themes, so it wins over preset tints. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root,
+  [data-theme-scope] {
+    --ca-glass-tint-ultra-thin: color-mix(in oklab, var(--ca-surface-raised) 92%, transparent);
+    --ca-glass-tint-thin:       color-mix(in oklab, var(--ca-surface-raised) 94%, transparent);
+    --ca-glass-tint:            color-mix(in oklab, var(--ca-surface-raised) 96%, transparent);
+    --ca-glass-tint-thick:      var(--ca-surface-overlay);
+    --ca-glass-tint-chrome:     var(--ca-surface-raised);
+    --ca-glass-bg:              var(--ca-surface-overlay);
+  }
+}

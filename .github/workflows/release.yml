@@ -1,0 +1,90 @@
+name: Release
+# Release channels (npm dist-tags), one branch each:
+#   main  → latest   1.2.0           docs: https://ui.codeatlas.com.br
+#   beta  → beta     1.3.0-beta.0    docs: https://beta.codeatlas-ui.pages.dev
+#   alpha → alpha    2.0.0-alpha.0   docs: https://alpha.codeatlas-ui.pages.dev
+# beta/alpha run in Changesets prerelease mode (.changeset/pre.json, tag = branch name).
+# On every push to a channel branch:
+# - pending changesets → opens/updates the "Version Packages (<channel>)" PR;
+# - that PR merged → publishes to npm under the channel's dist-tag, with provenance via
+#   Trusted Publishing (OIDC, no token), tags, creates the GitHub Release;
+# - always → deploys that channel's docs.
+on:
+  push:
+    branches: [main, beta, alpha]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write # npm Trusted Publishing + provenance
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      # Trusted Publishing needs npm >= 11.5.1.
+      - run: npm i -g npm@latest
+      - run: bun install --frozen-lockfile
+      # A prerelease must never reach `latest`, and a channel branch must be in its pre mode.
+      - name: Channel guard
+        run: |
+          channel="${GITHUB_REF_NAME}"
+          tag=$(node -p 'try { require("./.changeset/pre.json").tag } catch { "" }')
+          if [ "$channel" = "main" ] && [ -n "$tag" ]; then
+            echo "::error::.changeset/pre.json (tag $tag) is on main. Run 'bunx changeset pre exit' on the channel branch before merging it."; exit 1
+          fi
+          if [ "$channel" != "main" ] && [ "$tag" != "$channel" ]; then
+            echo "::error::Branch $channel must be in prerelease mode: bunx changeset pre enter $channel"; exit 1
+          fi
+      - run: bun run build:pkg
+      - run: bun run validate
+      # Packs the tarball into a fresh SvelteKit app and builds it: the release gate.
+      - run: bun run release
+      - id: changesets
+        uses: changesets/action@v2
+        with:
+          title: "chore: version packages (${{ github.ref_name }})"
+          commit: "chore: version packages (${{ github.ref_name }})"
+          version: bun run version
+          publish: bun run release:ci
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"
+
+  site:
+    needs: release
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'main' && 'production' || github.ref_name }}
+      url: ${{ github.ref_name == 'main' && 'https://ui.codeatlas.com.br' || format('https://{0}.codeatlas-ui.pages.dev', github.ref_name) }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: site
+          command: pages deploy dist --project-name codeatlas-ui --branch ${{ github.ref_name }}

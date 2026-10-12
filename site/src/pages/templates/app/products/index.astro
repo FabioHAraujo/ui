@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AppDemo from "~/templates/app/AppDemo.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="App products template" description="Product catalog list with search, filters and pagination.">
+	<AppDemo client:load page="products" {pathname} />
+</TemplateLayout>

@@ -1,0 +1,32 @@
+---
+import { SimpleTable } from "@codeatlasdev/ui";
+
+interface Row {
+	name: string;
+	type: string;
+	default?: string;
+	description: string;
+}
+interface Props {
+	rows: Row[];
+	title?: string;
+}
+const { rows, title = "Props" } = Astro.props;
+const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+---
+<section class="demo" aria-labelledby={id}>
+	<h2 id={id}>{title}</h2>
+	<SimpleTable responsive="cards">
+		<thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+		<tbody>
+			{rows.map((r) => (
+				<tr>
+					<td data-label="Prop"><code>{r.name}</code></td>
+					<td data-label="Type"><code>{r.type}</code></td>
+					<td data-label="Default">{r.default ? <code>{r.default}</code> : "–"}</td>
+					<td data-label="Description">{r.description}</td>
+				</tr>
+			))}
+		</tbody>
+	</SimpleTable>
+</section>

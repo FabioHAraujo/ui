@@ -1,0 +1,35 @@
+---
+title: GlassAppBar
+description: A top application bar with glass blur and leading, content and trailing slots.
+group: Navigation
+order: 7
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Default from "~/demos/navigation/app-bar/Default.svelte";
+import DefaultSrc from "~/demos/navigation/app-bar/Default.svelte?raw";
+import WithLeading from "~/demos/navigation/app-bar/WithLeading.svelte";
+import WithLeadingSrc from "~/demos/navigation/app-bar/WithLeading.svelte?raw";
+
+```svelte
+<script>
+  import { GlassAppBar, IconButton } from "@codeatlasdev/ui";
+</script>
+
+<GlassAppBar>
+  My Application
+  {#snippet trailing()}<IconButton aria-label="Search">...</IconButton>{/snippet}
+</GlassAppBar>
+```
+
+Renders a `<header>`. Icon-only buttons inside it need an `aria-label`. Inside [AppShell](/docs/layout/app-shell/) use the shell's own header; this bar is for standalone pages.
+
+<Demo title="Default" description="Content in the middle and actions in the trailing slot." src={DefaultSrc}><Default /></Demo>
+<Demo title="With leading icon" description="A menu button in the leading slot." src={WithLeadingSrc}><WithLeading /></Demo>
+
+<Props rows={[
+  { name: "children", type: "Snippet", description: "Main content, for example the title." },
+  { name: "leading", type: "Snippet", description: "Content at the start, usually a menu button." },
+  { name: "trailing", type: "Snippet", description: "Content at the end, usually actions and an avatar." },
+  { name: "class", type: "string", default: "''", description: "Extra CSS classes." },
+]} />

@@ -1,0 +1,43 @@
+---
+title: HeatmapChart
+description: Density and pattern visualization as calendar grids and hour-by-day matrices.
+group: Charts
+order: 70
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Calendar from "~/demos/charts/heatmap/Calendar.svelte";
+import CalendarSrc from "~/demos/charts/heatmap/Calendar.svelte?raw";
+import Matrix from "~/demos/charts/heatmap/Matrix.svelte";
+import MatrixSrc from "~/demos/charts/heatmap/Matrix.svelte?raw";
+import YearToggle from "~/demos/charts/heatmap/YearToggle.svelte";
+import YearToggleSrc from "~/demos/charts/heatmap/YearToggle.svelte?raw";
+
+```svelte
+<script>
+  import { HeatmapChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<HeatmapChart variant="calendar" data={[["2026-03-01", 4]]} range={["2026-01-01", "2026-09-15"]} />
+<HeatmapChart variant="matrix" matrixData={[[0, 0, 3]]} xCategories={hours} yCategories={days} />
+```
+
+`variant` is required. The calendar variant reads `data` and `range`; the matrix variant reads `matrixData`, `xCategories` and `yCategories`.
+
+<Demo title="Calendar heatmap" description="Daily commit activity from January to September." src={CalendarSrc}><Calendar client:visible /></Demo>
+<Demo title="Hour by day matrix" description="Points are [xIndex, yIndex, value] into xCategories and yCategories." src={MatrixSrc}><Matrix client:visible /></Demo>
+<Demo title="Year toggle" description="Swap data and range to move between years." src={YearToggleSrc}><YearToggle client:visible /></Demo>
+
+<Props rows={[
+  { name: "variant", type: "'calendar' | 'matrix'", description: "Which layout to render. Required." },
+  { name: "data", type: "CalendarHeatmapPoint[]", default: "[]", description: "Calendar variant: [date as YYYY-MM-DD, value] per day." },
+  { name: "range", type: "[string, string]", description: "Calendar variant: first and last date shown." },
+  { name: "matrixData", type: "MatrixHeatmapPoint[]", default: "[]", description: "Matrix variant: [xIndex, yIndex, value]." },
+  { name: "xCategories", type: "string[]", default: "[]", description: "Matrix variant: x-axis labels." },
+  { name: "yCategories", type: "string[]", default: "[]", description: "Matrix variant: y-axis labels." },
+  { name: "color", type: "string", description: "Hex or rgb color of the high end of the ramp. Defaults to the first palette color. Use hex or rgb, not oklch." },
+  { name: "max", type: "number", description: "Value that maps to the full color. Defaults to the data maximum." },
+  { name: "tooltipFormatter", type: "(value: number) => string", description: "Formats the value in the tooltip." },
+  { name: "height", type: "string", default: "'240px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

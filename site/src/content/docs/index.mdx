@@ -1,0 +1,64 @@
+---
+title: Introduction
+description: CodeAtlas UI is an open-source Svelte 5 component library with a glass material system, an OKLCH theme engine and native-feeling mobile behavior.
+group: Getting started
+order: 0
+---
+import { CardGrid, LinkCard } from "@codeatlasdev/ui";
+import CodeGroup from "~/components/docs/CodeGroup.astro";
+
+CodeAtlas UI gives Svelte 5 apps full screens, not just bricks: page templates, an app shell, data tables, charts, forms and overlays, all built on [bits-ui](https://bits-ui.com) and themed through CSS custom properties.
+
+```svelte
+<AppList title="Users" data={users} searchKeys={["name", "email"]}>
+  {#snippet children(list)}
+    <SimpleTable>
+      {#each list.rows as u (u.id)}
+        <tr><td><UserCell name={u.name} email={u.email} /></td></tr>
+      {/each}
+    </SimpleTable>
+  {/snippet}
+</AppList>
+```
+
+That is a whole users page: header, search, pagination, empty state and glass surface, with no CSS written.
+
+## What you get
+
+- **Pages, not primitives.** `AppList`, `AppForm`, `AppSettings`, `PageShell` and `AppShellLayout` bring layout, spacing and empty states.
+- **Liquid Glass.** Five material tiers with real `backdrop-filter`, tuned for light and dark, with opaque fallbacks for reduced transparency.
+- **Theme engine.** Eight OKLCH presets, brand presets from one hex color, four surface styles, and no flash on load.
+- **Native on mobile.** Safe areas, keyboard handling, 44px touch targets, bottom sheets with swipe to dismiss, and browser chrome color that follows the page.
+- **Accessible.** bits-ui behavior, axe-tested components, reduced motion and reduced transparency support.
+- **Light.** Charts, DataTable and CodeSnippet are separate entry points with optional peers, so they stay out of your bundle unless imported.
+- **Built for AI agents.** Closed prop vocabularies, typed props, `llms.txt` and installable skills.
+
+## Install
+
+<CodeGroup sync="pm" tabs={[
+  { label: "bun", code: "bun add @codeatlasdev/ui" },
+  { label: "npm", code: "npm install @codeatlasdev/ui" },
+  { label: "pnpm", code: "pnpm add @codeatlasdev/ui" },
+]} />
+
+## Start here
+
+<CardGrid>
+  <LinkCard title="Installation" href="/docs/getting-started/installation/" description="SvelteKit, Astro and plain Vite setup." />
+  <LinkCard title="Theming" href="/docs/getting-started/theming/" description="defineTheme, presets, schemes and token overrides." />
+  <LinkCard title="Mobile" href="/docs/getting-started/mobile/" description="Safe areas, keyboard, browser chrome and layout components." />
+  <LinkCard title="Accessibility" href="/docs/getting-started/accessibility/" description="What is handled for you and what is not." />
+  <LinkCard title="Internationalization" href="/docs/getting-started/i18n/" description="English by default, pt-BR built in, overridable." />
+  <LinkCard title="AI agents" href="/docs/getting-started/ai-agents/" description="Skills, llms.txt and the agent guide." />
+</CardGrid>
+
+## Explore
+
+<CardGrid>
+  <LinkCard title="Colors" href="/docs/foundation/colors/" description="Brand, surface, text, outline and semantic tokens." />
+  <LinkCard title="Materials" href="/docs/foundation/materials/" description="Glass tiers, tint, glow and button variants." />
+  <LinkCard title="Inputs" href="/docs/inputs/button/" description="Buttons, fields, selects and pickers." />
+  <LinkCard title="Templates" href="/templates/" description="Full-app pages built with the library." />
+  <LinkCard title="Theme editor" href="/theme/" description="Tune a preset and export it as a theme." />
+  <LinkCard title="GitHub" href="https://github.com/codeatlasdev/ui" description="Source, issues and changelog." />
+</CardGrid>

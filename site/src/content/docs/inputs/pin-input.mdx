@@ -1,0 +1,38 @@
+---
+title: PinInput
+description: One-time code and PIN entry. Paste, backspace and arrow keys work across cells, and SMS codes autofill.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Default from "~/demos/inputs/pin-input/Default.svelte";
+import DefaultSrc from "~/demos/inputs/pin-input/Default.svelte?raw";
+import States from "~/demos/inputs/pin-input/States.svelte";
+import StatesSrc from "~/demos/inputs/pin-input/States.svelte?raw";
+
+```svelte
+<script>
+  import { PinInput } from "@codeatlasdev/ui";
+  let code = $state("");
+</script>
+
+<PinInput label="Verification code" bind:value={code} oncomplete={(v) => verify(v)} />
+```
+
+One hidden input backs all cells, with `autocomplete="one-time-code"`, so mobile keyboards offer the SMS code. In `numeric` mode the numeric keypad opens and non-digits are rejected. The `error` is announced with `role="alert"`.
+
+<Demo title="Default" description="Six digits by default. oncomplete fires once all cells are filled. A four-digit masked PIN is shown below it." src={DefaultSrc}><Default client:visible /></Demo>
+<Demo title="States" description="Description, error, disabled and a free-text code." src={StatesSrc}><States client:visible /></Demo>
+
+<Props rows={[
+  { name: "length", type: "number", default: "6", description: "Number of cells." },
+  { name: "value", type: "string", default: "''", description: "Bindable value." },
+  { name: "type", type: "'numeric' | 'text'", default: "'numeric'", description: "Numeric restricts input to digits and opens the numeric keypad." },
+  { name: "label", type: "string", description: "Visible label." },
+  { name: "description", type: "string", description: "Hint below the cells." },
+  { name: "error", type: "string", description: "Error message (role=\"alert\"). Sets aria-invalid." },
+  { name: "mask", type: "boolean", default: "false", description: "Shows a bullet instead of each character." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables input." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "oncomplete", type: "(value: string) => void", description: "Called once all cells are filled." },
+]} />

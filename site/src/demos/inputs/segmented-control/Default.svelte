@@ -1,0 +1,44 @@
+<script lang="ts">
+  import { SegmentedControl } from '@codeatlasdev/ui';
+  import { LayoutGrid, LayoutList } from '@lucide/svelte';
+
+  let period = $state('month');
+  let view = $state('list');
+</script>
+
+<div class="col">
+  <div>
+    <SegmentedControl
+      aria-label="Period"
+      bind:value={period}
+      items={[
+        { value: 'week', label: 'Week' },
+        { value: 'month', label: 'Month' },
+        { value: 'year', label: 'Year' },
+      ]}
+    />
+    <p class="out">value: {period}</p>
+  </div>
+  <SegmentedControl
+    aria-label="View"
+    bind:value={view}
+    items={[
+      { value: 'list', label: 'List', icon: LayoutList },
+      { value: 'grid', label: 'Grid', icon: LayoutGrid },
+    ]}
+  />
+</div>
+
+<style>
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ca-space-5);
+  }
+
+  .out {
+    margin: var(--ca-space-3) 0 0;
+    font-size: var(--ca-font-size-caption);
+    color: var(--ca-text-secondary);
+  }
+</style>

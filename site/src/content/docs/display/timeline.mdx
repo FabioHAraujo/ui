@@ -1,0 +1,28 @@
+---
+title: Timeline
+description: "Chronological list of events with colored markers."
+group: Display
+order: 12
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Variants from "~/demos/display/timeline/Variants.svelte";
+import VariantsSrc from "~/demos/display/timeline/Variants.svelte?raw";
+import Simple from "~/demos/display/timeline/Simple.svelte";
+import SimpleSrc from "~/demos/display/timeline/Simple.svelte?raw";
+
+```svelte
+<script>
+  import { Timeline } from "@codeatlasdev/ui";
+</script>
+
+<Timeline items={[{ label: "Order created", date: "Today", variant: "success" }]} />
+```
+
+<Demo title="With variants" description={"Markers take the color of the item `variant`."} src={VariantsSrc}><Variants /></Demo>
+<Demo title="Simple" description={"Only a label and a date."} src={SimpleSrc}><Simple /></Demo>
+
+<Props rows={[
+  { name: "items", type: "TimelineItem[]", description: "Events: `{ label, description?, date?, variant? }`. `variant` is `'default' | 'success' | 'error' | 'warning' | 'info'`. Required." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

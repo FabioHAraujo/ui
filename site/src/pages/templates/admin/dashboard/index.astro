@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AdminApp from "~/templates/admin/AdminApp.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="Admin dashboard template" description="KPI cards, revenue chart, traffic sources and recent signups inside AppShellLayout, with a demo auth guard." noindex>
+	<AdminApp client:load page="dashboard" {pathname} />
+</TemplateLayout>

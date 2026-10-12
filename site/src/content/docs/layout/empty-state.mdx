@@ -1,0 +1,45 @@
+---
+title: EmptyState
+description: A placeholder for empty views with an icon, a title, a description and actions.
+group: Layout
+order: 80
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Basic from "~/demos/layout/empty-state/Basic.svelte";
+import BasicSrc from "~/demos/layout/empty-state/Basic.svelte?raw";
+import NoResults from "~/demos/layout/empty-state/NoResults.svelte";
+import NoResultsSrc from "~/demos/layout/empty-state/NoResults.svelte?raw";
+import Offline from "~/demos/layout/empty-state/Offline.svelte";
+import OfflineSrc from "~/demos/layout/empty-state/Offline.svelte?raw";
+import Hero from "~/demos/layout/empty-state/Hero.svelte";
+import HeroSrc from "~/demos/layout/empty-state/Hero.svelte?raw";
+import NoIcon from "~/demos/layout/empty-state/NoIcon.svelte";
+import NoIconSrc from "~/demos/layout/empty-state/NoIcon.svelte?raw";
+
+```svelte
+<script>
+  import { EmptyState, Button } from "@codeatlasdev/ui";
+  import { Inbox } from "@lucide/svelte";
+</script>
+
+<EmptyState icon={Inbox} title="No messages yet" description="New messages will appear here.">
+  {#snippet actions()}<Button size="sm">Compose</Button>{/snippet}
+</EmptyState>
+```
+
+<Demo title="Basic" description="Icon, title, description and a primary action." src={BasicSrc}><Basic /></Demo>
+<Demo title="No results" description="For searches and filters that match nothing." src={NoResultsSrc}><NoResults /></Demo>
+<Demo title="Error or offline" description="Failed network requests and loading errors." src={OfflineSrc}><Offline /></Demo>
+<Demo title="Hero" description="A larger, brand-tinted tile with a glow. On mobile the actions stack full width, so put the primary one first." src={HeroSrc}><Hero /></Demo>
+<Demo title="No icon" description="A minimal version without an icon." src={NoIconSrc}><NoIcon /></Demo>
+
+<Props rows={[
+  { name: "icon", type: "IconComponent", description: "Lucide icon. Size and color are managed by the component." },
+  { name: "title", type: "string", description: "Main title." },
+  { name: "variant", type: "'default' | 'hero'", default: "'default'", description: "'default' is a compact inline state. 'hero' adds a larger brand-tinted icon tile with a glow and bigger title." },
+  { name: "description", type: "string", description: "Supporting text." },
+  { name: "actions", type: "Snippet", description: "Call-to-action buttons." },
+  { name: "children", type: "Snippet", description: "Extra content below the description." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

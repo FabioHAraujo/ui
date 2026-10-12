@@ -1,0 +1,7 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import SignIn from "~/templates/auth/SignIn.svelte";
+---
+<TemplateLayout title="Sign in template" description="Split-screen sign-in page with email and password fields, social buttons and AuthLayout.">
+	<SignIn client:load />
+</TemplateLayout>

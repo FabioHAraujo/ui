@@ -1,0 +1,38 @@
+---
+title: PieChart
+description: Proportional data as pie, donut or Nightingale rose, with an optional center label.
+group: Charts
+order: 30
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Donut from "~/demos/charts/pie/Donut.svelte";
+import DonutSrc from "~/demos/charts/pie/Donut.svelte?raw";
+import CenterLabel from "~/demos/charts/pie/CenterLabel.svelte";
+import CenterLabelSrc from "~/demos/charts/pie/CenterLabel.svelte?raw";
+import Rose from "~/demos/charts/pie/Rose.svelte";
+import RoseSrc from "~/demos/charts/pie/Rose.svelte?raw";
+import Animated from "~/demos/charts/pie/Animated.svelte";
+import AnimatedSrc from "~/demos/charts/pie/Animated.svelte?raw";
+
+```svelte
+<script>
+  import { PieChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<PieChart data={[{ name: "Cloud", value: 38 }, { name: "SaaS", value: 24 }]} donut />
+```
+
+<Demo title="Basic donut" src={DonutSrc}><Donut client:visible /></Demo>
+<Demo title="Donut with center KPI" description="centerLabel overlays a value and caption in the hole of a donut." src={CenterLabelSrc}><CenterLabel client:visible /></Demo>
+<Demo title="Rose chart" description="Nightingale rose: the radius of each slice scales with its value." src={RoseSrc}><Rose client:visible /></Demo>
+<Demo title="Animated proportions" description="Swap the data and the slices animate to the new proportions." src={AnimatedSrc}><Animated client:visible /></Demo>
+
+<Props rows={[
+  { name: "data", type: "ChartSlice[]", description: "Slices as { name, value }." },
+  { name: "donut", type: "boolean", default: "false", description: "Renders a ring instead of a solid pie." },
+  { name: "rose", type: "boolean", default: "false", description: "Nightingale rose, where the slice radius scales with the value." },
+  { name: "centerLabel", type: "{ value: string; label: string }", description: "Text centered in a donut, such as a KPI total. Use with donut." },
+  { name: "height", type: "string", default: "'300px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

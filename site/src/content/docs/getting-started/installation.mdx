@@ -1,0 +1,187 @@
+---
+title: Installation
+description: Install @codeatlasdev/ui and wire the theme into SvelteKit, Astro or plain Vite without a flash of the wrong theme.
+group: Getting started
+order: 1
+---
+import { Callout, Steps } from "@codeatlasdev/ui";
+import CodeGroup from "~/components/docs/CodeGroup.astro";
+
+CodeAtlas UI needs Svelte 5 (runes mode). Setup is three things: import the stylesheet once, inject the theme script before first paint, and start the `colorScheme` store in your root layout.
+
+<CodeGroup sync="pm" tabs={[
+  { label: "bun", code: "bun add @codeatlasdev/ui" },
+  { label: "npm", code: "npm install @codeatlasdev/ui" },
+  { label: "pnpm", code: "pnpm add @codeatlasdev/ui" },
+]} />
+
+The core bundle stays small. Heavy features are separate entry points with optional peer dependencies, so install only what you use:
+
+| Feature | Import from | Also install |
+|---|---|---|
+| Charts | `@codeatlasdev/ui/charts` | `echarts` |
+| DataTable | `@codeatlasdev/ui/table` | `@tanstack/svelte-table` |
+| CodeSnippet | `@codeatlasdev/ui/code` | `shiki` |
+| Masked and money fields | `@codeatlasdev/ui/forms` | nothing |
+
+Icons come from `@lucide/svelte`, which the package already depends on.
+
+### Release channels
+
+| Channel | Install | When to use it |
+|---|---|---|
+| `latest` | `bun add @codeatlasdev/ui` | Production. Semver: breaking changes only in a major. |
+| `beta` | `bun add @codeatlasdev/ui@beta` | The next minor, feature-complete. Try it before it ships. |
+| `alpha` | `bun add @codeatlasdev/ui@alpha` | The next major while it is still moving. Expect breaking changes between alphas. |
+
+Every version is published from CI with an npm provenance statement, so you can check which commit and workflow built it (`npm audit signatures`).
+
+## SvelteKit
+
+<Steps>
+
+1. **Register the Vite plugin.** It bundles the ESM-only dependencies for SSR (`@tanstack/svelte-table`, `shiki`) and warns at build time if the theme script is not injected.
+
+   ```ts
+   // vite.config.ts
+   import { sveltekit } from "@sveltejs/kit/vite";
+   import { caThemePlugin } from "@codeatlasdev/ui/vite";
+   import { defineConfig } from "vite";
+   import { theme } from "./src/lib/theme";
+
+   export default defineConfig({ plugins: [sveltekit(), caThemePlugin(theme)] });
+   ```
+
+2. **Inject the theme script in the server hook.** `caThemeHandle` puts the brand presets and the init script right after `<head>` of every SSR and prerendered page, so the first paint already has the right scheme and preset.
+
+   ```ts
+   // src/hooks.server.ts
+   import { sequence } from "@sveltejs/kit/hooks";
+   import { caThemeHandle } from "@codeatlasdev/ui/kit";
+   import { theme } from "$lib/theme";
+
+   export const handle = sequence(caThemeHandle(theme));
+   ```
+
+3. **Define the theme once.** Both the hook and the plugin take the same object. An empty object is valid and gives you the built-in amber preset in dark mode.
+
+   ```ts
+   // src/lib/theme.ts
+   import type { ThemeOptions } from "@codeatlasdev/ui";
+
+   export const theme: ThemeOptions = {
+     defaultScheme: "system",
+   };
+   ```
+
+4. **Import the stylesheet and start the store in the root layout.**
+
+   ```svelte
+   <!-- src/routes/+layout.svelte -->
+   <script>
+     import "@codeatlasdev/ui/styles/global.css";
+     import { colorScheme } from "@codeatlasdev/ui";
+     import { onMount } from "svelte";
+
+     let { children } = $props();
+     onMount(() => colorScheme.init());
+   </script>
+
+   {@render children()}
+   ```
+
+5. **Set the viewport meta in `src/app.html`.** See [Mobile](/docs/getting-started/mobile/) for what each part does.
+
+   ```html
+   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+   ```
+
+</Steps>
+
+<Callout type="tip" title="Prefer app.html?">
+  If you cannot use a hook, paste the script into `src/app.html` instead. `CA_THEME_SCRIPT_TAG` from `@codeatlasdev/ui/vite` is a ready-to-paste tag for the default theme; for a custom theme, use the hook.
+</Callout>
+
+## Astro
+
+Use the integration together with `@astrojs/svelte`. `caUI` injects the theme into the `<head>` of every page and handles the SSR bundling.
+
+```sh
+bun add @codeatlasdev/ui @astrojs/svelte svelte
+```
+
+```js
+// astro.config.mjs
+import svelte from "@astrojs/svelte";
+import { caUI } from "@codeatlasdev/ui/astro";
+import { defineConfig } from "astro/config";
+import { theme } from "./src/theme.ts";
+
+export default defineConfig({ integrations: [svelte(), caUI(theme)] });
+```
+
+```ts
+// src/theme.ts
+import type { ThemeOptions } from "@codeatlasdev/ui/astro";
+
+export const theme: ThemeOptions = { defaultPreset: "amber", defaultScheme: "dark" };
+```
+
+Import the stylesheet once in your base layout and add the viewport meta:
+
+```astro
+---
+// src/layouts/Base.astro
+import "@codeatlasdev/ui/styles/global.css";
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+  </head>
+  <body><slot /></body>
+</html>
+```
+
+Components are Svelte islands. Add a client directive to anything interactive (`client:visible` or `client:load`); purely visual components render on the server with no JavaScript. In islands, call `colorScheme.init()` from one island that is always on the page, such as your header, or from a small script.
+
+<Callout type="note">
+  Astro needs `astro` 5, 6 or 7 as a peer. Components that read `colorScheme` render correctly on the server because the init script sets `class="dark"` and `data-preset` before the stylesheet applies.
+</Callout>
+
+## Plain Vite
+
+`caThemePlugin` also works without SvelteKit: it injects the theme head through `transformIndexHtml`.
+
+```ts
+// vite.config.ts
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { caThemePlugin } from "@codeatlasdev/ui/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({ plugins: [caThemePlugin(), svelte()] });
+```
+
+```ts
+// src/main.ts
+import "@codeatlasdev/ui/styles/global.css";
+import { colorScheme } from "@codeatlasdev/ui";
+import { mount } from "svelte";
+import App from "./App.svelte";
+
+colorScheme.init();
+mount(App, { target: document.getElementById("app")! });
+```
+
+## Verify
+
+```svelte
+<script>
+  import { Button, ThemeToggle } from "@codeatlasdev/ui";
+</script>
+
+<Button variant="filled">It works</Button>
+<ThemeToggle />
+```
+
+Reload with the toggle on dark and check that there is no white flash. Continue with [Theming](/docs/getting-started/theming/).

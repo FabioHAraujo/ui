@@ -1,0 +1,48 @@
+/* Error template layout. Tokens only. */
+.error-root {
+	display: flex;
+	min-height: var(--ca-vh, 100vh);
+	align-items: center;
+	justify-content: center;
+	padding: calc(40px + var(--ca-safe-top)) 24px calc(40px + var(--ca-safe-bottom));
+}
+.error-inner {
+	max-width: 420px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+}
+.error-code {
+	font-size: clamp(80px, 20vw, 140px);
+	font-weight: 900;
+	line-height: 1;
+	letter-spacing: -0.04em;
+	user-select: none;
+}
+.error-code--brand {
+	background: linear-gradient(135deg, var(--ca-brand-main), var(--ca-brand-dark));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+.error-code--danger {
+	background: linear-gradient(135deg, var(--ca-semantic-error), oklch(0.65 0.22 25));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+.error-title {
+	margin: 0;
+	font-size: var(--ca-font-size-h4);
+	font-weight: 700;
+	color: var(--ca-text-primary);
+}
+.error-body {
+	margin: 0;
+	font-size: var(--ca-font-size-body1);
+	color: var(--ca-text-secondary);
+	line-height: 1.6;
+	max-width: 320px;
+}

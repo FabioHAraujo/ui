@@ -1,0 +1,34 @@
+---
+title: Collapsible
+description: "A single toggle panel, simpler than Accordion when you only need one."
+group: Surfaces
+order: 3
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Default from "~/demos/surfaces/collapsible/Default.svelte";
+import DefaultSrc from "~/demos/surfaces/collapsible/Default.svelte?raw";
+import Open from "~/demos/surfaces/collapsible/Open.svelte";
+import OpenSrc from "~/demos/surfaces/collapsible/Open.svelte?raw";
+
+```svelte
+<script>
+  import { Collapsible } from "@codeatlasdev/ui";
+</script>
+
+<Collapsible title="Details" bind:open>…</Collapsible>
+```
+
+The trigger is a button with `aria-expanded`. Use [Accordion](/docs/surfaces/accordion/) when several related panels should coordinate.
+
+<Demo title="Default (closed)" src={DefaultSrc}><Default client:visible /></Demo>
+<Demo title="Open by default" description={"Start expanded and bind `open` to follow the state."} src={OpenSrc}><Open client:visible /></Demo>
+
+<Props rows={[
+  { name: "title", type: "string", description: "Trigger label. Required." },
+  { name: "open", type: "boolean", default: "false", description: "Expanded state. Bindable." },
+  { name: "disabled", type: "boolean", default: "false", description: "Prevents toggling." },
+  { name: "onOpenChange", type: "(open: boolean) => void", default: "undefined", description: "Called when the state changes." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+  { name: "children", type: "Snippet", default: "undefined", description: "Panel content." },
+]} />

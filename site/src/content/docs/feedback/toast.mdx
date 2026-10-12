@@ -1,0 +1,40 @@
+---
+title: Toast
+description: A global notification system. Mount Toaster once, then call toast.success(), toast.error() and friends from anywhere.
+group: Feedback
+order: 8
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Toasts from "~/demos/feedback/toast/Toasts.svelte";
+import ToastsSrc from "~/demos/feedback/toast/Toasts.svelte?raw";
+
+```svelte
+<!-- +layout.svelte: mount once -->
+<script>
+  import { Toaster } from "@codeatlasdev/ui";
+</script>
+<Toaster />
+
+<!-- anywhere -->
+<script>
+  import { toast } from "@codeatlasdev/ui";
+</script>
+<button onclick={() => toast.success("Changes saved.")}>Save</button>
+```
+
+`toast` is a global store, so the calls need no component context. The Toaster is a polite live region (`role="region"`, `aria-live="polite"`) and each toast is a `role="status"`. Toasts stack in the bottom right corner. The demo below mounts its own `Toaster` because every demo is an independent island.
+
+<Demo title="Variants and duration" description="Five variants, plus persistent (duration 0) and custom durations. The default auto-dismiss is 4 seconds." src={ToastsSrc}><Toasts client:visible /></Demo>
+
+<Props title="API" rows={[
+  { name: "toast.show(message, opts?)", type: "(message: string, opts?: { variant?: ToastVariant; duration?: number }) => string", description: "Shows a toast and returns its id. Variant defaults to 'default'." },
+  { name: "toast.success(message, duration?)", type: "(message: string, duration?: number) => string", description: "Success toast." },
+  { name: "toast.error(message, duration?)", type: "(message: string, duration?: number) => string", description: "Error toast." },
+  { name: "toast.warning(message, duration?)", type: "(message: string, duration?: number) => string", description: "Warning toast." },
+  { name: "toast.info(message, duration?)", type: "(message: string, duration?: number) => string", description: "Info toast." },
+  { name: "toast.remove(id)", type: "(id: string) => void", description: "Dismisses a toast by id." },
+  { name: "toast.items", type: "ToastItem[]", description: "Reactive list of the visible toasts." },
+  { name: "duration", type: "number", default: "4000", description: "Auto-dismiss delay in ms. 0 keeps the toast until dismissed." },
+  { name: "ToastVariant", type: "'default' | 'success' | 'error' | 'warning' | 'info'", description: "Accepted variants." },
+]} />

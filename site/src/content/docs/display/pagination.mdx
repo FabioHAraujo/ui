@@ -1,0 +1,37 @@
+---
+title: Pagination
+description: "Navigation between pages of a data set, with a bindable current page."
+group: Display
+order: 9
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Basic from "~/demos/display/pagination/Basic.svelte";
+import BasicSrc from "~/demos/display/pagination/Basic.svelte?raw";
+import Siblings from "~/demos/display/pagination/Siblings.svelte";
+import SiblingsSrc from "~/demos/display/pagination/Siblings.svelte?raw";
+import FewItems from "~/demos/display/pagination/FewItems.svelte";
+import FewItemsSrc from "~/demos/display/pagination/FewItems.svelte?raw";
+
+```svelte
+<script>
+  import { Pagination } from "@codeatlasdev/ui";
+</script>
+
+<Pagination count={100} perPage={10} bind:page />
+```
+
+`count` is the total number of items, not the number of pages. Pages are numbered from 1.
+
+<Demo title="Basic" src={BasicSrc}><Basic client:visible /></Demo>
+<Demo title="More siblings" description={"`siblingCount` controls how many pages show around the current one."} src={SiblingsSrc}><Siblings client:visible /></Demo>
+<Demo title="Few items" src={FewItemsSrc}><FewItems client:visible /></Demo>
+
+<Props rows={[
+  { name: "count", type: "number", description: "Total number of items to paginate. Required." },
+  { name: "perPage", type: "number", default: "10", description: "Items per page." },
+  { name: "page", type: "number", default: "1", description: "Current page, 1-based. Bindable." },
+  { name: "siblingCount", type: "number", default: "1", description: "Pages shown on each side of the current page." },
+  { name: "onPageChange", type: "(page: number) => void", default: "undefined", description: "Called when the page changes." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

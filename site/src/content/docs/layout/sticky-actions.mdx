@@ -1,0 +1,35 @@
+---
+title: StickyActions
+description: A form action bar pinned to the bottom of a scrolling container, with glass, safe-area and virtual keyboard support.
+group: Layout
+order: 10
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Dirty from "~/demos/layout/sticky-actions/Dirty.svelte";
+import DirtySrc from "~/demos/layout/sticky-actions/Dirty.svelte?raw";
+import Stretch from "~/demos/layout/sticky-actions/Stretch.svelte";
+import StretchSrc from "~/demos/layout/sticky-actions/Stretch.svelte?raw";
+
+```svelte
+<script>
+  import { StickyActions, Button } from "@codeatlasdev/ui";
+</script>
+
+<StickyActions show={dirty}>
+  <Button variant="ghost">Cancel</Button>
+  <Button variant="filled">Save</Button>
+</StickyActions>
+```
+
+Place it as the last child of the element that scrolls. On screens narrower than 900px it sticks to the bottom edge with a glass background, respects the home-indicator inset (`--ca-safe-bottom`) and rises with the virtual keyboard. From 900px up it becomes a plain inline row without chrome.
+
+<Demo title="End aligned" description="Buttons sit on the right. The bar only renders while the form is dirty (show)." src={DirtySrc}><Dirty client:visible /></Demo>
+<Demo title="Stretch" description="On touch screens the primary button fills the width and the ghost button stays compact." src={StretchSrc}><Stretch client:visible /></Demo>
+
+<Props rows={[
+  { name: "children", type: "Snippet", description: "The buttons of the bar." },
+  { name: "align", type: "'end' | 'stretch'", default: "'end'", description: "'end' packs the buttons to the right. 'stretch' makes the buttons fill the width on touch screens." },
+  { name: "show", type: "boolean", default: "true", description: "Renders the bar only while there is something to confirm." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

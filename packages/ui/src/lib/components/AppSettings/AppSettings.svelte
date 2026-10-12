@@ -1,0 +1,396 @@
+<script lang="ts">
+  import { t } from '../../i18n/state.svelte.js';
+  /**
+   * AppSettings — settings/preferences page layout.
+   *
+   * ┌──────────────────────────────────────────────────────────────┐
+   * │  Settings                                  [Save changes]    │  header
+   * ├────────────┬─────────────────────────────────────────────────┤
+   * │            │                                                  │
+   * │  General   │  ┌─ Workspace ─────────────────────────────┐    │
+   * │  Notifs    │  │  Name ________  Slug ___________         │    │  body
+   * │  Members   │  └──────────────────────────────────────────┘    │
+   * │  Security  │                                                   │
+   * │            │  ┌─ Danger Zone ────────────────────────────┐    │
+   * │            │  │  Delete workspace             [Delete]    │    │
+   * │            │  └──────────────────────────────────────────┘    │
+   * └────────────┴─────────────────────────────────────────────────┘
+   *
+   * Comportamento:
+   * - O conteúdo direito ocupa TODA a largura disponível — sem max-width no container.
+   *   Quem controla a largura máxima dos campos é o FormSection, não o AppSettings.
+   * - Nav esquerda: fixa, não rola.
+   * - Conteúdo direito: único bloco que rola.
+   * - Header: fixo no topo.
+   *
+   * Uso mínimo — estado gerenciado internamente:
+   *
+   *   <AppSettings title="Settings" tabs={TABS}>
+   *     {#snippet actions()}<Button onclick={save}>Save</Button>{/snippet}
+   *     {#snippet children(tab)}
+   *       {#if tab === 'general'}
+   *         <FormSection title="Workspace">
+   *           <TextField label="Name" bind:value={name} />
+   *         </FormSection>
+   *       {/if}
+   *     {/snippet}
+   *   </AppSettings>
+   *
+   * Com controle externo (bind:activeTab):
+   *
+   *   <AppSettings tabs={TABS} bind:activeTab={tab} onTabChange={handleChange}>
+   *     {#snippet children(tab)}…{/snippet}
+   *   </AppSettings>
+   */
+  import type { IconComponent } from '../../types.js';
+  import type { Snippet } from 'svelte';
+
+  interface SettingsTab {
+    value:   string;
+    label:   string;
+    icon?:   IconComponent;
+    badge?:  number;
+    /** Renders the item in error/danger color */
+    danger?: boolean;
+  }
+
+  interface Props {
+    title?:        string;
+    description?:  string;
+    tabs:          SettingsTab[];
+    /** Initial active tab. Defaults to first tab's value. */
+    defaultTab?:   string;
+    /** Bindable for external control. If omitted, state is managed internally. */
+    activeTab?:    string;
+    /** Optional callback when tab changes */
+    onTabChange?:  (value: string) => void;
+    /** Top-right slot: save / cancel buttons */
+    actions?:      Snippet;
+    class?:        string;
+    /** Receives the active tab value as its first argument */
+    children?:     Snippet<[string]>;
+  }
+
+  let {
+    title,
+    description,
+    tabs,
+    defaultTab,
+    activeTab = $bindable(defaultTab ?? tabs[0]?.value ?? ''),
+    onTabChange,
+    actions,
+    class: className = '',
+    children,
+  }: Props = $props();
+
+  function selectTab(value: string) {
+    activeTab = value;
+    onTabChange?.(value);
+  }
+</script>
+
+<div class="ca-app-settings {className}">
+
+  <!-- ── Header ─────────────────────────────────────────────────── -->
+  <div class="ca-app-settings__header">
+    <div class="ca-app-settings__meta">
+      {#if title}<h1 class="ca-app-settings__title">{title}</h1>{/if}
+      {#if description}<p class="ca-app-settings__desc">{description}</p>{/if}
+    </div>
+    {#if actions}
+      <div class="ca-app-settings__actions">{@render actions()}</div>
+    {/if}
+  </div>
+
+  <!-- ── Body ───────────────────────────────────────────────────── -->
+  <div class="ca-app-settings__body">
+
+    <!-- Nav esquerda — não rola -->
+    <div class="ca-app-settings__nav" aria-label={t().appSettings.navigation} role="tablist">
+      {#each tabs as t}
+        {@const active = t.value === activeTab}
+        <button
+          type="button"
+          class="ca-app-settings__nav-item"
+          class:active
+          class:danger={t.danger}
+          role="tab"
+          aria-selected={active}
+          onclick={() => selectTab(t.value)}
+        >
+          {#if t.icon}
+            {@const Icon = t.icon}
+            <Icon
+              size={15}
+              stroke-width={active ? 2.2 : 1.6}
+              class="ca-app-settings__nav-icon"
+            />
+          {/if}
+          <span class="ca-app-settings__nav-label">{t.label}</span>
+          {#if t.badge != null}
+            <span class="ca-app-settings__nav-badge">{t.badge}</span>
+          {/if}
+        </button>
+      {/each}
+    </div>
+
+    <!-- Conteúdo direito — único bloco que rola -->
+    <div class="ca-app-settings__content" role="tabpanel" aria-label={t().appSettings.content}>
+      {@render children?.(activeTab)}
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* ── Root ──────────────────────────────────────────────────────
+     Ocupa todo o ca-shell__content (display:flex flex-col overflow:hidden).
+  ─────────────────────────────────────────────────────────────── */
+  .ca-app-settings {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  /* ── Header ────────────────────────────────────────────────────
+     Consistente com AppList e AppForm: usa --ca-page-px e --ca-page-pt.
+  ─────────────────────────────────────────────────────────────── */
+  .ca-app-settings__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ca-space-4, 16px);
+    padding:
+      var(--ca-page-pt, 20px)
+      var(--ca-page-px, 24px)
+      var(--ca-space-4, 16px);
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--ca-outline-subtle);
+  }
+
+  .ca-app-settings__meta { flex: 1; min-width: 0; }
+
+  .ca-app-settings__title {
+    font-size: var(--ca-font-size-h5);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ca-text-primary);
+    margin: 0 0 2px;
+    line-height: 1.2;
+  }
+
+  .ca-app-settings__desc {
+    font-size: var(--ca-font-size-body2);
+    color: var(--ca-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .ca-app-settings__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--ca-space-2, 8px);
+    flex-shrink: 0;
+  }
+
+  /* ── Body ───────────────────────────────────────────────────────
+     Flex row: nav fixa + conteúdo scrollável lado a lado.
+  ─────────────────────────────────────────────────────────────── */
+  .ca-app-settings__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ── Nav esquerda ───────────────────────────────────────────────
+     Largura: 220px. Não rola (a menos que tenha muitos itens).
+     Padding usa os tokens globais.
+  ─────────────────────────────────────────────────────────────── */
+  .ca-app-settings__nav {
+    width: 220px;
+    flex-shrink: 0;
+    padding: var(--ca-space-4, 16px) var(--ca-space-3, 12px);
+    border-right: 1px solid var(--ca-outline-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .ca-app-settings__nav::-webkit-scrollbar { width: 0; }
+
+  /* Item da nav */
+  .ca-app-settings__nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--ca-space-2, 8px);
+    padding: 7px 10px;
+    border-radius: var(--ca-radius-md);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--ca-font-size-body2);
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--ca-text-secondary);
+    text-align: left;
+    width: 100%;
+    transition:
+      background var(--ca-duration-fast) var(--ca-ease-standard),
+      color      var(--ca-duration-fast) var(--ca-ease-standard);
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .ca-app-settings__nav-item:hover {
+    background: var(--ca-action-hover);
+    color: var(--ca-text-primary);
+  }
+
+  /* Active — bg tinted + pill indicador à esquerda */
+  .ca-app-settings__nav-item.active {
+    background: color-mix(in oklab, var(--ca-brand-main) 10%, transparent);
+    color: var(--ca-brand-text);
+  }
+
+  .ca-app-settings__nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--ca-brand-main);
+  }
+
+  /* Danger variant */
+  .ca-app-settings__nav-item.danger       { color: var(--ca-semantic-error); }
+  .ca-app-settings__nav-item.danger:hover {
+    background: color-mix(in oklab, var(--ca-semantic-error) 8%, transparent);
+    color: var(--ca-semantic-error);
+  }
+
+  :global(.ca-app-settings__nav-icon) {
+    flex-shrink: 0;
+    color: currentColor;
+    opacity: 0.75;
+  }
+
+  .ca-app-settings__nav-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ca-app-settings__nav-badge {
+    font-size: var(--ca-font-size-micro);
+    font-weight: 600;
+    background: color-mix(in oklab, var(--ca-brand-main) 14%, transparent);
+    color: var(--ca-brand-text);
+    padding: 1px 6px;
+    border-radius: var(--ca-radius-pill);
+    flex-shrink: 0;
+    line-height: 1.6;
+  }
+
+  /* ── Conteúdo direito ───────────────────────────────────────────
+     Ocupa TODA a largura restante — sem max-width aqui.
+     O max-width de leitura confortável fica no FormSection.
+     Padding usa os tokens globais.
+  ─────────────────────────────────────────────────────────────── */
+  .ca-app-settings__content {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--ca-space-6, 24px) var(--ca-page-px, 24px) var(--ca-space-12, 48px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--ca-page-gap, 20px);
+  }
+
+  .ca-app-settings__content::-webkit-scrollbar      { width: 5px; }
+  .ca-app-settings__content::-webkit-scrollbar-track { background: transparent; }
+  .ca-app-settings__content::-webkit-scrollbar-thumb {
+    background: var(--ca-outline-default);
+    border-radius: 999px;
+  }
+
+  /* ── Mobile (<= 768px) ───────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .ca-app-settings__body { flex-direction: column; }
+
+    /* Nav vira barra horizontal scrollável */
+    .ca-app-settings__nav {
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: var(--ca-space-2, 8px) var(--ca-page-px-sm, 16px);
+      border-right: none;
+      border-bottom: 1px solid var(--ca-outline-subtle);
+      gap: 4px;
+      scroll-snap-type: x proximity;
+      scroll-padding-inline: var(--ca-page-px-sm, 16px);
+      -webkit-overflow-scrolling: touch;
+      /* Fade the trailing edge so it reads as scrollable. */
+      mask-image: linear-gradient(to right, #000 calc(100% - var(--ca-page-px-sm, 16px)), transparent);
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--ca-page-px-sm, 16px)), transparent);
+    }
+
+    .ca-app-settings__nav::-webkit-scrollbar { height: 0; }
+
+    .ca-app-settings__nav-item {
+      /* The base rule is width:100% (vertical list): size to content in the strip. */
+      width: auto;
+      min-height: 36px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      padding: 5px 12px;
+    }
+
+    /* Esconde o pill indicador na horizontal — usa apenas bg */
+    .ca-app-settings__nav-item.active::before { display: none; }
+
+    .ca-app-settings__content {
+      padding:
+        var(--ca-space-4, 16px)
+        var(--ca-page-px-sm, 16px)
+        var(--ca-space-10, 40px);
+    }
+
+    .ca-app-settings__header {
+      padding:
+        var(--ca-space-4, 16px)
+        var(--ca-page-px-sm, 16px)
+        var(--ca-space-3, 12px);
+      flex-wrap: wrap;
+    }
+  }
+
+  /* Inside AppShellLayout the mobile header (< 900px) already shows the page title:
+     keep the h1 for assistive tech, hide it visually. */
+  @media (max-width: 899px) {
+    :global(.ca-shell__content) .ca-app-settings__title {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+  }
+</style>

@@ -1,0 +1,45 @@
+<script lang="ts">
+  import { Drawer, Button, Switch, Stack, FilterGroup } from '@codeatlasdev/ui';
+  import { SlidersHorizontal } from '@lucide/svelte';
+
+  let open = $state(false);
+  let statusF = $state('all');
+  let roleF = $state('all');
+  const statusOpts = [{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }];
+  const roleOpts = [{ value: 'Admin', label: 'Admin' }, { value: 'Editor', label: 'Editor' }, { value: 'Viewer', label: 'Viewer' }];
+</script>
+
+<Button variant="outlined" onclick={() => (open = true)}>
+  {#snippet leading()}<SlidersHorizontal size={14} />{/snippet}
+  Open drawer
+</Button>
+
+<Drawer bind:open title="Filters">
+  <Stack gap={16}>
+    <div>
+      <p class="label">Status</p>
+      <FilterGroup options={statusOpts} value={statusF} onchange={(v) => (statusF = v)} />
+    </div>
+    <div>
+      <p class="label">Role</p>
+      <FilterGroup options={roleOpts} value={roleF} onchange={(v) => (roleF = v)} />
+    </div>
+    <Switch label="Show inactive only" />
+    <Switch label="Include archived" />
+  </Stack>
+  {#snippet actions()}
+    <Button variant="ghost" onclick={() => (open = false)}>Reset</Button>
+    <Button variant="filled" onclick={() => (open = false)}>Apply</Button>
+  {/snippet}
+</Drawer>
+
+<style>
+  .label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ca-text-secondary);
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>

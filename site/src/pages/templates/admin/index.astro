@@ -1,0 +1,12 @@
+---
+import Base from "~/layouts/Base.astro";
+const target = "/templates/admin/dashboard/";
+---
+<Base title="Admin template" description="Full admin app built with AppShellLayout." noindex>
+	<Fragment slot="head">
+		<meta http-equiv="refresh" content={`0; url=${target}`} />
+	</Fragment>
+	<main id="main" tabindex="-1">
+		<p>Redirecting to the <a href={target}>admin dashboard</a>.</p>
+	</main>
+</Base>

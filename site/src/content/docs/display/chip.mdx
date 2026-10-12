@@ -1,0 +1,58 @@
+---
+title: Chip
+description: "Compact element for tags, filters and status labels, with icons, color variants, selection and deletion."
+group: Display
+order: 4
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Basic from "~/demos/display/chip/Basic.svelte";
+import BasicSrc from "~/demos/display/chip/Basic.svelte?raw";
+import Variants from "~/demos/display/chip/Variants.svelte";
+import VariantsSrc from "~/demos/display/chip/Variants.svelte?raw";
+import Icons from "~/demos/display/chip/Icons.svelte";
+import IconsSrc from "~/demos/display/chip/Icons.svelte?raw";
+import Selectable from "~/demos/display/chip/Selectable.svelte";
+import SelectableSrc from "~/demos/display/chip/Selectable.svelte?raw";
+import Deletable from "~/demos/display/chip/Deletable.svelte";
+import DeletableSrc from "~/demos/display/chip/Deletable.svelte?raw";
+import Status from "~/demos/display/chip/Status.svelte";
+import StatusSrc from "~/demos/display/chip/Status.svelte?raw";
+
+```svelte
+<script>
+  import { Chip, StatusChip } from "@codeatlasdev/ui";
+</script>
+
+<Chip label="Design" variant="brand" deletable ondelete={remove} />
+<StatusChip status="success" label="Active" />
+```
+
+A chip becomes a keyboard-focusable toggle button when `onclick` is set: Enter and Space activate it and `aria-pressed` follows `selected`. `StatusChip` is a separate, non-interactive component for dot + label statuses.
+
+<Demo title="Basic" src={BasicSrc}><Basic /></Demo>
+<Demo title="Variants and size" description={"Semantic variants and the compact `sm` size."} src={VariantsSrc}><Variants /></Demo>
+<Demo title="With icons" description={"Pass any Lucide icon component to `icon`."} src={IconsSrc}><Icons /></Demo>
+<Demo title="Selectable" description={"Set `onclick` to make the chip a toggle."} src={SelectableSrc}><Selectable client:visible /></Demo>
+<Demo title="Deletable" description={"Click the \u00d7 button to remove a tag."} src={DeletableSrc}><Deletable client:visible /></Demo>
+<Demo title="StatusChip" description={"Semantic status indicators with dot and label."} src={StatusSrc}><Status /></Demo>
+
+
+<Props title="Chip props" rows={[
+  { name: "label", type: "string", description: "Text content of the chip. Required." },
+  { name: "icon", type: "Component", default: "undefined", description: "Icon component rendered before the label." },
+  { name: "variant", type: "'default' | 'success' | 'error' | 'warning' | 'info' | 'brand'", default: "'default'", description: "Color variant." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Chip size." },
+  { name: "selected", type: "boolean", default: "false", description: "Selected visual state, exposed as `aria-pressed` on interactive chips." },
+  { name: "deletable", type: "boolean", default: "false", description: "Shows a \u00d7 remove button." },
+  { name: "onclick", type: "() => void", default: "undefined", description: "Makes the chip interactive (button role, focusable)." },
+  { name: "ondelete", type: "() => void", default: "undefined", description: "Called when the \u00d7 button is clicked." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />
+
+
+<Props title="StatusChip props" rows={[
+  { name: "status", type: "'success' | 'warning' | 'error' | 'info' | 'neutral'", description: "Semantic status. Required." },
+  { name: "label", type: "string", description: "Text shown next to the dot. Required." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

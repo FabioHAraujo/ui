@@ -1,0 +1,42 @@
+---
+title: Select
+description: Dropdown selector built on Bits UI with keyboard navigation and a glass content panel.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Basic from "~/demos/inputs/select/Basic.svelte";
+import BasicSrc from "~/demos/inputs/select/Basic.svelte?raw";
+import Placeholder from "~/demos/inputs/select/Placeholder.svelte";
+import PlaceholderSrc from "~/demos/inputs/select/Placeholder.svelte?raw";
+import States from "~/demos/inputs/select/States.svelte";
+import StatesSrc from "~/demos/inputs/select/States.svelte?raw";
+
+```svelte
+<script>
+  import { Select } from "@codeatlasdev/ui";
+  let value = $state("br");
+</script>
+
+<Select label="Country" options={[{ value: "br", label: "Brazil" }]} bind:value />
+```
+
+For long lists that need filtering, use [Combobox](/docs/inputs/combobox/). Without a `label` the trigger is named by its `placeholder`. Text inside inputs stays at 16px or more on touch screens, so iOS Safari never zooms on focus.
+
+<Demo title="Basic" description="Controlled select with a pre-selected value." src={BasicSrc}><Basic client:visible /></Demo>
+<Demo title="Placeholder" description="No initial value: the placeholder shows until the user picks an option." src={PlaceholderSrc}><Placeholder client:visible /></Demo>
+<Demo title="States" description="Disabled options, description, error and a disabled select." src={StatesSrc}><States client:visible /></Demo>
+
+<Props rows={[
+  { name: "value", type: "string", description: "Bindable selected value." },
+  { name: "options", type: "Array<{ value: string; label: string; disabled?: boolean }>", description: "Option items." },
+  { name: "placeholder", type: "string", default: "'Select…' (localized)", description: "Text shown when no value is selected. The default comes from the active i18n catalog." },
+  { name: "label", type: "string", description: "Visible label above the trigger." },
+  { name: "description", type: "string", description: "Hint shown below the trigger." },
+  { name: "error", type: "string", description: "Error message. Puts the select in the error state." },
+  { name: "required", type: "boolean", default: "false", description: "Marks the field as required." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the entire select." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Trigger height." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "onchange", type: "(value: string) => void", description: "Called when the selection changes." },
+]} />

@@ -1,0 +1,37 @@
+{
+	"name": "site",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview --port 4321",
+		"check": "astro check --minimumFailingSeverity warning",
+		"test:e2e": "playwright test",
+		"test:a11y": "playwright test --project=a11y"
+	},
+	"dependencies": {
+		"@astrojs/mdx": "8.0.3",
+		"@astrojs/sitemap": "3.7.4",
+		"@astrojs/svelte": "9.0.1",
+		"@codeatlasdev/ui": "workspace:*",
+		"@fontsource-variable/funnel-display": "5.3.0",
+		"@fontsource-variable/inter": "5.3.0",
+		"@fontsource-variable/jetbrains-mono": "5.3.0",
+		"@lucide/svelte": "1.48.0",
+		"@tanstack/svelte-table": "9.2.4",
+		"astro": "7.3.8",
+		"echarts": "6.1.0",
+		"gsap": "3.15.0",
+		"lenis": "1.3.26",
+		"shiki": "4.4.3",
+		"svelte": "5.57.0"
+	},
+	"devDependencies": {
+		"@astrojs/check": "0.9.10",
+		"@axe-core/playwright": "4.13.0",
+		"@playwright/test": "1.64.0",
+		"typescript": "5.9.3",
+		"wrangler": "4.149.0"
+	}
+}

@@ -1,0 +1,56 @@
+<script lang="ts">
+  import { Drawer, Button } from '@codeatlasdev/ui';
+  import { Settings } from '@lucide/svelte';
+
+  let leftOpen = $state(false);
+  let rightOpen = $state(false);
+</script>
+
+<Button variant="outlined" onclick={() => (leftOpen = true)}>Open left drawer</Button>
+<Button variant="outlined" onclick={() => (rightOpen = true)}>
+  {#snippet leading()}<Settings size={16} stroke-width={2} />{/snippet}
+  Open settings
+</Button>
+
+<Drawer bind:open={leftOpen} side="left" title="Navigation">
+  <nav class="nav" aria-label="Demo navigation">
+    {#each ['Home', 'Components', 'Foundation', 'About'] as item}
+      <a href="#top" class="nav__item" onclick={() => (leftOpen = false)}>{item}</a>
+    {/each}
+  </nav>
+</Drawer>
+
+<Drawer bind:open={rightOpen} side="right" title="Settings">
+  <div class="settings">
+    {#each [['Theme', 'Amber'], ['Language', 'English'], ['Notifications', 'Enabled']] as [label, value]}
+      <div class="row">
+        <p class="label">{label}</p>
+        <p class="value">{value}</p>
+      </div>
+    {/each}
+  </div>
+</Drawer>
+
+<style>
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav__item {
+    padding: 10px 16px;
+    border-radius: var(--ca-radius-sm);
+    font-size: var(--ca-font-size-body2);
+    font-weight: 500;
+    color: var(--ca-text-primary);
+    text-decoration: none;
+    transition: background var(--ca-duration-fast) var(--ca-ease-standard);
+  }
+  .nav__item:hover { background: var(--ca-action-hover); }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--ca-outline-subtle);
+  }
+  .label, .value { margin: 0; font-size: var(--ca-font-size-body2); }
+  .label { color: var(--ca-text-secondary); }
+  .value { font-weight: 500; color: var(--ca-text-primary); }
+</style>

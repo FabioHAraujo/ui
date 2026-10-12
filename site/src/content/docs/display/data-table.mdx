@@ -1,0 +1,57 @@
+---
+title: DataTable
+description: "Table with global search, column sorting, pagination and a column visibility toggle, built on TanStack Table."
+group: Display
+order: 6
+---
+import Demo from "~/components/docs/Demo.astro";
+import CodeGroup from "~/components/docs/CodeGroup.astro";
+import Props from "~/components/docs/Props.astro";
+import Simple from "~/demos/display/data-table/Simple.svelte";
+import SimpleSrc from "~/demos/display/data-table/Simple.svelte?raw";
+import Controlled from "~/demos/display/data-table/Controlled.svelte";
+import ControlledSrc from "~/demos/display/data-table/Controlled.svelte?raw";
+
+DataTable lives in its own entry point so that TanStack Table stays out of bundles that do not need it. Install the optional peer first.
+
+<CodeGroup sync="pm" tabs={[{ label: "bun", code: "bun add @tanstack/svelte-table" }, { label: "npm", code: "npm i @tanstack/svelte-table" }, { label: "pnpm", code: "pnpm add @tanstack/svelte-table" }]} />
+
+```svelte
+<script lang="ts">
+  import { DataTable, createCaColumnHelper } from "@codeatlasdev/ui/table";
+
+  const col = createCaColumnHelper<User>();
+  const columns = col.columns([
+    col.accessor("name", { header: "Name", meta: { label: "Name" } }),
+  ]);
+</script>
+
+<DataTable {columns} data={users} />
+```
+
+There are two modes. In simple mode you pass `columns` and `data` and the table searches, sorts and paginates locally. In controlled mode you pass `globalFilter`, `pagination` and `sorting` together with their change handlers, and feed it one page of data plus `total`, which is what you want for server-side data.
+
+<Demo title="Simple mode" description={"Pass `columns` and `data`. Search, sort and pagination are managed automatically."} src={SimpleSrc}><Simple client:visible /></Demo>
+<Demo title="Controlled mode" description={"Own the state to drive server-side filtering, sorting and pagination."} src={ControlledSrc}><Controlled client:visible /></Demo>
+
+<Props rows={[
+  { name: "columns", type: "ColumnDef[]", description: "Column definitions created with `createCaColumnHelper`. Required." },
+  { name: "data", type: "TData[]", description: "Row data. In simple mode pass all rows; in controlled mode pass the current page. Required." },
+  { name: "total", type: "number", default: "data.length", description: "Total row count after filtering, used to compute the page count. Ignored in simple mode." },
+  { name: "globalFilter", type: "string", default: "undefined", description: "Search value. Passing it switches the table to controlled mode." },
+  { name: "onGlobalFilterChange", type: "(v: string) => void", default: "undefined", description: "Called when the user types in the search box." },
+  { name: "pagination", type: "PaginationState", default: "undefined", description: "Controlled `{ pageIndex, pageSize }`." },
+  { name: "onPaginationChange", type: "(v: Updater<PaginationState>) => void", default: "undefined", description: "Called when the page or page size changes." },
+  { name: "sorting", type: "SortingState", default: "undefined", description: "Controlled sorting, `[{ id, desc }]`." },
+  { name: "onSortingChange", type: "(v: Updater<SortingState>) => void", default: "undefined", description: "Called when the user clicks a column header." },
+  { name: "labels", type: "{ noResults?, noResultsSub?, clearSearch? }", default: "undefined", description: "Overrides the strings of the no-results state." },
+  { name: "searchPlaceholder", type: "string", default: "undefined", description: "Placeholder of the search input." },
+  { name: "isLoading", type: "boolean", default: "undefined", description: "Shows a loading indicator in the toolbar." },
+  { name: "isExporting", type: "boolean", default: "undefined", description: "Shows the export button as busy." },
+  { name: "onExport", type: "() => void", default: "undefined", description: "Enables the export button in the toolbar." },
+  { name: "onRowClick", type: "(row: TData) => void", default: "undefined", description: "Called when a row is clicked." },
+  { name: "hasActiveFilters", type: "boolean", default: "undefined", description: "Treats the table as filtered, which suppresses the empty state." },
+  { name: "emptyState", type: "Snippet", default: "undefined", description: "Custom content shown when there is no data and no active filter." },
+  { name: "children", type: "Snippet", default: "undefined", description: "Filter chips such as `DataTableFacetedFilter`, rendered in the toolbar." },
+  { name: "class", type: "string", default: "''", description: "Extra class names on the wrapper." },
+]} />

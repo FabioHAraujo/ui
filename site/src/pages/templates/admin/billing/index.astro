@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AdminApp from "~/templates/admin/AdminApp.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="Admin billing template" description="Current plan, usage bars, pricing cards and invoice history." noindex>
+	<AdminApp client:load page="billing" {pathname} />
+</TemplateLayout>

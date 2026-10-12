@@ -1,0 +1,197 @@
+/* ── Reset ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Touch: no grey tap flash, no double-tap zoom delay on controls ─────── */
+a, button, input, select, textarea, label, summary, [role="button"], [role="tab"], [role="option"], [role="menuitem"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ── Page background ───────────────────────────────────────────────────────
+ * html carries a SOLID --ca-surface-base. Browsers paint their chrome from it:
+ * Safari 26 ignores theme-color and samples the root (or fixed/sticky edge elements)
+ * background, and every engine shows it in the overscroll/rubber-band area.
+ * body stays transparent so the canvas color comes from html.
+ * The decorative mesh lives in body::before (pseudo-elements are never sampled and
+ * position:fixed replaces background-attachment:fixed, which iOS does not support). */
+html {
+  background-color: var(--ca-surface-base);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  --ca-page-mesh:
+    radial-gradient(ellipse 80% 60% at 0% 0%,
+      color-mix(in oklab, var(--ca-brand-main) 22%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, oklch(0.68 0.14 235 / 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, oklch(0.60 0.13 150 / 0.12) 0%, transparent 50%);
+}
+html.dark {
+  --ca-page-mesh:
+    radial-gradient(ellipse 80% 60% at 0% 0%,
+      color-mix(in oklab, var(--ca-brand-main) 42%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 100%, oklch(0.40 0.14 235 / 0.30) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, oklch(0.35 0.10 150 / 0.20) 0%, transparent 50%);
+}
+html[data-style="frosted"] {
+  --ca-page-mesh:
+    radial-gradient(ellipse 60% 40% at 0% 0%,
+      color-mix(in oklab, var(--ca-brand-main) 12%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 35% at 100% 100%, oklch(0.68 0.10 235 / 0.10) 0%, transparent 50%);
+}
+html.dark[data-style="frosted"] {
+  --ca-page-mesh:
+    radial-gradient(ellipse 60% 40% at 0% 0%,
+      color-mix(in oklab, var(--ca-brand-main) 25%, transparent) 0%, transparent 55%);
+}
+/* Solid / flat: no decoration. Transparent windows (Tauri/Electron vibrancy): nothing at all. */
+html[data-style="solid"],
+html[data-style="flat"] {
+  --ca-page-mesh: none;
+}
+html[data-ca-surface="transparent"] {
+  background-color: transparent;
+  --ca-page-mesh: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--ca-page-mesh);
+}
+
+/* ── FOUC prevention — disable transitions during theme init ────────────── */
+.ca-init, .ca-init *, .ca-init *::before, .ca-init *::after {
+  transition: none !important;
+  animation-duration: 0.001ms !important;
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+body {
+  /* Transparent on purpose: an opaque body would paint over body::before (z-index -1).
+     The canvas takes the solid color from html. */
+  background-color: transparent;
+  min-height: var(--ca-vh);
+  font-family: var(--ca-font-sans);
+  font-size: var(--ca-font-size-body1);
+  color: var(--ca-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Theme islands: text color is inherited as a computed value, re-resolve it ── */
+[data-theme-scope] {
+  color: var(--ca-text-primary);
+}
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+h1 {
+  font-size: var(--ca-font-size-h1);
+  line-height: 1.10;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+h2 {
+  font-size: var(--ca-font-size-h2);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+h3 {
+  font-size: var(--ca-font-size-h3);
+  line-height: 1.20;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+h4 {
+  font-size: var(--ca-font-size-h4);
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+h5 {
+  font-size: var(--ca-font-size-h5);
+  line-height: 1.30;
+  font-weight: 500;
+}
+h6 {
+  font-size: var(--ca-font-size-h6);
+  line-height: 1.40;
+  font-weight: 500;
+}
+p {
+  font-size: var(--ca-font-size-body1);
+  line-height: 1.60;
+}
+
+/* ── Focus ───────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--ca-focus-ring);
+  outline-offset: var(--ca-focus-ring-offset);
+  border-radius: var(--ca-radius-sm);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ca-scrollbar-thumb);
+  border-radius: var(--ca-radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ca-scrollbar-thumb-hover);
+}
+* {
+  scrollbar-color: var(--ca-scrollbar-thumb) transparent;
+}
+::selection {
+  background: var(--ca-selection-bg);
+}
+
+/* ── iOS Safari input zoom ───────────────────────────────────────────────── */
+/* Safari zooms the page when a focused field computes under 16px. Never disable zoom
+   (maximum-scale / user-scalable). Every text-entry control, package or app, stays at
+   16px+ on touch / small screens; :where() keeps specificity at zero so an app can
+   still opt a field out explicitly. Package controls use --ca-input-font-size. */
+@media (pointer: coarse), (max-width: 767px) {
+  :where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"], [type="hidden"]), textarea, select, [contenteditable]:not([contenteditable="false"])) {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* ── nativeFeel() (kit): app-like focus and selection ─────────────────────
+ * !important: these must beat unlayered component focus styles, and a layered
+ * !important declaration outranks unlayered ones. */
+html[data-ca-native]:not([data-kbd]) :focus,
+html[data-ca-native]:not([data-kbd]) :focus-visible {
+  outline: none !important;
+}
+html[data-ca-native] {
+  overscroll-behavior: none;
+}
+html[data-ca-native] :is(button, a, nav, header, label, [role="button"], [role="tab"], [role="menuitem"], [role="option"]) {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  cursor: default;
+}
+html[data-ca-native] :is(a, img) {
+  -webkit-user-drag: none;
+}
+/* Opt back into selection inside native chrome (log panes, code, messages). */
+html[data-ca-native] .ca-selectable,
+html[data-ca-native] .ca-selectable * {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}

@@ -1,0 +1,46 @@
+---
+title: AppShell
+description: Application layout with a module rail, a navigation panel, a mobile header and a bottom navigation, independent of any router.
+group: Layout
+order: 30
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Anatomy from "~/demos/layout/app-shell/Anatomy.svelte";
+import AnatomySrc from "~/demos/layout/app-shell/Anatomy.svelte?raw";
+import Shell from "~/demos/layout/app-shell/Shell.svelte";
+import ShellSrc from "~/demos/layout/app-shell/Shell.svelte?raw";
+
+```svelte
+<script>
+  import { AppShellLayout, type NavModule } from "@codeatlasdev/ui";
+  import { goto } from "$app/navigation"; // or any router
+  import { page } from "$app/state";
+
+  const modules: NavModule[] = [/* id, label, icon, basePath, items */];
+</script>
+
+<AppShellLayout {modules} pathname={page.url.pathname} onNavigate={(path) => goto(path)}>
+  {#snippet header()}<SiteHeader />{/snippet}
+  {@render children()}
+</AppShellLayout>
+```
+
+The shell never imports a router. You pass the current `pathname` and handle `onNavigate`, so it works with SvelteKit, Astro, or plain state. `onNavigate` fires when the user switches module from the rail or the bottom navigation. Panel items are plain `<a href>` links, so a client-side router takes them over like any other link. Put it only on application routes, never on marketing pages. Below 900px the rail and panel disappear and the mobile header plus bottom navigation take over. See the [templates](/templates/) for complete applications built on it.
+
+<Demo title="Anatomy" description="Rail (52px), panel (200px) and the main content area." src={AnatomySrc}><Anatomy /></Demo>
+<Demo title="Live shell" description="The real component inside a fixed-height frame. The pathname lives in local state; click the rail and panel to navigate." src={ShellSrc} stage><Shell client:visible /></Demo>
+
+<Props rows={[
+  { name: "modules", type: "NavModule[]", description: "Navigation modules. Each has id, label, icon, basePath, optional pathPrefixes and items (NavItem or NavSection)." },
+  { name: "pathname", type: "string", description: "Current location. Decides the active module and item." },
+  { name: "onNavigate", type: "(path: string) => void", description: "Called with the destination path when the rail, panel or bottom navigation is used." },
+  { name: "defaultModule", type: "number", default: "0", description: "Module index used before any navigation matches." },
+  { name: "persistPanel", type: "boolean", default: "true", description: "Persists the open or closed state of the panel in localStorage." },
+  { name: "header", type: "Snippet", description: "Desktop header rendered above the page content. Hidden below 900px." },
+  { name: "brand", type: "Snippet", description: "Logo shown at the top of the rail and in the mobile header." },
+  { name: "railBottom", type: "Snippet", description: "Items pinned to the bottom of the rail, such as an avatar or notifications." },
+  { name: "mobileHeaderActions", type: "Snippet", description: "Controls at the trailing edge of the mobile header. Use it for anything that must stay reachable below 900px." },
+  { name: "mobileTitle", type: "Snippet", description: "Replaces the plain page title in the mobile header, for example a tappable title that opens a sheet." },
+  { name: "children", type: "Snippet", description: "Page content." },
+]} />

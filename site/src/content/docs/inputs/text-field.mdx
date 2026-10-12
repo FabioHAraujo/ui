@@ -1,0 +1,50 @@
+---
+title: TextField
+description: Styled text input with label, helper text, error state and leading and trailing slots.
+group: Inputs
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Default from "~/demos/inputs/text-field/Default.svelte";
+import DefaultSrc from "~/demos/inputs/text-field/Default.svelte?raw";
+import Icons from "~/demos/inputs/text-field/Icons.svelte";
+import IconsSrc from "~/demos/inputs/text-field/Icons.svelte?raw";
+import States from "~/demos/inputs/text-field/States.svelte";
+import StatesSrc from "~/demos/inputs/text-field/States.svelte?raw";
+
+```svelte
+<script>
+  import { TextField } from "@codeatlasdev/ui";
+  let email = $state("");
+</script>
+
+<TextField label="Email" type="email" bind:value={email} />
+```
+
+An `error` replaces the `description` and is announced to assistive tech. On touch devices the input text stays at 16px or more so iOS Safari does not zoom on focus. Wrapper components such as `MaskedField`, `MoneyInput` and `PhoneField` forward these props to TextField.
+
+<Demo title="Default" description="Basic text inputs with a label." src={DefaultSrc}><Default client:visible /></Demo>
+<Demo title="With icons" description="leading and trailing snippets. Interactive trailing content, like a reveal button, must be a real button with its own label." src={IconsSrc}><Icons client:visible /></Demo>
+<Demo title="States" description="Helper text, error, required, read-only, disabled and the small size." src={StatesSrc}><States client:visible /></Demo>
+
+<Props rows={[
+  { name: "label", type: "string", description: "Label text." },
+  { name: "placeholder", type: "string", default: "''", description: "Input placeholder." },
+  { name: "value", type: "string", default: "''", description: "Bindable input value." },
+  { name: "type", type: "string", default: "'text'", description: "HTML input type." },
+  { name: "error", type: "string", description: "Validation error message. Puts the field in the error state." },
+  { name: "description", type: "string", description: "Non-error hint shown below the field." },
+  { name: "helperText", type: "string", description: "Deprecated alias of description." },
+  { name: "disabled", type: "boolean", default: "false", description: "Disables the input." },
+  { name: "required", type: "boolean", default: "false", description: "Marks the field as required." },
+  { name: "readonly", type: "boolean", default: "false", description: "Makes the input read-only." },
+  { name: "autocomplete", type: "HTMLInputAttributes['autocomplete']", description: "Native autocomplete hint." },
+  { name: "name", type: "string", description: "Native name, for form submission." },
+  { name: "size", type: "'sm' | 'md'", default: "'md'", description: "Field height." },
+  { name: "leading", type: "Snippet", description: "Icon or element before the input." },
+  { name: "trailing", type: "Snippet", description: "Icon or element after the input." },
+  { name: "class", type: "string", description: "Extra classes on the root." },
+  { name: "oninput", type: "(value: string) => void", description: "Called on every keystroke with the new value." },
+  { name: "onchange", type: "(value: string) => void", description: "Called when the value is committed (blur or Enter)." },
+  { name: "onblur", type: "(e: FocusEvent) => void", description: "Called when the input loses focus." },
+]} />

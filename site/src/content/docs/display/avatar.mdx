@@ -1,0 +1,44 @@
+---
+title: Avatar
+description: "User avatar backed by Bits UI that shows an image and falls back to colored initials, with size, shape and presence status."
+group: Display
+order: 2
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Images from "~/demos/display/avatar/Images.svelte";
+import ImagesSrc from "~/demos/display/avatar/Images.svelte?raw";
+import Initials from "~/demos/display/avatar/Initials.svelte";
+import InitialsSrc from "~/demos/display/avatar/Initials.svelte?raw";
+import Sizes from "~/demos/display/avatar/Sizes.svelte";
+import SizesSrc from "~/demos/display/avatar/Sizes.svelte?raw";
+import ShapeStatus from "~/demos/display/avatar/ShapeStatus.svelte";
+import ShapeStatusSrc from "~/demos/display/avatar/ShapeStatus.svelte?raw";
+import Stack from "~/demos/display/avatar/Stack.svelte";
+import StackSrc from "~/demos/display/avatar/Stack.svelte?raw";
+
+```svelte
+<script>
+  import { Avatar } from "@codeatlasdev/ui";
+</script>
+
+<Avatar src="/ana.jpg" alt="Ana Lima" size="lg" status="online" />
+```
+
+Without `src`, or when the image fails to load, the avatar shows initials derived from `alt` (or `fallback`). The background color is generated from the name, so the same person always gets the same color.
+
+<Demo title="With image" description={"Loads a real image URL and falls back to initials if it fails."} src={ImagesSrc}><Images client:visible /></Demo>
+<Demo title="Initials fallback" description={"No `src`: initials come from `alt`, or from `fallback` when set."} src={InitialsSrc}><Initials client:visible /></Demo>
+<Demo title="Sizes" description={"Named sizes `xs` to `xl`, or any number in pixels."} src={SizesSrc}><Sizes client:visible /></Demo>
+<Demo title="Shape and status" description={"`shape=\"rounded\"` and the presence dot."} src={ShapeStatusSrc}><ShapeStatus client:visible /></Demo>
+<Demo title="Avatar stack" description={"Overlap pattern common in collaboration UIs."} src={StackSrc}><Stack client:visible /></Demo>
+
+<Props rows={[
+  { name: "src", type: "string", default: "undefined", description: "Image URL. Initials are shown while loading or when loading fails." },
+  { name: "alt", type: "string", default: "''", description: "Alt text. Initials are derived from it when no `fallback` is set." },
+  { name: "fallback", type: "string", default: "undefined", description: "Explicit initials. Overrides the ones derived from `alt`." },
+  { name: "size", type: "'xs' | 'sm' | 'md' | 'lg' | 'xl' | number", default: "'md'", description: "Named size (20, 28, 36, 48, 64px) or a diameter in pixels." },
+  { name: "shape", type: "'circle' | 'rounded'", default: "'circle'", description: "Avatar outline." },
+  { name: "status", type: "'online' | 'offline' | 'busy' | 'away'", default: "undefined", description: "Shows a presence dot in the bottom-right corner." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

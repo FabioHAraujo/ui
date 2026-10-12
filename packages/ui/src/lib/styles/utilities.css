@@ -1,0 +1,170 @@
+/**
+ * @codeatlasdev/ui — utility classes
+ *
+ * Disponível para todo app que importa global.css.
+ * Zero configuração necessária.
+ */
+
+/* ─── AppList toolbar ────────────────────────────────────────────── */
+
+.ca-search-field {
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+}
+
+.ca-toolbar-spacer { flex: 1; }
+
+/* Separador vertical entre grupos no toolbar */
+.ca-toolbar-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--ca-outline-subtle);
+  flex-shrink: 0;
+}
+
+/* Botão "Clear filters" */
+.ca-clear-btn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ca-text-hint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--ca-radius-sm);
+  font-family: inherit;
+  transition: color var(--ca-duration-fast);
+  flex-shrink: 0;
+}
+.ca-clear-btn:hover { color: var(--ca-text-primary); }
+
+/* ─── AppList table ──────────────────────────────────────────────── */
+
+.ca-page-info {
+  font-size: var(--ca-font-size-caption);
+  color: var(--ca-text-hint);
+  white-space: nowrap;
+}
+
+.ca-row-actions {
+  opacity: 0;
+  transition: opacity var(--ca-duration-fast) var(--ca-ease-standard);
+  justify-content: flex-end;
+}
+
+tr:hover .ca-row-actions,
+tr:focus-within .ca-row-actions {
+  opacity: 1;
+}
+
+/* Coluna de checkbox — largura fixa + padding compacto */
+.ca-col-check {
+  width: 44px;
+  padding-left: 20px !important;
+  padding-right: 4px !important;
+}
+
+/* Coluna de ações inline (edit/delete buttons) */
+.ca-col-actions { width: 80px; }
+
+/* Checkbox de linha */
+.ca-row-check {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--ca-brand-main);
+  cursor: pointer;
+}
+
+/* Linha selecionada */
+.ca-row--selected td {
+  background: color-mix(in oklab, var(--ca-brand-main) 6%, transparent) !important;
+}
+
+/* ─── Avatar block (profile/form pages) ─────────────────────────── */
+
+.ca-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ca-space-4, 16px);
+}
+
+.ca-avatar-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ca-space-1, 4px);
+}
+
+.ca-avatar-hint {
+  margin: 0;
+  font-size: var(--ca-font-size-caption);
+  color: var(--ca-text-hint);
+}
+
+/* ─── Rail buttons (AppShell bottom slot) ───────────────────────── */
+
+.ca-rail-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  border-radius: var(--ca-radius-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ca-text-hint);
+  text-decoration: none;
+  transition:
+    background var(--ca-duration-fast) var(--ca-ease-standard),
+    color      var(--ca-duration-fast) var(--ca-ease-standard);
+}
+
+.ca-rail-btn:hover {
+  background: color-mix(in oklab, var(--ca-brand-main) 8%, transparent);
+  color: var(--ca-text-primary);
+}
+
+.ca-rail-btn--danger:hover {
+  background: color-mix(in oklab, var(--ca-semantic-error) 10%, transparent);
+  color: var(--ca-semantic-error);
+}
+
+.ca-rail-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  border-radius: var(--ca-radius-md);
+  text-decoration: none;
+  transition: opacity var(--ca-duration-fast);
+}
+.ca-rail-avatar:hover { opacity: 0.75; }
+
+/* ─── Buttons ────────────────────────────────────────────────────── */
+
+.ca-btn-danger      { color: var(--ca-semantic-error) !important; border-color: var(--ca-semantic-error) !important; }
+.ca-btn-danger-ghost{ color: var(--ca-semantic-error) !important; }
+
+/* ─── Progress bar (dinâmica via --bar-w) ───────────────────────── */
+
+.ca-bar-fill {
+  height: 100%;
+  border-radius: var(--ca-radius-pill);
+  background: var(--ca-brand-main);
+  width: var(--bar-w, 0%);
+  transition: width 0.6s var(--ca-ease-decelerate);
+}
+
+.ca-bar-fill--warn { background: var(--ca-semantic-warning); }
+
+/* ─── Pricing card ───────────────────────────────────────────────── */
+
+.ca-pricing-cta { width: 100%; margin-top: auto; }
+
+/* ─── Semantic trend colors ─────────────────────────────────────── */
+
+.ca-trend-up   { color: var(--ca-semantic-success); }
+.ca-trend-down { color: var(--ca-semantic-error); }
+

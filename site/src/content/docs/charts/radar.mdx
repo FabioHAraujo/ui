@@ -1,0 +1,38 @@
+---
+title: RadarChart
+description: Multi-dimensional profiles from single skill sets to interactive comparisons.
+group: Charts
+order: 50
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Simple from "~/demos/charts/radar/Simple.svelte";
+import SimpleSrc from "~/demos/charts/radar/Simple.svelte?raw";
+import Compare from "~/demos/charts/radar/Compare.svelte";
+import CompareSrc from "~/demos/charts/radar/Compare.svelte?raw";
+import Interactive from "~/demos/charts/radar/Interactive.svelte";
+import InteractiveSrc from "~/demos/charts/radar/Interactive.svelte?raw";
+
+```svelte
+<script>
+  import { RadarChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<RadarChart
+  indicators={[{ name: "Speed", max: 100 }, { name: "Quality", max: 100 }, { name: "Support", max: 100 }]}
+  series={[{ name: "Team A", values: [88, 92, 94] }]}
+/>
+```
+
+`values` must follow the order of `indicators`. A legend appears automatically when there is more than one series.
+
+<Demo title="Simple radar" src={SimpleSrc}><Simple client:visible /></Demo>
+<Demo title="Comparison" description="Two series with a legend and focus on hover." src={CompareSrc}><Compare client:visible /></Demo>
+<Demo title="Interactive team builder" description="Drag the sliders and the radar updates live." src={InteractiveSrc}><Interactive client:visible /></Demo>
+
+<Props rows={[
+  { name: "indicators", type: "RadarIndicator[]", description: "Axes as { name, max }." },
+  { name: "series", type: "RadarSeries[]", description: "Named series as { name, values: number[], color? }, aligned to indicators." },
+  { name: "height", type: "string", default: "'340px'", description: "CSS height of the chart." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

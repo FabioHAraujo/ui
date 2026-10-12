@@ -1,0 +1,52 @@
+---
+title: Dialog
+description: A second-layer modal. The overlay blurs the page while the panel uses a solid surface.
+group: Feedback
+order: 1
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Confirmation from "~/demos/feedback/dialog/Confirmation.svelte";
+import ConfirmationSrc from "~/demos/feedback/dialog/Confirmation.svelte?raw";
+import Info from "~/demos/feedback/dialog/Info.svelte";
+import InfoSrc from "~/demos/feedback/dialog/Info.svelte?raw";
+import Form from "~/demos/feedback/dialog/Form.svelte";
+import FormSrc from "~/demos/feedback/dialog/Form.svelte?raw";
+import Chromeless from "~/demos/feedback/dialog/Chromeless.svelte";
+import ChromelessSrc from "~/demos/feedback/dialog/Chromeless.svelte?raw";
+import Split from "~/demos/feedback/dialog/Split.svelte";
+import SplitSrc from "~/demos/feedback/dialog/Split.svelte?raw";
+
+```svelte
+<script>
+  import { Dialog, Button } from "@codeatlasdev/ui";
+  let open = $state(false);
+</script>
+
+<Dialog bind:open title="Confirm" description="This cannot be undone.">
+  {#snippet actions()}
+    <Button variant="ghost" onclick={() => (open = false)}>Cancel</Button>
+    <Button variant="destructive" onclick={remove}>Delete</Button>
+  {/snippet}
+</Dialog>
+```
+
+Built on the Bits UI Dialog: focus is trapped, Escape closes and the panel carries `aria-modal`. For decisions that need an explicit answer use [AlertDialog](/docs/feedback/alert-dialog/). On phones, prefer [Sheet](/docs/feedback/sheet/) for bottom-anchored content.
+
+<Demo title="Confirmation" description="The destructive confirm and cancel pattern." src={ConfirmationSrc}><Confirmation client:visible /></Demo>
+<Demo title="Info" description="Informational content with a single action." src={InfoSrc}><Info client:visible /></Demo>
+<Demo title="Form" description="A dialog holding a form, at the md size." src={FormSrc}><Form client:visible /></Demo>
+<Demo title="Chromeless" description="No header, description or actions, and the body has no padding. The title becomes the visually hidden accessible name." src={ChromelessSrc}><Chromeless client:visible /></Demo>
+<Demo title="Split" description='size="split" is 1100 by 720 with two columns from the md breakpoint and a single column below it. Combine it with chromeless.' src={SplitSrc}><Split client:visible /></Demo>
+
+<Props rows={[
+  { name: "open", type: "boolean", default: "false", description: "Bindable open state." },
+  { name: "title", type: "string", description: "Header title. With chromeless it is the hidden accessible name." },
+  { name: "description", type: "string", description: "Subtitle below the title." },
+  { name: "size", type: "'sm' | 'md' | 'lg' | 'xl' | 'split'", default: "'md'", description: "Width: 400, 480, 600 or 820px. split is 1100 by 720 in two columns from md." },
+  { name: "chromeless", type: "boolean", default: "false", description: "Omits header, description and actions; the body has no padding. title and description stay available to screen readers." },
+  { name: "children", type: "Snippet", description: "Dialog body." },
+  { name: "actions", type: "Snippet", description: "Footer buttons." },
+  { name: "onOpenChange", type: "(open: boolean) => void", description: "Called whenever the open state changes." },
+  { name: "class", type: "string", default: "''", description: "Extra classes on the panel." },
+]} />

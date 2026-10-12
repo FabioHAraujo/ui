@@ -1,0 +1,40 @@
+---
+title: Charts overview
+description: Apache ECharts wrapped by the design system. Pass data only; themes, animation and glass tooltips are automatic.
+group: Charts
+order: 0
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Dashboard from "~/demos/charts/overview/Dashboard.svelte";
+import DashboardSrc from "~/demos/charts/overview/Dashboard.svelte?raw";
+
+```svelte
+<script>
+  import { LineChart } from "@codeatlasdev/ui/charts";
+</script>
+
+<LineChart series={[{ name: "Revenue", data: [42, 58, 51, 74] }]} categories={["Jan", "Feb", "Mar", "Apr"]} />
+```
+
+Charts live in the `@codeatlasdev/ui/charts` subpath and need the optional peer dependency `echarts` (`bun add echarts`). Every chart takes data and a few semantic props. There are no color, font or style props on purpose: the palette follows the active preset, tooltips use the glass material, and charts re-theme when the color scheme, preset or surface style changes. Chart components render on the client, so hydrate them with `client:visible` in Astro.
+
+|Component|Use for|
+|---|---|
+|[LineChart](/docs/charts/line/)|Trends over time, areas, live streams|
+|[BarChart](/docs/charts/bar/)|Vertical, horizontal, stacked and grouped bars|
+|[PieChart](/docs/charts/pie/)|Pie, donut and rose proportions|
+|[ScatterChart](/docs/charts/scatter/)|Correlations and bubble sizing|
+|[RadarChart](/docs/charts/radar/)|Multi-dimension profiles|
+|[GaugeChart](/docs/charts/gauge/)|KPI gauges and progress rings|
+|[HeatmapChart](/docs/charts/heatmap/)|Calendar and matrix density|
+|[Sparkline](/docs/charts/sparklines/)|Inline micro charts|
+
+All chart components also accept `height` (CSS length, each chart has its own default) and `class`.
+
+<Demo title="Dashboard" description="Every chart type together inside glass cards." src={DashboardSrc}><Dashboard client:visible /></Demo>
+
+<Props title="Shared props" rows={[
+  { name: "height", type: "string", description: "CSS height of the chart. Defaults differ per chart (320px for line, bar and scatter; 300px for pie; 340px for radar; 280px for gauge; 240px for heatmap; 48px for sparkline)." },
+  { name: "class", type: "string", default: "''", description: "Extra class names on the chart container." },
+]} />

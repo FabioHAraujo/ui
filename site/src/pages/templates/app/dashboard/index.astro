@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AppDemo from "~/templates/app/AppDemo.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="App dashboard template" description="Compact app dashboard: KPIs, revenue line chart, traffic donut and recent signups.">
+	<AppDemo client:load page="dashboard" {pathname} />
+</TemplateLayout>

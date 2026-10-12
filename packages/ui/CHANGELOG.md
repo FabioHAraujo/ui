@@ -1,0 +1,175 @@
+# Changelog
+
+## 0.7.1
+
+### Patch Changes
+
+- Charts now re-theme on a color scheme, preset or surface style change. Their options read design tokens from CSS custom properties, which aren't reactive, so a theme switch re-applied the previous theme's axis, text and palette colors. Token reads now track the theme store, so every chart option rebuilds with the new values.
+
+## 0.7.0
+
+### Minor Changes
+
+- Accessibility and behavior fixes found by the new test suite.
+  
+  - New tokens `--ca-text-hint`, `--ca-brand-text` and `--ca-semantic-error-fill` (WCAG AA contrast). Hints, placeholders and brand-colored text now use them.
+  - `DropdownMenu`, `Popover` and `Tooltip` accept a `triggerChild` snippet that receives the trigger props, so a `Button` can be the trigger without nesting interactive elements. `Button` and `IconButton` forward extra attributes.
+  - `Checkbox` and `Switch` accept `aria-label` and `aria-labelledby`. `Switch` is now 44×24 px.
+  - Fixed: Combobox popup position and keyboard focus; MoneyInput lost typed input; `use:mask` fired `input` twice per keystroke; DataTable `aria-sort`, page reset and column toggle; `colorScheme.resolved` did not follow OS changes in `system` mode; calendar navigation labels in pt-BR; DatePicker popover focus; Toaster, NotificationBell, Select, FileUpload, ScrollArea and SettingItem ARIA issues.
+  - CodeSnippet uses the high-contrast GitHub shiki themes.
+  - `DocsSearch` results are real links again (`<a role="option" href>`), so middle-click, open in new tab and copy link work. A plain click still goes through `onselect`.
+  - `CommandPalette` gains `minQueryLength` (default `1`). The query is now trimmed before matching, so `" rel "` finds "Relatórios".
+
+## 0.6.0
+
+### Minor Changes
+
+- Docs primitives for developer documentation sites, mobile-first.
+  
+  - `DocsShell`: page frame with sticky glass header (brand, section tabs, search, theme), sidebar + "Nesta página" rail on desktop, and ONE compact header on phones (safe-area insets, 44px targets) whose menu opens a bottom `Sheet` with a section switcher and the sidebar tree. The page index becomes an inline disclosure on small screens. ⌘K / Ctrl+K / `/` open search; skip link included. Props: `sections`, `active`, `groups`, `pathname`, `headings`, `searchIndex`, `onnavigate`, `brand`, `actions`, `menuFooter`.
+  - `DocsNav` (sidebar tree with `MethodBadge`), `TableOfContents` (`variant="rail" | "inline"`, scrollspy), `DocsSearch` (dialog on desktop, full-height sheet with a 16px input on phones; accepts entries or an async loader) and the `searchDocs` ranking helper.
+  - `CodeTabs` / `CodeTab`: language tabs with keyboard support, 44px targets, scrollable strip, copy button, and preference sync across groups (`sync` key, persisted in localStorage; first paint always renders the first tab so SSR hydrates cleanly).
+  - `Callout` (note, tip, caution, danger; built on `Alert`), `Steps`, `LinkCard`, `CardGrid`, `MethodBadge`.
+  - `.ca-prose` typography in `global.css`: headings with balanced wrapping, links, inline code that wraps, tables in `.ca-table-wrap` (scrollable, focusable), shiki dual-theme code blocks in `.ca-code`, tight mobile spacing, reduced motion.
+  - Showcase: Navigation / Docs.
+
+## 0.5.2
+
+### Patch Changes
+
+- AppShellLayout: skip the desktop panel for modules with a single destination, so the rail item, panel entry and page title no longer repeat the same label.
+
+## 0.5.1
+
+### Patch Changes
+
+- Mobile polish.
+  
+  - Inputs no longer trigger Safari's focus zoom: TextField, TextArea, Select, NumberField, Combobox, CommandPalette and the DataTable search/page-size fields use `max(16px, var(--ca-font-size-body2))` under `(pointer: coarse), (max-width: 767px)`. `base.css` adds the same rule for raw `input, textarea, select` inside `.ca-app` and a `.ca-input-ios-safe` helper class. Zoom itself is never disabled.
+  - New `Sheet` component: bottom sheet (`bind:open`, `title`, `description`, `onclose`, `children`, `footer`) with drag handle, safe-area padding, focus trap, Escape/backdrop close and reduced-motion support; centered dialog from 768px.
+  - `AppShellLayout` gains `mobileTitle` snippet that replaces the plain page-title text in the mobile header (tappable session title, etc.).
+  - `AppList`, `AppSettings`, `AppForm`, `PageShell`: inside `AppShellLayout` the h1 is visually hidden below 900px (kept for a11y) because the mobile header already shows the title; below 768px the actions wrap under the description, full-width.
+  - `EmptyState` gains `variant="hero"`: larger brand-tinted icon tile with glow, bigger title, actions stacked full-width on mobile.
+  - Button: disabled `filled` keeps the brand hue (AA fill + contrast text at 0.45 opacity) instead of looking muddy.
+  - `AppSettings` (mobile): tabs in the horizontal strip were inheriting `width: 100%` and each filled the row; they now size to content, with a 36px touch target, scroll-snap and a trailing edge fade.
+  - `AppList` / `useListState`: new `ofLabel` option (default `"of"`) for the word in the auto count and page info; pass `"de"` for pt-BR ("5 de 5"). On mobile the auto search field now fills the toolbar instead of keeping its 180px minimum.
+
+## 0.5.0
+
+### Minor Changes
+
+- AppShell (mobile): one compact sticky header. New `mobileHeaderActions` snippet on `AppShellLayout` renders at the header's trailing edge (switchers, account menu), so apps no longer need a second bar under the header. The header pads for `env(safe-area-inset-top)`; `BottomNav` extends its background through `env(safe-area-inset-bottom)` over an opaque base (no dark band above Safari's toolbar), uses equal shrinkable columns with ellipsised 10px labels so five items fit at 320px, and has 44px touch targets. Apps must set `viewport-fit=cover` in their viewport meta for the insets to apply.
+  
+  Theme: new `--ca-brand-fill` / `--ca-brand-fill-hover` tokens in every static theme and in generated brand presets. `--ca-brand-contrast` text on `--ca-brand-fill` is at least WCAG AA (4.5:1): white is preferred, the fill is darkened (hue and chroma kept) when needed, and ink text is used only for very light brands. `generatePreset` now picks the text colour by real contrast instead of an L threshold; Button/IconButton filled, Badge brand, active Tabs, Pagination, Checkbox, Stepper and the nav badge now use the fill tokens. Disabled filled Button keeps the AA pair at 0.6 opacity.
+  
+  New `Lightbox` component: full-screen image viewer (`bind:open`, `src`, `alt`, `onclose`) with focus trap/restore, Escape, backdrop and close-button dismissal, safe-area insets and reduced-motion support.
+
+## 0.4.4
+
+### Patch Changes
+
+- Dark themes: `--ca-brand-contrast` is now white. Text and icons on brand fills (primary Button, IconButton, Badge, active Tabs, Checkbox, Pagination, Stepper, PanelNavItem) were near-black on the dark presets. APCA contrast on the dark brand fills: white Lc 70–84 vs near-black Lc 31–45 on every preset (WCAG 2 ratios favor black on crimson/cyan/emerald/ocean/slate, a known WCAG 2 error for mid-tone fills in dark mode).
+  
+  Dialog: new `size="xl"` (820px) for two-pane layouts such as settings.
+  
+  Kbd: flat keycap (tinted fill, heavier bottom edge) instead of a glass blur, which rendered as a near-black block on dark surfaces.
+
+## 0.4.3
+
+### Patch Changes
+
+- SvelteKit 3 support: `useBreadcrumbs` and `usePageTitle` read `$app/state` (the removed `$app/stores` broke Kit 3 apps at import), and `caThemeHandle` derives its `Handle` type from `@sveltejs/kit/hooks` so it type-checks on Kit 2 and 3. The `@sveltejs/kit` peer range is now `^2.12.0 || ^3.0.0`. Hook return types are unchanged (`Readable`).
+
+## 0.4.2
+
+### Patch Changes
+
+- `MobileHeader` fills the width of the mobile shell bar instead of shrinking to its title (the bar background covered only part of the screen).
+- Tints no longer drift toward purple/pink. Every `color-mix` of a token with a neutral (gray tokens such as `--ca-glass-tint`, black, white) now mixes in OKLab: in OKLCH an achromatic color has hue 0°, so the hue was interpolated between the brand hue and 0°. Selected `Chip`, destructive `Button`/`DropdownMenuItem` hovers and other tinted surfaces now keep the brand or semantic hue.
+
+## 0.4.1
+
+### Patch Changes
+
+- `Drawer`: overlay no longer renders above the panel. Depending on CSS load order the base `.ca-overlay` z-index (modal) won over the drawer one and blurred the open drawer.
+
+## 0.4.0
+
+### Minor Changes
+
+- Brand themes and brand slot.
+  
+  - `caThemeHandle(options)` and `caThemePlugin(options)` accept `ThemeOptions`: `defaultPreset`, `defaultScheme` and `presets`, brand presets generated from one hex color and inlined in `<head>`. Before this, the init script always fell back to `amber`/`dark` and overrode `data-preset` set in `app.html`.
+  - `colorScheme` starts from the configured defaults instead of hardcoded `amber`/`dark`.
+  - `PresetId` accepts custom ids; `BuiltinPresetId` lists the eight shipped presets.
+  - Charts use the brand hex as the first series color for brand presets (they fell back to amber).
+  - `hexToOklch` and `brandPresetCSS`/`themeHead`/`themeScript` exported for custom setups.
+  - `tokensToCSS` dark block now includes the neutral outline/glass/scrim tokens, so generated presets no longer inherit light-mode outlines in dark mode.
+  - `AuthLayout` panel mixes brand with neutrals in OKLab: in OKLCH the hue swung toward 0° (blue brands rendered purple).
+  - `AuthLayout` brand panel now hides below 768px (the override lost to the scoped rule); `AuthCard` footer links use the brand color.
+  - `ThemeToggle`: light/dark button for the AppShell rail, SSR-safe icon.
+  - `brand` snippet for the logo in `AppShellLayout` (top of the Rail and mobile header; `MobileHeader` gains `leading`) and in `AuthLayout`. Both default to the previous "CA" text mark.
+
+## 0.3.0
+
+### Minor Changes
+
+- Breaking: charts, DataTable and CodeSnippet moved out of the root import into subpaths with optional peers, so the core install no longer pulls ECharts, TanStack Table or Shiki.
+  
+  | import from | install |
+  |---|---|
+  | `@codeatlasdev/ui/charts` | `echarts` |
+  | `@codeatlasdev/ui/table` | `@tanstack/svelte-table` |
+  | `@codeatlasdev/ui/code` | `shiki` |
+  
+  Migrate: change `import { LineChart } from '@codeatlasdev/ui'` to `'@codeatlasdev/ui/charts'` (same for `DataTable*`, `Table`, `createCaTable`, `createCaColumnHelper`, `caTableFeatures`, `PaginationState`, `SortingState`, `Updater` → `/table`, and `CodeSnippet` → `/code`), then install the matching peer. `SimpleTable` and `UserCell` stay in the root.
+
+## 0.2.2
+
+### Patch Changes
+
+- New README: AI-first quick start with `npx skills add codeatlasdev/ui`.
+
+## 0.2.1
+
+### Patch Changes
+
+- Charts load a modular ECharts build with only the series and components they use. The lazy chart chunk drops from 1,124 kB to about 650 kB (374 to about 218 kB gzip).
+
+## 0.2.0
+
+### Minor Changes
+
+- Package exports now point to `dist` (fixes `@codeatlasdev/ui/vite` failing to load from `node_modules`). Adapted to the bits-ui 2 API (`Accordion` drops `collapsible`), swapped deprecated `lucide-svelte` for `@lucide/svelte`, and exported the shared `IconComponent`/`IconProps` types plus TanStack `PaginationState`, `SortingState` and `Updater`. The theme plugin no longer warns about FOUC when `caThemeHandle` is set in `hooks.server`.
+
+All notable changes to `@codeatlasdev/ui` are documented here.
+
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [0.1.0] 2026-09-26
+
+### Added
+
+- **60+ components** across page templates, navigation, data, forms, charts, overlays, and feedback
+- **Page templates:** `AppList`, `AppForm`, `AppSettings`, `PageShell`: complete screen patterns in one component
+- **Navigation shell:** `AppShellLayout` with `Rail`, `Panel`, `BottomNav`, `MobileHeader`, `SiteHeader`
+- **Layout primitives:** `Grid`, `Row`, `Stack`: replace manual flex/grid entirely
+- **Charts (8):** `LineChart`, `BarChart`, `PieChart`, `ScatterChart`, `HeatmapChart`, `GaugeChart`, `RadarChart`, `Sparkline`
+- **Data:** `DataTable` (TanStack Table v9), `SimpleTable`, `Pagination`, `KpiCard`, `EmptyState`, `FilterGroup`
+- **Forms (11):** `Button`, `TextField`, `TextArea`, `NumberField`, `Select`, `Combobox`, `Checkbox`, `RadioGroup`, `Switch`, `Slider`, `FileUpload`
+- **Auth:** `AuthLayout`, `AuthCard`
+- **Overlays:** `Dialog`, `Drawer`, `Popover`, `Tooltip`, `DropdownMenu`, `CommandPalette`
+- **Feedback:** `Toast`, `Spinner`, `Skeleton`, `Progress`, `ErrorPage`
+- **8 built-in OKLCH themes:** amber, ocean, crimson, cyan, violet, emerald, rose, slate: set via `data-preset` attribute
+- **Liquid Glass material system**: `GlassCard`, `GlassSurface`, `GlassAppBar`, `LiquidGlass`
+- **CSS token system**: `--ca-*` custom properties for color, spacing, radius, typography, z-index
+- **SvelteKit helpers** (`@codeatlasdev/ui/kit`): theme handle, breadcrumbs, page title, error templates
+- **Vite plugin** (`@codeatlasdev/ui/vite`): fixes SSR externalization for `@tanstack/svelte-table`
+- **Dark mode**: independent from themes, compose freely (`data-preset="ocean" class="dark"`)
+- **Svelte 5 runes throughout**: `$state`, `$derived`, `$props`, `$effect`, no legacy APIs
+- **`.agents/skills/`**: AI agent skills for codeatlas-ui, DX, and writing
+
+[0.1.0]: https://github.com/codeatlasdev/ui/releases/tag/v0.1.0

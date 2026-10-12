@@ -1,0 +1,191 @@
+/*
+ * Shared overlay + dialog panel styles.
+ * Imported by Dialog.svelte and AlertDialog.svelte (and relied on by Drawer, Sheet,
+ * DocsSearch for `.ca-overlay` / `.ca-layer-close`). Public `ca-*` class contract.
+ */
+
+/* ── Shared overlay — used by Dialog, AlertDialog AND Drawer ─── */
+.ca-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ca-z-modal, 1300);
+  /* Blur the page content, then darken */
+  -webkit-backdrop-filter: blur(4px) saturate(180%);
+  backdrop-filter: blur(4px) saturate(180%);
+  background: oklch(0 0 0 / 0.45);
+  /* iOS: touches on the scrim must not scroll/rubber-band the page behind. */
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+.ca-overlay[data-state='open'] {
+  animation: ca-overlay-in 180ms var(--ca-ease-decelerate, ease-out) both;
+}
+.ca-overlay[data-state='closed'] {
+  animation: ca-overlay-out 140ms var(--ca-ease-standard, ease) both;
+}
+
+/* ── Dialog panel ───────────────────────────────────────────── */
+.ca-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: calc(100vw - 32px);
+  max-width: var(--dialog-max-w, 480px);
+  max-height: calc(var(--ca-vh) * 0.85);
+  height: fit-content;
+  z-index: calc(var(--ca-z-modal, 1300) + 1);
+
+  /* Solid surface — NOT glass. Overlay already separates from page. */
+  background: var(--ca-surface-overlay);
+  border: 1px solid var(--ca-outline-subtle);
+  border-radius: var(--ca-radius-xl);
+  box-shadow:
+    0 0 0 1px oklch(0 0 0 / 0.04),
+    0 8px 24px oklch(0 0 0 / 0.12),
+    0 24px 64px oklch(0 0 0 / 0.18);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ca-dialog[data-state='open'] {
+  animation: ca-dialog-in 220ms var(--ca-ease-decelerate, ease-out) both;
+}
+.ca-dialog[data-state='closed'] {
+  animation: ca-dialog-out 160ms var(--ca-ease-standard, ease) both;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.ca-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 20px 20px 0;
+  flex-shrink: 0;
+}
+
+.ca-dialog__title {
+  font-size: var(--ca-font-size-dialog);
+  font-weight: 600;
+  color: var(--ca-text-primary);
+  margin: 0;
+  flex: 1;
+  line-height: 1.3;
+}
+
+/* ── Description ────────────────────────────────────────────── */
+.ca-dialog__description {
+  font-size: var(--ca-font-size-body2);
+  color: var(--ca-text-secondary);
+  margin: 0;
+  padding: 8px 20px 0;
+  line-height: 1.55;
+  flex-shrink: 0;
+}
+
+/* ── Body (scrollable) ──────────────────────────────────────── */
+/* The panel is `height: fit-content`; a `flex: 1` or `min-height: 0` body collapses
+   to 0 in WKWebView (Tauri/Safari). Size it to its content (`flex: 0 1 auto`) with
+   `min-height: auto`, which resolves to 0 for a scroll container: it still shrinks
+   and scrolls under the panel's max-height. */
+.ca-dialog__body {
+  flex: 0 1 auto;
+  min-height: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 20px;
+}
+
+/* ── Actions footer ─────────────────────────────────────────── */
+.ca-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 20px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--ca-outline-subtle);
+}
+
+/* ── Chromeless — no header/description/actions, edge-to-edge body ── */
+.ca-dialog--chromeless .ca-dialog__body {
+  padding: 0;
+}
+
+/* Visually hidden title/description (chromeless dialogs keep an accessible name). */
+.ca-dialog__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Split — two-column modal (e.g. media + form) ───────────── */
+.ca-dialog--split {
+  --dialog-max-w: 1100px;
+  width: min(1100px, calc(100vw - 32px));
+  height: min(720px, calc(var(--ca-vh) - 32px));
+  max-height: calc(var(--ca-vh) - 32px);
+}
+/* Fixed height → the body can safely fill the panel. */
+.ca-dialog--split .ca-dialog__body {
+  flex: 1 1 auto;
+}
+@media (min-width: 768px) {
+  .ca-dialog--split .ca-dialog__body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+}
+
+/* ── Shared close button (Dialog + AlertDialog + Drawer + Sheet) ── */
+.ca-layer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ca-radius-sm);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ca-text-hint);
+  flex-shrink: 0;
+  transition:
+    background var(--ca-duration-fast) var(--ca-ease-standard),
+    color      var(--ca-duration-fast) var(--ca-ease-standard);
+}
+.ca-layer-close:hover {
+  background: var(--ca-action-hover);
+  color: var(--ca-text-primary);
+}
+.ca-layer-close:focus-visible {
+  outline: 2px solid var(--ca-brand-main);
+  outline-offset: 2px;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes ca-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ca-overlay-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes ca-dialog-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+@keyframes ca-dialog-out {
+  from { opacity: 1; transform: scale(1)    translateY(0);   }
+  to   { opacity: 0; transform: scale(0.98) translateY(4px); }
+}

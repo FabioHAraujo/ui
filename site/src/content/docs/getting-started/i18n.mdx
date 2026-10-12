@@ -1,0 +1,88 @@
+---
+title: Internationalization
+description: Every string the components render comes from a catalog. English is the default, Brazilian Portuguese ships built in, and any phrase can be overridden.
+group: Getting started
+order: 5
+---
+import { Callout } from "@codeatlasdev/ui";
+
+Every visible string the package generates (aria-labels, placeholders, empty states, "Copy", "On this page", toast and dialog buttons) comes from a message catalog. The default language is **English**. Call `setLocale` once, in your root layout, to change it:
+
+```svelte
+<!-- src/routes/+layout.svelte -->
+<script>
+  import { setLocale } from "@codeatlasdev/ui";
+
+  setLocale("pt-BR"); // "en" | "pt-BR"
+</script>
+```
+
+It runs on the server too, before the first render, so server-rendered HTML is already in the right language.
+
+## Override phrases
+
+The second argument is a deep partial of the catalog. It is merged over the chosen locale, so you only write the strings you want to change:
+
+```ts
+setLocale("en", { docs: { toc: "In this article" }, common: { copy: "Copy link" } });
+```
+
+A later call to `setLocale` replaces the previous overrides. Message functions (strings with runtime values) keep their signature:
+
+```ts
+setLocale("en", {
+  notificationBell: { label: (unread) => `Inbox, ${unread} new` },
+});
+```
+
+## Explicit props win
+
+A text prop always beats the catalog. Components that take text (`label`, `placeholder`, `confirmLabel`, `emptyText`, ...) fall back to the catalog only when the prop is omitted:
+
+```svelte
+<TableOfContents {headings} label="Neste artigo" />
+```
+
+## Reactive locale
+
+The locale is shared module state, so every component and every island on the page re-renders when it changes. Read it with `locale.value`:
+
+```svelte
+<script>
+  import { locale, setLocale } from "@codeatlasdev/ui";
+</script>
+
+<button onclick={() => setLocale(locale.value === "en" ? "pt-BR" : "en")}>
+  {locale.value}
+</button>
+```
+
+<Callout type="note">
+  With Astro, each island is a separate Svelte app but they share the module, so one `setLocale` call in the first island that runs is enough. Call it before the islands that render text.
+</Callout>
+
+## Catalog
+
+The catalog is grouped by component, for example `docs.search.placeholder`, `dialog.close`, `pagination.nextPage`, `fileUpload`, `dataTable` and `toast`. English (`en.ts`) is the source of truth; `pt-BR.ts` is typed against it, so a missing key is a type error. Both locales are tested to have identical keys.
+
+Unknown locale codes throw:
+
+```
+[codeatlasdev/ui] unknown locale "fr" (expected en | pt-BR)
+```
+
+To ship another language today, use `setLocale("en", translatedOverrides)` with your full translation as the override object. The exported `Messages` type describes its shape.
+
+## Dates, numbers and masks are separate
+
+The UI language does not change date or number formatting. Pass `locale` to the components that format values, for example `DatePicker`, which defaults to `pt-BR`:
+
+```svelte
+<DatePicker locale="en-US" label="Start date" />
+```
+
+Formatting helpers such as `formatCurrency`, `formatDate` and `formatNumber` take their own locale too.
+
+## In tests
+
+The default is English. When a test asserts Portuguese text, call `setLocale("pt-BR")` and reset with `setLocale("en")` in `afterEach`, so the module state does not leak between tests.

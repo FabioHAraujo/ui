@@ -1,0 +1,33 @@
+---
+title: PageShell
+description: The standard page container with a title, a description and an actions slot.
+group: Layout
+order: 40
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Dashboard from "~/demos/layout/page-shell/Dashboard.svelte";
+import DashboardSrc from "~/demos/layout/page-shell/Dashboard.svelte?raw";
+
+```svelte
+<script>
+  import { PageShell, Button } from "@codeatlasdev/ui";
+</script>
+
+<PageShell title="Dashboard" description="Overview of this month">
+  {#snippet actions()}<Button size="sm">New report</Button>{/snippet}
+  <!-- page content -->
+</PageShell>
+```
+
+<Demo title="Dashboard page" description="KPI cards and a content card inside a PageShell." src={DashboardSrc}><Dashboard /></Demo>
+
+<Props rows={[
+  { name: "title", type: "string", description: "Page title." },
+  { name: "description", type: "string", description: "Supporting text under the title." },
+  { name: "gap", type: "number", default: "28", description: "Vertical gap between the header and the content, in px." },
+  { name: "maxWidth", type: "string", default: "'1280px'", description: "Maximum width of the content column." },
+  { name: "actions", type: "Snippet", description: "Right side of the page header." },
+  { name: "children", type: "Snippet", description: "Page content." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

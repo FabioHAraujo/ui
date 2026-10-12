@@ -1,0 +1,63 @@
+<script lang="ts">
+  import { Button, TextArea, TextField, useForm } from '@codeatlasdev/ui';
+
+  const form = useForm(
+    { username: '', bio: '' },
+    {
+      schema: (data) => {
+        const errs: Partial<Record<'username' | 'bio', string>> = {};
+        if (data.username.length < 3) errs.username = 'At least 3 characters.';
+        if (data.username.length > 20) errs.username = 'Max 20 characters.';
+        if (data.bio.length > 160) errs.bio = 'Bio must be 160 characters or fewer.';
+        return errs;
+      },
+    },
+  );
+</script>
+
+<div class="col">
+  <TextField
+    label="Username"
+    placeholder="john_doe"
+    value={form.fields.username.value}
+    error={form.fields.username.error}
+    description="3–20 characters."
+    oninput={(v) => form.set('username', v)}
+    onblur={() => form.touch('username')}
+  />
+  <TextArea
+    label="Bio"
+    placeholder="Tell us about yourself…"
+    value={form.fields.bio.value}
+    error={form.fields.bio.error}
+    description="{form.fields.bio.value.length}/160"
+    oninput={(v) => form.set('bio', v)}
+    onblur={() => form.touch('bio')}
+  />
+  <div class="row">
+    <Button onclick={() => form.validate()}>Validate all</Button>
+    <Button variant="outlined" onclick={() => form.reset()}>Reset</Button>
+  </div>
+  <p class="hint">valid: {form.valid}</p>
+</div>
+
+<style>
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ca-space-4);
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .row {
+    display: flex;
+    gap: var(--ca-space-2);
+  }
+
+  .hint {
+    margin: 0;
+    font-size: var(--ca-font-size-caption);
+    color: var(--ca-text-secondary);
+  }
+</style>

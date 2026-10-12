@@ -1,0 +1,78 @@
+---
+title: AI agents
+description: Give Claude, Cursor, Codex and other coding agents the context to use CodeAtlas UI correctly, through skills, llms.txt and the agent guide.
+group: Getting started
+order: 6
+---
+import { Callout, Steps } from "@codeatlasdev/ui";
+
+The API is designed so a language model gets it right on the first try. A component name says what the screen is (`AppList`, `AppForm`, `AppSettings`, `PageShell`), props are data, and snippets are the holes you fill. There are no styling decisions to guess: colors, spacing and radius come from `--ca-*` tokens.
+
+Typed props are the first source of truth. The package ships TypeScript declarations for every component, so an agent with editor or `svelte-check` feedback sees the exact prop names, unions and defaults.
+
+## Machine-readable docs
+
+This site publishes its documentation in plain text for tools that cannot render pages.
+
+| Resource | Content |
+|---|---|
+| [`/llms.txt`](/llms.txt) | Index: one line per documentation page with title, link and description. |
+| [`/llms-full.txt`](/llms-full.txt) | Every page concatenated as markdown, with code fences intact. Paste it, or let a tool fetch it, when you want everything in one context. |
+| [Agent guide](https://github.com/codeatlasdev/ui/blob/main/AGENTES.md) | `AGENTES.md` in the repository: critical rules, spacing and token reference, page template patterns, store and theme setup. Written in Portuguese. |
+
+Every page is also linked with `<link rel="alternate" type="text/plain" href="/llms.txt">` in its head.
+
+## Install the skills
+
+The repository ships three agent skills that work with Claude Code, Cursor, Codex and other agents that support the skills format:
+
+```sh
+npx skills add codeatlasdev/ui
+```
+
+| Skill | What it teaches |
+|---|---|
+| `codeatlas-ui` | Components, props, layout rules, AppShell and page template patterns, and the anti-patterns to avoid. |
+| `codeatlas-dx` | File structure and size limits so the codebase stays clean. |
+| `codeatlas-writing` | UI copy that does not read like a chatbot wrote it. |
+
+## Point your agent at the docs
+
+<Steps>
+
+1. **Claude Code.** Install the skills above, or add a line to your `CLAUDE.md`:
+
+   ```md
+   This project uses @codeatlasdev/ui (Svelte 5). Docs for agents: https://ui.codeatlas.com.br/llms.txt
+   Read https://ui.codeatlas.com.br/llms-full.txt before writing UI. Never write layout CSS; use Grid, Row, Stack and --ca-* tokens.
+   ```
+
+2. **Cursor.** Add `https://ui.codeatlas.com.br/llms-full.txt` as a custom doc source in Cursor's settings, or put the same instructions in a project rule so every chat starts with them.
+
+3. **Other agents.** Put the instructions in `AGENTS.md` (or your tool's equivalent) at the root of your app, and let the agent fetch `llms.txt` when it needs a component.
+
+</Steps>
+
+## Rules worth repeating to any agent
+
+These come from the agent guide and prevent the most common mistakes:
+
+- Import everything from `@codeatlasdev/ui`, never from internal paths. Charts, DataTable and CodeSnippet come from the `/charts`, `/table` and `/code` subpaths.
+- Import `global.css` once, in the root layout, and call `colorScheme.init()` there.
+- No layout CSS and no hardcoded colors. Use `Grid`, `Row` and `Stack` with a numeric `gap`, and `--ca-*` tokens.
+- No inline `padding` or `margin`. Inline styles are only for dynamic custom properties such as `style="--bar-w:{pct}%"`.
+- Build pages with `AppList`, `AppForm`, `AppSettings` or `PageShell`, not hand-made wrappers. Put `AppShellLayout` only in authenticated route layouts.
+- Svelte 5 runes only (`$state`, `$derived`, `$props`). No stores from `svelte/store`, no `svelte:component`, no `class:` directive on bits-ui components.
+- Never combine `will-change: transform` with `backdrop-filter`.
+- `ca-*` classes are public API: do not rename or remove them.
+
+<Callout type="tip">
+  Ask the agent to run `svelte-check` after generating UI. Prop typos and wrong snippet names show up as type errors, which is the fastest feedback loop for both people and agents.
+</Callout>
+
+## Why it works
+
+- **Page-level components.** The agent chooses a template, not forty primitives.
+- **Closed prop vocabularies.** `variant`, `size` and `severity` are string unions, not free-form classes.
+- **One token system.** There is one place for color, radius, spacing and type, so output stays consistent across generations.
+- **Tested for accessibility.** Components are checked with axe, so generated pages start from an accessible baseline, see [Accessibility](/docs/getting-started/accessibility/).

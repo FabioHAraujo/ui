@@ -1,0 +1,30 @@
+---
+title: Stepper
+description: Multi-step wizard navigation with completed, active and pending states.
+group: Navigation
+order: 6
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Horizontal from "~/demos/navigation/stepper/Horizontal.svelte";
+import HorizontalSrc from "~/demos/navigation/stepper/Horizontal.svelte?raw";
+
+```svelte
+<script>
+  import { Stepper } from "@codeatlasdev/ui";
+  let step = $state(0);
+  const steps = [{ label: "Account" }, { label: "Profile" }, { label: "Review" }];
+</script>
+
+<Stepper {steps} bind:current={step} />
+```
+
+The Stepper shows progress; it does not render the step content or the Back and Next buttons. Drive `current` from your own form state, as in the demo.
+
+<Demo title="Horizontal stepper" description="Four steps with Back and Next controls." src={HorizontalSrc}><Horizontal client:visible /></Demo>
+
+<Props rows={[
+  { name: "steps", type: "StepItem[]", description: "Array of { label, description? }." },
+  { name: "current", type: "number", default: "0", description: "Bindable, zero-indexed active step. Earlier steps render as completed." },
+  { name: "class", type: "string", default: "''", description: "Extra CSS classes." },
+]} />

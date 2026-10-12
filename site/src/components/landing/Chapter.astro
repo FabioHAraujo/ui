@@ -1,0 +1,22 @@
+---
+// One idea per chapter. `id` doubles as the rail target and the data-chapter key.
+interface Props {
+	id: string;
+	title: string;
+	lead?: string;
+	/** `wide` lets the demo take the full row below the copy. */
+	layout?: "split" | "wide";
+	flip?: boolean;
+}
+const { id, title, lead, layout = "split", flip = false } = Astro.props;
+---
+<section id={id} class:list={["chapter", `chapter--${layout}`, { "chapter--flip": flip }]} data-chapter={id} aria-labelledby={`${id}-h`}>
+	<div class="chapter__copy">
+		<h2 id={`${id}-h`} class="display" data-rise>{title}</h2>
+		{lead && <p class="chapter__lead" data-reveal>{lead}</p>}
+		<slot name="copy" />
+	</div>
+	<div class="chapter__demo" data-reveal="0.1">
+		<slot />
+	</div>
+</section>

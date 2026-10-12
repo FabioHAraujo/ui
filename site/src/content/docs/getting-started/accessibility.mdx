@@ -1,0 +1,88 @@
+---
+title: Accessibility
+description: What the components handle for you (focus, keyboard, labels, motion, transparency, contrast) and what stays your responsibility.
+group: Getting started
+order: 4
+---
+import { Callout } from "@codeatlasdev/ui";
+
+Interactive components are built on [bits-ui](https://bits-ui.com), which provides the ARIA roles, keyboard handling and focus management of each pattern. The package adds tokens, motion and touch rules on top, and every component is tested with axe in a real browser.
+
+## What you get
+
+| Area | Behavior |
+|---|---|
+| Focus ring | A global `:focus-visible` outline in `--ca-focus-ring` (the brand color) with a 2px offset. Never remove it; change the token instead. |
+| Overlays | `Dialog`, `AlertDialog`, `Drawer`, `Sheet`, `Popover` and menus trap focus, restore it on close, close on Escape and lock page scroll. |
+| Keyboard | Tabs, menus, selects, comboboxes, the command palette, date pickers, toggle groups and segmented controls follow their WAI-ARIA keyboard patterns. |
+| Names | `IconButton` requires `aria-label` at the type level. Built-in strings (close, dismiss, copy, loading) come from the [i18n catalog](/docs/getting-started/i18n/), so they are announced in the active language. |
+| Status | `Alert` uses `role="alert"`. `Toast` items use `role="status"` inside a polite live region. `Spinner` has `role="status"` with a label, `Progress` has `role="progressbar"` with `aria-valuenow`. `CopyButton` announces "Copied" through a polite live region. |
+| Loading buttons | `Button` and `IconButton` with `loading` set `aria-busy`, keep their label and ignore clicks. |
+| Forms | `TextField` and the other fields link hint and error text with `aria-describedby` and set `aria-invalid` on error. Errors render with `role="alert"`. |
+| Touch targets | Controls grow to 44px (`--ca-touch-target`) under `(pointer: coarse)`. |
+| Zoom | The package never disables zoom. Fields are 16px on touch so iOS does not zoom on focus, see [Mobile](/docs/getting-started/mobile/#input-font-size). |
+| Skip link | `DocsShell` renders a "Skip to content" link as the first focusable element. |
+
+## Motion
+
+When the user prefers reduced motion, `--ca-duration-fast`, `--ca-duration-base` and `--ca-duration-slow` become `0ms`, so every token-driven transition is instant. Components with JavaScript-driven motion check the `reducedMotion` store: `Sheet` disables its swipe spring and `SegmentedControl` turns off its indicator animation.
+
+```ts
+import { reducedMotion, reducedTransparency } from "@codeatlasdev/ui";
+
+reducedMotion.init();       // start following the media query (returns cleanup)
+reducedMotion.value;        // boolean, reactive
+reducedTransparency.value;  // prefers-reduced-transparency
+```
+
+Use the duration tokens in your own CSS and your animations respect the setting for free:
+
+```css
+.panel {
+  transition: transform var(--ca-duration-base) var(--ca-ease-standard);
+}
+```
+
+## Reduced transparency
+
+With `prefers-reduced-transparency: reduce`, every glass material (`glass-regular`, `glass-chrome`, overlays, panels, upload zones and glass buttons) drops `backdrop-filter` and renders on an opaque tint. Browsers without `backdrop-filter` support get the same near-opaque fallback, so text never sits on raw page content.
+
+## Color contrast
+
+Text tokens are tuned per preset and scheme:
+
+- `--ca-text-primary` and `--ca-text-secondary` for body text.
+- `--ca-text-hint` is the lowest readable tier and keeps 4.5:1. Use it for captions and helper text.
+- `--ca-text-disabled` is for inactive controls only, never for information.
+- `--ca-brand-text` is brand-colored text that keeps contrast on the surface. Use `--ca-brand-fill` with `--ca-brand-contrast` for filled brand elements.
+
+Brand presets generated from a hex color use the same generator, so they keep these relationships. Semantic colors (success, warning, error, info) are separated from the brand by luminance, not only hue, and should always be paired with an icon or text: color alone is never the only signal. `Alert` and `Toast` already include an icon.
+
+<Callout type="caution">
+  Contrast of your own combinations is your responsibility. Check custom `overrides`, `setTokens` values and text placed over images or gradients.
+</Callout>
+
+## Writing accessible pages
+
+- Give every page one `<h1>` and keep heading levels in order.
+- Provide a skip link and a `<main id="main" tabindex="-1">` landmark. `DocsShell` already has both (`#ca-docs-content`); add them to shells you build.
+- Label icon-only controls (`IconButton` enforces it) and give `Dialog`, `Sheet` and `Drawer` a `title`. Use `chromeless` dialogs with a `title` so the accessible name remains.
+- Give `Select`, `Combobox` and the other fields a `label` prop. Without one, the control has no visible or programmatic name.
+- Do not put `will-change: transform` on glass surfaces. It breaks blur rendering, which also removes the contrast the tint was tuned for.
+- Make clickable non-button elements real `<button>` or `<a>` elements.
+
+## Testing
+
+Components are tested with `vitest-browser-svelte` and axe-core. The helper in `packages/ui/tests/a11y.ts` provides `checkA11y` and a `toHaveNoViolations` matcher (this is the pattern used inside the repo):
+
+```ts
+import { render } from "vitest-browser-svelte";
+import { checkA11y } from "../../../tests/a11y";
+
+it("has no axe violations", async () => {
+  const screen = await render(MyComponent);
+  expect(await checkA11y(screen.container)).toHaveNoViolations();
+});
+```
+
+In your app, run axe on your routes in light and dark, and with an overlay open, using Playwright with `@axe-core/playwright`. Also test with a keyboard only and with a screen reader on at least one platform.

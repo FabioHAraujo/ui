@@ -1,0 +1,30 @@
+<script lang="ts">
+  import { GlassCard, Row, Button } from '@codeatlasdev/ui';
+  import { BarChart } from '@codeatlasdev/ui/charts';
+
+  const fmt = (v: number) => `$${(v / 1000).toFixed(0)}k`;
+  let mode = $state<'grouped' | 'stacked'>('grouped');
+</script>
+
+<div class="wrap">
+  <Row gap={8}>
+    <Button variant={mode === 'grouped' ? 'filled' : 'glass'} size="sm" onclick={() => (mode = 'grouped')}>Grouped</Button>
+    <Button variant={mode === 'stacked' ? 'filled' : 'glass'} size="sm" onclick={() => (mode = 'stacked')}>Stacked</Button>
+  </Row>
+  <GlassCard full>
+    <BarChart
+      series={[
+        { name: '2025', data: [44200, 58600, 67400, 81200] },
+        { name: '2026', data: [52800, 71400, 84600, 98800] },
+      ]}
+      categories={['Q1', 'Q2', 'Q3', 'Q4']}
+      valueFormatter={fmt}
+      stacked={mode === 'stacked'}
+      height="300px"
+    />
+  </GlassCard>
+</div>
+
+<style>
+  .wrap { width: 100%; display: flex; flex-direction: column; gap: var(--ca-space-3); }
+</style>

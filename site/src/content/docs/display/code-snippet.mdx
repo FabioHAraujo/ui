@@ -1,0 +1,33 @@
+---
+title: CodeSnippet
+description: "Syntax-highlighted code block with a copy button, highlighted by Shiki and following the current color scheme."
+group: Display
+order: 5
+---
+import Demo from "~/components/docs/Demo.astro";
+import CodeGroup from "~/components/docs/CodeGroup.astro";
+import Props from "~/components/docs/Props.astro";
+import Languages from "~/demos/display/code-snippet/Languages.svelte";
+import LanguagesSrc from "~/demos/display/code-snippet/Languages.svelte?raw";
+
+CodeSnippet lives in its own entry point so that Shiki stays out of bundles that do not need it. Install the optional peer first.
+
+<CodeGroup sync="pm" tabs={[{ label: "bun", code: "bun add shiki" }, { label: "npm", code: "npm i shiki" }, { label: "pnpm", code: "pnpm add shiki" }]} />
+
+```svelte
+<script>
+  import { CodeSnippet } from "@codeatlasdev/ui/code";
+</script>
+
+<CodeSnippet code={source} language="typescript" />
+```
+
+The theme switches between a light and a dark high-contrast Shiki theme when the color scheme changes.
+
+<Demo title="Languages" description={"Svelte, TypeScript and CSS."} src={LanguagesSrc}><Languages client:visible /></Demo>
+
+<Props rows={[
+  { name: "code", type: "string", description: "Source code to display. Required." },
+  { name: "language", type: "string", default: "'svelte'", description: "Shiki language identifier." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

@@ -1,0 +1,32 @@
+<script lang="ts">
+  import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel, Button } from '@codeatlasdev/ui';
+  import { Edit2, Copy, Trash2, Download } from '@lucide/svelte';
+
+  let last = $state('');
+</script>
+
+<DropdownMenu>
+  {#snippet triggerChild(props)}
+    <Button variant="glass" {...props}>Open menu</Button>
+  {/snippet}
+  <DropdownMenuLabel>File actions</DropdownMenuLabel>
+  <DropdownMenuItem onclick={() => (last = 'Edit')}>
+    {#snippet children()}<Edit2 size={14} /> Edit{/snippet}
+  </DropdownMenuItem>
+  <DropdownMenuItem onclick={() => (last = 'Duplicate')}>
+    {#snippet children()}<Copy size={14} /> Duplicate{/snippet}
+  </DropdownMenuItem>
+  <DropdownMenuItem onclick={() => (last = 'Download')}>
+    {#snippet children()}<Download size={14} /> Download{/snippet}
+  </DropdownMenuItem>
+  <DropdownMenuSeparator />
+  <DropdownMenuItem variant="destructive" onclick={() => (last = 'Delete')}>
+    {#snippet children()}<Trash2 size={14} /> Delete{/snippet}
+  </DropdownMenuItem>
+</DropdownMenu>
+
+{#if last}<span class="note" aria-live="polite">Last action: {last}</span>{/if}
+
+<style>
+  .note { font-size: var(--ca-font-size-body2); color: var(--ca-text-secondary); }
+</style>

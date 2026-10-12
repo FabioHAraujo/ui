@@ -1,0 +1,36 @@
+---
+title: Badge
+description: "Small count and status indicators anchored to icons, avatars and buttons."
+group: Display
+order: 3
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Counts from "~/demos/display/badge/Counts.svelte";
+import CountsSrc from "~/demos/display/badge/Counts.svelte?raw";
+import OnAvatars from "~/demos/display/badge/OnAvatars.svelte";
+import OnAvatarsSrc from "~/demos/display/badge/OnAvatars.svelte?raw";
+import Colors from "~/demos/display/badge/Colors.svelte";
+import ColorsSrc from "~/demos/display/badge/Colors.svelte?raw";
+
+```svelte
+<script>
+  import { Badge } from "@codeatlasdev/ui";
+</script>
+
+<Badge count={3}><IconButton aria-label="Messages">…</IconButton></Badge>
+```
+
+Badge wraps its child and positions the indicator on the corner. Pass `count` for a number (hidden at 0, capped at `99+`) or `dot` for a plain status dot. Add an accessible label to the wrapped control, since the indicator itself is visual.
+
+<Demo title="Dot and counts" description={"`dot` shows a plain indicator, `count` shows a number capped at `99+`."} src={CountsSrc}><Counts /></Demo>
+<Demo title="On avatars" description={"Status dots on avatars."} src={OnAvatarsSrc}><OnAvatars /></Demo>
+<Demo title="Colors" description={"brand, success, warning and error."} src={ColorsSrc}><Colors /></Demo>
+
+<Props rows={[
+  { name: "count", type: "number", default: "undefined", description: "Number to display. Hidden when 0 or undefined unless `dot` is set. Values above 99 render as `99+`." },
+  { name: "dot", type: "boolean", default: "false", description: "Shows a dot instead of a number." },
+  { name: "color", type: "'brand' | 'success' | 'error' | 'warning'", default: "'brand'", description: "Indicator color." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+  { name: "children", type: "Snippet", default: "undefined", description: "The element the badge is anchored to." },
+]} />

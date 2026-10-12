@@ -1,0 +1,57 @@
+---
+title: Page layouts
+description: Ready-made page layouts for lists, forms, settings and dashboards, built from AppList, AppForm, AppSettings and PageShell.
+group: Layout
+order: 50
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import AppListDemo from "~/demos/layout/list-page/AppListDemo.svelte";
+import AppListDemoSrc from "~/demos/layout/list-page/AppListDemo.svelte?raw";
+import AppSettingsDemo from "~/demos/layout/list-page/AppSettingsDemo.svelte";
+import AppSettingsDemoSrc from "~/demos/layout/list-page/AppSettingsDemo.svelte?raw";
+import PageShellDemo from "~/demos/layout/list-page/PageShellDemo.svelte";
+import PageShellDemoSrc from "~/demos/layout/list-page/PageShellDemo.svelte?raw";
+
+```svelte
+<script>
+  import { AppList, AppForm, AppSettings, PageShell } from "@codeatlasdev/ui";
+</script>
+```
+
+These layouts fill the content area of the [app shell](/docs/layout/app-shell/) and manage their own scrolling, so give them a parent with a fixed or flexible height. AppForm has its own page, see [AppForm](/docs/layout/form-page/).
+
+<Demo title="AppList" description="Pass data and the layout handles search, filters and pagination." src={AppListDemoSrc}><AppListDemo client:visible /></Demo>
+<Demo title="AppSettings" description="Side navigation plus content. The active tab is managed internally." src={AppSettingsDemoSrc}><AppSettingsDemo client:visible /></Demo>
+<Demo title="PageShell" description="A scrollable container for dashboards and non-CRUD pages." src={PageShellDemoSrc}><PageShellDemo /></Demo>
+
+<Props title="AppList props" rows={[
+  { name: "title", type: "string", description: "Page title." },
+  { name: "description", type: "string", description: "Subtitle. Derived from the list count when omitted in data mode." },
+  { name: "data", type: "T[]", description: "Full dataset. When set, AppList manages search, filters and pagination." },
+  { name: "searchKeys", type: "(keyof T)[]", description: "Fields included in text search. Defaults to all string fields." },
+  { name: "perPage", type: "number", default: "20", description: "Rows per page." },
+  { name: "idKey", type: "keyof T", default: "'id'", description: "Row identifier field." },
+  { name: "searchPlaceholder", type: "string", description: "Placeholder of the search input." },
+  { name: "ofLabel", type: "string", default: "'of'", description: "Word between the numbers in the count and page info." },
+  { name: "filters", type: "Snippet<[ListCtx]>", description: "Extra filter controls after the search input." },
+  { name: "children", type: "Snippet<[ListCtx]> | Snippet", description: "Table or grid content. Receives the list context in data mode." },
+  { name: "actions", type: "Snippet", description: "Top-right slot for the primary action." },
+  { name: "toolbar", type: "Snippet", description: "Manual toolbar, used only without data." },
+  { name: "empty", type: "Snippet<[ListCtx]> | Snippet", description: "Shown when filtered rows are zero." },
+  { name: "footer", type: "Snippet", description: "Manual footer, used only without data." },
+  { name: "maxWidth", type: "string", description: "Maximum width of the content." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />
+
+<Props title="AppSettings props" rows={[
+  { name: "title", type: "string", description: "Page title." },
+  { name: "description", type: "string", description: "Subtitle." },
+  { name: "tabs", type: "{ value, label, icon?, badge?, danger? }[]", description: "Side navigation entries." },
+  { name: "defaultTab", type: "string", description: "Initial tab. Defaults to the first." },
+  { name: "activeTab", type: "string", description: "Bindable active tab for external control." },
+  { name: "onTabChange", type: "(value: string) => void", description: "Called when the tab changes." },
+  { name: "actions", type: "Snippet", description: "Top-right slot for save and cancel buttons." },
+  { name: "children", type: "Snippet<[string]>", description: "Content. Receives the active tab value." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

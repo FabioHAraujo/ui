@@ -1,0 +1,34 @@
+---
+title: ScrollArea
+description: "Scrollable container with overlay scrollbars styled by the theme, backed by Bits UI."
+group: Display
+order: 10
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Vertical from "~/demos/display/scroll-area/Vertical.svelte";
+import VerticalSrc from "~/demos/display/scroll-area/Vertical.svelte?raw";
+import Horizontal from "~/demos/display/scroll-area/Horizontal.svelte";
+import HorizontalSrc from "~/demos/display/scroll-area/Horizontal.svelte?raw";
+
+```svelte
+<script>
+  import { ScrollArea } from "@codeatlasdev/ui";
+</script>
+
+<ScrollArea maxHeight="240px">…</ScrollArea>
+```
+
+The area scrolls once its content exceeds `maxHeight` or `maxWidth`, so set one of them (or a height through `class`). Native scrolling, touch momentum and keyboard scrolling are preserved.
+
+<Demo title="Vertical scroll" description={"Capped with `maxHeight`."} src={VerticalSrc}><Vertical client:visible /></Demo>
+<Demo title="Horizontal scroll" description={"`orientation=\"horizontal\"` with always-visible scrollbars."} src={HorizontalSrc}><Horizontal client:visible /></Demo>
+
+<Props rows={[
+  { name: "type", type: "'hover' | 'scroll' | 'auto' | 'always'", default: "'hover'", description: "When the scrollbar is visible." },
+  { name: "orientation", type: "'vertical' | 'horizontal' | 'both'", default: "'vertical'", description: "Which scrollbars to render." },
+  { name: "maxHeight", type: "string", default: "undefined", description: "CSS max-height of the area, for example `'240px'`." },
+  { name: "maxWidth", type: "string", default: "undefined", description: "CSS max-width of the area." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+  { name: "children", type: "Snippet", default: "undefined", description: "Scrollable content." },
+]} />

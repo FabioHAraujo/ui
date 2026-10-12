@@ -1,0 +1,43 @@
+---
+title: Drawer
+description: A side or bottom panel for the second layer, with a blurred overlay and a solid panel.
+group: Feedback
+order: 3
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Right from "~/demos/feedback/drawer/Right.svelte";
+import RightSrc from "~/demos/feedback/drawer/Right.svelte?raw";
+import Sides from "~/demos/feedback/drawer/Sides.svelte";
+import SidesSrc from "~/demos/feedback/drawer/Sides.svelte?raw";
+import Notifications from "~/demos/feedback/drawer/Notifications.svelte";
+import NotificationsSrc from "~/demos/feedback/drawer/Notifications.svelte?raw";
+
+```svelte
+<script>
+  import { Drawer } from "@codeatlasdev/ui";
+  let open = $state(false);
+</script>
+
+<Drawer bind:open title="Filters" side="right" width="360px">
+  ...
+  {#snippet actions()}<Button onclick={apply}>Apply</Button>{/snippet}
+</Drawer>
+```
+
+Same architecture as [Dialog](/docs/feedback/dialog/): the overlay blurs the page and the panel is a solid surface that slides in from an edge. For a mobile bottom panel with swipe to dismiss, use [Sheet](/docs/feedback/sheet/).
+
+<Demo title="Right (default)" description="Slides in from the right, with a footer actions area." src={RightSrc}><Right client:visible /></Demo>
+<Demo title="Left and bottom" description="Left suits mobile navigation. Bottom is a simple bottom panel without gestures." src={SidesSrc}><Sides client:visible /></Demo>
+<Demo title="Notification panel" description="A real-world use: a 400px wide panel on the right." src={NotificationsSrc}><Notifications client:visible /></Demo>
+
+<Props rows={[
+  { name: "open", type: "boolean", default: "false", description: "Bindable open state." },
+  { name: "side", type: "'left' | 'right' | 'bottom'", default: "'right'", description: "Edge the panel slides from." },
+  { name: "title", type: "string", description: "Header title." },
+  { name: "width", type: "string", default: "'360px'", description: "Panel width for left and right." },
+  { name: "children", type: "Snippet", description: "Panel body." },
+  { name: "actions", type: "Snippet", description: "Footer buttons, separated by a top rule." },
+  { name: "onOpenChange", type: "(open: boolean) => void", description: "Called whenever the open state changes." },
+  { name: "class", type: "string", default: "''", description: "Extra classes on the panel." },
+]} />

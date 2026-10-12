@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import AppDemo from "~/templates/app/AppDemo.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="App billing template" description="Plan overview, usage, pricing cards and invoices.">
+	<AppDemo client:load page="billing" {pathname} />
+</TemplateLayout>

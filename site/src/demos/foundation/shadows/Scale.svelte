@@ -1,0 +1,44 @@
+<script lang="ts">
+	const sizes = ["xs", "sm", "md", "lg", "xl"];
+</script>
+
+<div class="grid">
+	{#each sizes as size (size)}
+		<div class="card" style="--card-shadow: var(--ca-shadow-{size})">
+			<p class="name">shadow-{size}</p>
+			<p class="token">--ca-shadow-{size}</p>
+		</div>
+	{/each}
+</div>
+
+<style>
+	.grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--ca-space-6);
+		padding: var(--ca-space-2);
+		width: 100%;
+	}
+	.card {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: var(--ca-space-1);
+		min-width: 8.5rem;
+		padding: var(--ca-space-6);
+		border-radius: var(--ca-radius-lg);
+		background: var(--ca-surface-base);
+		box-shadow: var(--card-shadow);
+	}
+	.name {
+		margin: 0;
+		font-weight: 600;
+		color: var(--ca-text-primary);
+	}
+	.token {
+		margin: 0;
+		font-family: var(--ca-font-mono);
+		font-size: var(--ca-font-size-caption);
+		color: var(--ca-text-hint);
+	}
+</style>

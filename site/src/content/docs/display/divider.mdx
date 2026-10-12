@@ -1,0 +1,31 @@
+---
+title: Divider
+description: "Horizontal and vertical separators drawn with outline tokens."
+group: Display
+order: 7
+---
+import Demo from "~/components/docs/Demo.astro";
+import Props from "~/components/docs/Props.astro";
+import Horizontal from "~/demos/display/divider/Horizontal.svelte";
+import HorizontalSrc from "~/demos/display/divider/Horizontal.svelte?raw";
+import Vertical from "~/demos/display/divider/Vertical.svelte";
+import VerticalSrc from "~/demos/display/divider/Vertical.svelte?raw";
+
+```svelte
+<script>
+  import { Divider } from "@codeatlasdev/ui";
+</script>
+
+<Divider />
+<Divider orientation="vertical" />
+```
+
+A vertical divider stretches to the height of its flex container, so place it inside a `Row` with `align="center"` or a fixed height.
+
+<Demo title="Horizontal" src={HorizontalSrc}><Horizontal /></Demo>
+<Demo title="Vertical" src={VerticalSrc}><Vertical /></Demo>
+
+<Props rows={[
+  { name: "orientation", type: "'horizontal' | 'vertical'", default: "'horizontal'", description: "Direction of the separator." },
+  { name: "class", type: "string", default: "''", description: "Extra class names." },
+]} />

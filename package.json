@@ -1,0 +1,50 @@
+{
+	"name": "codeatlasdev-ui",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": ">=22.12.0",
+		"bun": ">=1.0.0"
+	},
+	"workspaces": [
+		"packages/*",
+		"site"
+	],
+	"scripts": {
+		"dev": "bun run --cwd site dev",
+		"build": "bun run --cwd packages/ui build && bun run --cwd site build",
+		"build:pkg": "bun run --cwd packages/ui build",
+		"preview": "bun run --cwd site preview",
+		"check": "bun run --cwd packages/ui check && bun run --cwd site check",
+		"lint": "biome check .",
+		"format": "biome format --write .",
+		"changeset": "changeset",
+		"version": "changeset version && bun install --lockfile-only",
+		"release": "node scripts/release.js",
+		"clean": "rm -rf packages/ui/dist site/dist site/.astro",
+		"lint:fix": "biome check --write .",
+		"validate": "bun run --cwd packages/ui themes:check && bun run check && bun run lint && bun run test:unit",
+		"predev": "bun run build:pkg",
+		"postinstall": "node scripts/fix-ts-symlink.js && bunx playwright install chromium",
+		"test": "bun run test:unit && bun run test:browser && bun run test:e2e",
+		"test:unit": "bun run --cwd packages/ui test:unit",
+		"test:browser": "bun run --cwd packages/ui test:browser",
+		"test:watch": "bun run --cwd packages/ui test:watch",
+		"test:e2e": "bun run --cwd site test:e2e",
+		"test:a11y": "bun run --cwd site test:a11y",
+		"test:vrt": "sh scripts/vrt.sh",
+		"test:vrt:update": "sh scripts/vrt.sh --update",
+		"site:deploy": "sh scripts/deploy-site.sh",
+		"release:ci": "bun run build:pkg && changeset publish"
+	},
+	"dependencies": {
+		"@lucide/svelte": "1.48.0",
+		"bits-ui": "2.3.1",
+		"svelte": "5.57.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.13",
+		"@changesets/cli": "3.0.2",
+		"typescript": "5.9.3"
+	}
+}

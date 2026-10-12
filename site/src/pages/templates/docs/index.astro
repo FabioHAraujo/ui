@@ -1,0 +1,8 @@
+---
+import TemplateLayout from "~/layouts/TemplateLayout.astro";
+import DocsTemplate from "~/templates/docs/DocsTemplate.svelte";
+const pathname = Astro.url.pathname;
+---
+<TemplateLayout title="API documentation template" description="DocsShell reference page: sections, grouped sidebar, table of contents, code tabs, callout and steps.">
+	<DocsTemplate client:load {pathname} />
+</TemplateLayout>
