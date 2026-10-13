@@ -1,10 +1,11 @@
 {
 	"name": "codeatlasdev-ui",
 	"private": true,
+	"packageManager": "bun@1.4.3",
 	"type": "module",
 	"engines": {
 		"node": ">=22.12.0",
-		"bun": ">=1.0.0"
+		"bun": ">=1.4.3"
 	},
 	"workspaces": [
 		"packages/*",
@@ -35,7 +36,7 @@
 		"test:vrt": "sh scripts/vrt.sh",
 		"test:vrt:update": "sh scripts/vrt.sh --update",
 		"site:deploy": "sh scripts/deploy-site.sh",
-		"release:ci": "bun run build:pkg && changeset publish"
+		"release:ci": "bun run build:pkg && node scripts/release.js --smoke && changeset publish"
 	},
 	"dependencies": {
 		"@lucide/svelte": "1.48.0",
