@@ -59,13 +59,12 @@ jobs:
       - id: changesets
         uses: changesets/action@v2
         with:
-          title: "chore: version packages (${{ github.ref_name }})"
-          commit: "chore: version packages (${{ github.ref_name }})"
-          version: bun run version
-          publish: bun run release:ci
-          createGithubReleases: true
+          pr-title: "chore: version packages (${{ github.ref_name }})"
+          commit-message: "chore: version packages (${{ github.ref_name }})"
+          version-script: bun run version
+          publish-script: bun run release:ci
+          create-github-releases: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
 
   site:
