@@ -67,18 +67,18 @@ test("theme-color follows the opaque chrome at the top edge", async ({ page }) =
 	await expect
 		.poll(async () => {
 			const r = await read();
-			return r.meta === r.header;
+			return r.meta === r.header ? "match" : JSON.stringify(r);
 		})
-		.toBe(true);
+		.toBe("match");
 	// Theme switch re-syncs.
 	await page.evaluate(() => document.documentElement.classList.toggle("dark"));
 	// Compare both values from the same read: the header color can still be settling.
 	await expect
 		.poll(async () => {
 			const r = await read();
-			return r.meta === r.header;
+			return r.meta === r.header ? "match" : JSON.stringify(r);
 		})
-		.toBe(true);
+		.toBe("match");
 });
 
 test("html paints a solid canvas color (overscroll, Safari 26 sampling)", async ({ page }) => {
