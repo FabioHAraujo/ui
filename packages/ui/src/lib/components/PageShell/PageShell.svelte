@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { scrollFocusable } from '../../actions/scroll-focusable.js';
 
   interface Props {
     title?: string;
@@ -11,15 +12,32 @@
     children?: Snippet;
   }
 
-  let { title, description, gap = 28, maxWidth = '1280px', actions, class: className = '', children }: Props = $props();
+  let { title, description, gap, maxWidth, actions, class: className = '', children }: Props = $props();
+  const titleId = $props.id();
+
+  // Only caller-supplied values become inline vars; the defaults live in the stylesheet as tokens.
+  const rootStyle = $derived(
+    [maxWidth ? `--ps-max:${maxWidth}` : '', gap !== undefined ? `--ps-gap:${gap}px` : ''].filter(Boolean).join(';') || undefined,
+  );
 </script>
 
-<div class="ca-page-shell {className}" style="--ps-max:{maxWidth};--ps-gap:{gap}px">
+<!-- The shell is the page's scroll container, named by its title. Focusable in the server
+     HTML too (keyboard scrolling before or without hydration); scrollFocusable drops the tab
+     stop after hydration when nothing overflows (axe scrollable-region-focusable). -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<div
+  class="ca-page-shell {className}"
+  style={rootStyle}
+  role="region"
+  aria-labelledby={title ? titleId : undefined}
+  tabindex="0"
+  use:scrollFocusable
+>
   {#if title || description || actions}
     <div class="ca-page-shell__header">
       <div class="ca-page-shell__meta">
         {#if title}
-          <h1 class="ca-page-shell__title">{title}</h1>
+          <h1 class="ca-page-shell__title" id={titleId}>{title}</h1>
         {/if}
         {#if description}
           <p class="ca-page-shell__description">{description}</p>
@@ -43,10 +61,10 @@
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    max-width: var(--ps-max, 1280px);
+    max-width: var(--ps-max, calc(var(--ca-space-unit) * 320));
     width: 100%;
     margin: 0 auto;
-    padding: var(--ca-page-pt, 20px) var(--ca-page-px, 24px) var(--ca-space-12, 48px);
+    padding: var(--ca-page-pt) var(--ca-page-px) var(--ca-space-12);
     box-sizing: border-box;
   }
 
@@ -55,51 +73,53 @@
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--ca-space-4, 16px);
-    margin-bottom: var(--ps-gap, 28px);
+    gap: var(--ca-space-4);
+    margin-bottom: var(--ps-gap, var(--ca-space-7));
   }
 
   .ca-page-shell__meta { flex: 1; min-width: 0; }
 
   .ca-page-shell__title {
+    font-family: var(--ca-font-display);
     font-size: var(--ca-font-size-h5);
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    font-weight: var(--ca-font-weight-heading);
+    letter-spacing: var(--ca-heading-tracking);
+    text-transform: var(--ca-heading-case);
     color: var(--ca-text-primary);
-    margin: 0 0 2px;
-    line-height: 1.2;
+    margin: 0 0 var(--ca-space-0-5);
+    line-height: var(--ca-line-height-tight);
   }
 
   .ca-page-shell__description {
     font-size: var(--ca-font-size-body2);
     color: var(--ca-text-secondary);
     margin: 0;
-    line-height: 1.5;
+    line-height: var(--ca-line-height-relaxed);
   }
 
   .ca-page-shell__actions {
     display: flex;
     align-items: center;
-    gap: var(--ca-space-2, 8px);
+    gap: var(--ca-space-2);
     flex-shrink: 0;
   }
 
   .ca-page-shell__body {
     display: flex;
     flex-direction: column;
-    gap: var(--ps-gap, 28px);
+    gap: var(--ps-gap, var(--ca-space-7));
     width: 100%;
   }
 
-  @media (max-width: 599px) {
+  @media (max-width: 599.98px) {
     .ca-page-shell {
-      padding: var(--ca-space-5, 20px) var(--ca-page-px-sm, 16px) var(--ca-space-10, 40px);
+      padding: var(--ca-space-5) var(--ca-page-px-sm) var(--ca-space-10);
     }
   }
 
   /* Inside AppShellLayout the mobile header (< 900px) already shows the page title:
      keep the h1 for assistive tech and the document outline, hide it visually. */
-  @media (max-width: 899px) {
+  @media (max-width: 899.98px) {
     :global(.ca-shell__content) .ca-page-shell__title {
       position: absolute;
       width: 1px;
@@ -114,11 +134,11 @@
   }
 
   /* Mobile: description leads, actions wrap below it full-width. */
-  @media (max-width: 767px) {
+  @media (max-width: 899.98px) {
     .ca-page-shell__header {
       flex-direction: column;
       align-items: stretch;
-      gap: var(--ca-space-3, 12px);
+      gap: var(--ca-space-3);
     }
     .ca-page-shell__actions {
       flex-shrink: 1;

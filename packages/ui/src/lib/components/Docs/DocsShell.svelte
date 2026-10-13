@@ -3,7 +3,7 @@
   import { t } from '../../i18n/state.svelte.js';
   import type { Snippet } from 'svelte';
   import { onMount } from 'svelte';
-  import { Menu, Search } from '@lucide/svelte';
+  import { ChevronLeft, ChevronRight, Menu, Search } from '@lucide/svelte';
   import Kbd from '../Kbd/Kbd.svelte';
   import SkipLink from '../SkipLink/SkipLink.svelte';
   import Sheet from '../Sheet/Sheet.svelte';
@@ -11,7 +11,7 @@
   import DocsNav from './DocsNav.svelte';
   import DocsSearch from './DocsSearch.svelte';
   import TableOfContents from './TableOfContents.svelte';
-  import type { DocsHeading, DocsNavGroup, DocsSearchEntry, DocsSection } from './types.js';
+  import type { DocsHeading, DocsNavGroup, DocsPagerLink, DocsSearchEntry, DocsSection } from './types.js';
 
   /**
    * DocsShell: page frame for developer docs.
@@ -54,6 +54,11 @@
     actions?: Snippet;
     /** Content below the sidebar tree inside the mobile Sheet (e.g. external links). */
     menuFooter?: Snippet;
+    /**
+     * Previous/next pages. Cards at the end of the article on wide screens; a fixed bottom
+     * action bar on narrow ones, so reading flows header → content → actions like an e-book.
+     */
+    pager?: { prev?: DocsPagerLink; next?: DocsPagerLink };
     children: Snippet;
   }
 
@@ -70,6 +75,7 @@
     brand,
     actions,
     menuFooter,
+    pager,
     children,
   }: Props = $props();
 
@@ -123,7 +129,7 @@
       <Search size={20} />
     </button>
 
-    {@render actions?.()}
+    {#if actions}<div class="ca-docs-actions">{@render actions()}</div>{/if}
     <ThemeToggle label={t().docs.toggleTheme} class="ca-docs-theme" />
   </div>
 </header>
@@ -140,6 +146,28 @@
       <TableOfContents {headings} variant="inline" class="ca-docs-toc-inline" />
     {/if}
     {@render children()}
+    {#if pager?.prev || pager?.next}
+      <nav class="ca-docs-pager" aria-label={t().docs.pager}>
+        {#if pager.prev}
+          <a class="ca-docs-pager__link" href={pager.prev.href} rel="prev">
+            <ChevronLeft size={18} aria-hidden="true" />
+            <span class="ca-docs-pager__text">
+              <small>{t().docs.previous}</small>
+              <span class="ca-docs-pager__title">{pager.prev.title}</span>
+            </span>
+          </a>
+        {/if}
+        {#if pager.next}
+          <a class="ca-docs-pager__link ca-docs-pager__link--next" href={pager.next.href} rel="next">
+            <span class="ca-docs-pager__text">
+              <small>{t().docs.next}</small>
+              <span class="ca-docs-pager__title">{pager.next.title}</span>
+            </span>
+            <ChevronRight size={18} aria-hidden="true" />
+          </a>
+        {/if}
+      </nav>
+    {/if}
   </main>
 
   {#if hasSidebar && headings.length > 1}
@@ -180,7 +208,7 @@
   }
 
   :global(html) {
-    scroll-padding-top: calc(var(--ca-docs-header-h) + var(--ca-safe-top) + 1.5rem);
+    scroll-padding-top: calc(var(--ca-docs-header-h) + var(--ca-safe-top) + var(--ca-space-6));
   }
 
   /* ── Header ─────────────────────────────────────────────────────────── */
@@ -191,30 +219,32 @@
     z-index: var(--ca-z-sticky);
     padding-top: var(--ca-safe-top);
     background: color-mix(in oklab, var(--ca-surface-base) 82%, transparent);
-    -webkit-backdrop-filter: blur(16px) saturate(1.4);
-    backdrop-filter: blur(16px) saturate(1.4);
-    border-bottom: 1px solid var(--ca-outline-subtle);
+    -webkit-backdrop-filter: var(--ca-mat-thin-filter);
+    backdrop-filter: var(--ca-mat-thin-filter);
+    border-bottom: var(--ca-border-width) solid var(--ca-outline-subtle);
   }
 
   .ca-docs-header__inner {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--ca-space-2);
     height: var(--ca-docs-header-h);
     max-width: var(--ca-docs-max-w);
     margin: 0 auto;
-    padding: 0 max(1.25rem, var(--ca-safe-right)) 0 max(1.25rem, var(--ca-safe-left));
+    padding: 0 max(var(--ca-space-5), var(--ca-safe-right)) 0 max(var(--ca-space-5), var(--ca-safe-left));
   }
 
   .ca-docs-brand {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    min-height: 44px;
-    margin-right: 1rem;
+    gap: var(--ca-space-2);
+    min-height: var(--ca-touch-target);
+    margin-right: var(--ca-space-4);
     color: var(--ca-text-primary);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: var(--ca-font-display);
+    font-weight: var(--ca-font-weight-heading);
+    letter-spacing: var(--ca-heading-tracking);
+    text-transform: var(--ca-heading-case);
     text-decoration: none;
     white-space: nowrap;
   }
@@ -223,26 +253,26 @@
   .ca-docs-section:focus-visible,
   .ca-docs-icon:focus-visible,
   .ca-docs-search-btn:focus-visible {
-    outline: 2px solid var(--ca-brand-main);
-    outline-offset: 2px;
+    outline: var(--ca-border-width-focus) solid var(--ca-focus-ring);
+    outline-offset: var(--ca-focus-ring-offset);
     border-radius: var(--ca-radius-md);
   }
 
   .ca-docs-sections {
     display: flex;
-    gap: 0.25rem;
+    gap: var(--ca-space-1);
     height: 100%;
   }
 
   .ca-docs-section {
     display: flex;
     align-items: center;
-    padding: 0 0.75rem;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
+    padding: 0 var(--ca-space-3);
+    border-bottom: var(--ca-border-width-strong) solid transparent;
+    margin-bottom: calc(var(--ca-border-width) * -1);
     color: var(--ca-text-secondary);
     font-size: var(--ca-font-size-body2);
-    font-weight: 500;
+    font-weight: var(--ca-font-weight-medium);
     text-decoration: none;
     transition: color var(--ca-duration-fast) var(--ca-ease-standard);
   }
@@ -259,13 +289,13 @@
   .ca-docs-search-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--ca-space-2);
     width: 18rem;
-    height: 2.25rem;
+    height: var(--ca-control-height);
     white-space: nowrap;
-    padding: 0 0.5rem 0 0.75rem;
-    border: 1px solid var(--ca-outline-default);
-    border-radius: var(--ca-radius-md);
+    padding: 0 var(--ca-space-2) 0 var(--ca-space-3);
+    border: var(--ca-border-width) solid var(--ca-outline-default);
+    border-radius: var(--ca-radius-control);
     background: var(--ca-surface-raised);
     color: var(--ca-text-secondary);
     font: inherit;
@@ -276,16 +306,16 @@
 
   .ca-docs-search-btn:hover { border-color: var(--ca-outline-strong); }
   .ca-docs-search-btn__label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
-  .ca-docs-search-btn :global(.ca-kbd) { flex-shrink: 0; margin-left: 0.25rem; }
+  .ca-docs-search-btn :global(.ca-kbd) { flex-shrink: 0; margin-left: var(--ca-space-1); }
 
   .ca-docs-icon {
     display: none;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: var(--ca-touch-target);
+    height: var(--ca-touch-target);
     border: none;
-    border-radius: var(--ca-radius-md);
+    border-radius: var(--ca-radius-control);
     background: transparent;
     color: var(--ca-text-secondary);
     cursor: pointer;
@@ -293,10 +323,63 @@
 
   .ca-docs-icon:hover { color: var(--ca-text-primary); background: var(--ca-action-hover); }
 
+  /* Consumer actions (links or buttons) get the same 44px box, color and focus as built-in icons,
+     so a plain <a><Icon/></a> can never sit off-axis or show the UA link/visited color. */
+  .ca-docs-actions { display: flex; align-items: center; }
+  .ca-docs-actions > :global(a),
+  .ca-docs-actions > :global(button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--ca-touch-target);
+    height: var(--ca-touch-target);
+    border: none;
+    border-radius: var(--ca-radius-control);
+    background: transparent;
+    color: var(--ca-text-secondary);
+    cursor: pointer;
+  }
+  .ca-docs-actions > :global(a:hover),
+  .ca-docs-actions > :global(button:hover) { color: var(--ca-text-primary); background: var(--ca-action-hover); }
+  .ca-docs-actions > :global(a:focus-visible),
+  .ca-docs-actions > :global(button:focus-visible) {
+    outline: var(--ca-border-width-focus) solid var(--ca-focus-ring);
+    outline-offset: var(--ca-focus-ring-offset);
+  }
+
+  /* ── Pager ─────────────────────────────────────────────────────────── */
+  .ca-docs-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--ca-space-3);
+    margin-top: var(--ca-space-12);
+    padding-top: var(--ca-space-6);
+    border-top: var(--ca-border-width) solid var(--ca-outline-subtle);
+  }
+  .ca-docs-pager__link {
+    display: flex;
+    align-items: center;
+    gap: var(--ca-space-3);
+    min-width: 0;
+    padding: var(--ca-space-3) var(--ca-space-4);
+    border: var(--ca-border-width) solid var(--ca-outline-subtle);
+    border-radius: var(--ca-radius-md);
+    color: var(--ca-text-primary);
+    text-decoration: none;
+    transition: border-color var(--ca-duration-fast) var(--ca-ease-standard), background var(--ca-duration-fast) var(--ca-ease-standard);
+  }
+  .ca-docs-pager__link--next { grid-column: 2; justify-content: flex-end; text-align: right; }
+  .ca-docs-pager__link:hover { border-color: var(--ca-outline-default); background: var(--ca-action-hover); }
+  .ca-docs-pager__link:focus-visible { outline: var(--ca-border-width-focus) solid var(--ca-focus-ring); outline-offset: var(--ca-focus-ring-offset); }
+  .ca-docs-pager__text { display: grid; gap: var(--ca-space-0-5); min-width: 0; }
+  .ca-docs-pager small { font-size: var(--ca-font-size-caption); color: var(--ca-text-secondary); }
+  .ca-docs-pager__title { font-weight: var(--ca-font-weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ca-docs-pager :global(svg) { flex-shrink: 0; color: var(--ca-text-secondary); }
+
   :global(.ca-docs-theme.ca-rail-btn) {
     flex: 0 0 auto;
-    width: 44px;
-    height: 44px;
+    width: var(--ca-touch-target);
+    height: var(--ca-touch-target);
   }
 
   /* Right cluster (search, consumer actions, theme) is pinned by the spacer; actions never stretch. */
@@ -321,13 +404,19 @@
     height: calc(var(--ca-vh) - var(--ca-docs-header-h) - var(--ca-safe-top));
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 1.5rem 0.75rem 3rem;
-    border-right: 1px solid var(--ca-outline-subtle);
+    padding: var(--ca-space-6) var(--ca-space-3) var(--ca-space-12);
+    border-right: var(--ca-border-width) solid var(--ca-outline-subtle);
   }
 
   .ca-docs-main {
     min-width: 0;
     outline: none;
+    /* Fluid gutter keeps content off the sidebar, the TOC and the screen edge (plus notches). */
+    padding:
+      var(--ca-space-8)
+      max(var(--ca-gutter), var(--ca-safe-right))
+      var(--ca-space-16)
+      max(var(--ca-gutter), var(--ca-safe-left));
   }
 
   .ca-docs-toc {
@@ -336,8 +425,8 @@
     align-self: start;
     max-height: calc(var(--ca-vh) - var(--ca-docs-header-h) - var(--ca-safe-top));
     overflow-y: auto;
-    padding-right: max(1.5rem, var(--ca-safe-right));
-    padding-left: 0.5rem;
+    padding-right: max(var(--ca-space-6), var(--ca-safe-right));
+    padding-left: var(--ca-space-2);
   }
 
   :global(.ca-docs-toc-inline) { display: none; }
@@ -346,10 +435,10 @@
 
   .ca-docs-sheet-sections {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--ca-outline-subtle);
+    gap: var(--ca-space-2);
+    margin-bottom: var(--ca-space-4);
+    padding-bottom: var(--ca-space-4);
+    border-bottom: var(--ca-border-width) solid var(--ca-outline-subtle);
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -358,13 +447,13 @@
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
-    min-height: 44px;
-    padding: 0 1rem;
-    border: 1px solid var(--ca-outline-default);
+    min-height: var(--ca-touch-target);
+    padding: 0 var(--ca-space-4);
+    border: var(--ca-border-width) solid var(--ca-outline-default);
     border-radius: var(--ca-radius-pill);
     color: var(--ca-text-primary);
     font-size: var(--ca-font-size-body2);
-    font-weight: 500;
+    font-weight: var(--ca-font-weight-medium);
     text-decoration: none;
   }
 
@@ -376,24 +465,62 @@
 
   /* ── Responsive ─────────────────────────────────────────────────────── */
 
-  @media (max-width: 1279px) {
-    .ca-docs { grid-template-columns: var(--ca-docs-sidebar-w) minmax(0, 1fr); }
+  @media (max-width: 1199.98px) {
+    .ca-docs { display: block; }
     .ca-docs-toc { display: none; }
     :global(.ca-docs-toc-inline) { display: block; }
-  }
-
-  @media (max-width: 1023px) {
-    .ca-docs { display: block; }
     .ca-docs-sidebar,
     .ca-docs-sections,
     .ca-docs-search-btn { display: none; }
     .ca-docs-icon { display: flex; }
     :global(:root) { --ca-docs-header-h: 52px; }
     .ca-docs-header__inner {
-      gap: 0.25rem;
-      padding: 0 max(0.5rem, var(--ca-safe-right)) 0 max(0.5rem, var(--ca-safe-left));
+      gap: var(--ca-space-1);
+      padding: 0 max(var(--ca-space-2), var(--ca-safe-right)) 0 max(var(--ca-space-2), var(--ca-safe-left));
     }
     .ca-docs-brand { margin-right: 0; }
+  }
+
+  /* Narrow screens: the pager becomes the page's action bar, pinned above the home indicator. */
+  @media (max-width: 899.98px) {
+    .ca-docs-main:has(.ca-docs-pager) {
+      padding-bottom: calc(var(--ca-space-12) + var(--ca-touch-target) + var(--ca-safe-bottom));
+    }
+    /* One bar, two halves: like a native toolbar, not two cards floating in a strip. */
+    .ca-docs-pager {
+      position: fixed;
+      inset: auto 0 0 0;
+      z-index: var(--ca-z-sticky);
+      margin: 0;
+      gap: 0;
+      padding: 0 var(--ca-safe-right) var(--ca-safe-bottom) var(--ca-safe-left);
+      border-top: none;
+      background: var(--ca-chrome-bg);
+      -webkit-backdrop-filter: var(--ca-chrome-blur);
+      backdrop-filter: var(--ca-chrome-blur);
+      box-shadow: inset 0 var(--ca-border-width) 0 var(--ca-glass-separator);
+    }
+    .ca-docs-pager__link {
+      min-height: calc(var(--ca-touch-target) + var(--ca-space-2));
+      padding: var(--ca-space-1-5) var(--ca-space-4);
+      gap: var(--ca-space-2);
+      border: none;
+      border-radius: 0;
+      background: transparent;
+    }
+    .ca-docs-pager__link:hover { background: var(--ca-action-hover); }
+    .ca-docs-pager__link:active { background: var(--ca-action-selected); }
+    /* Hairline between the halves (only when both exist). */
+    .ca-docs-pager__link + .ca-docs-pager__link {
+      box-shadow: inset var(--ca-border-width) 0 0 var(--ca-glass-separator);
+    }
+    .ca-docs-pager__link:focus-visible { outline-offset: calc(var(--ca-border-width-focus) * -1); }
+    .ca-docs-pager small {
+      font-size: var(--ca-font-size-micro);
+      letter-spacing: var(--ca-overline-tracking);
+      text-transform: uppercase;
+    }
+    .ca-docs-pager__title { font-size: var(--ca-font-size-body2); }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -35,59 +35,96 @@
     box-shadow 200ms ease;
 }
 
+/* ── Material tiers ─────────────────────────────────────────────────────────
+ * Every tier reads four tokens: filter (blur), fill, elevation shadow and edge (rims,
+ * borders). Surface styles ([data-style] below) and theme recipes swap the tokens, so the
+ * same component can be glass, flat, outlined, neumorphic, clay or brutalist.
+ * Re-declared on every element that can change their inputs (scheme/preset/style islands). */
+:root,
+[data-ca-tokens],
+[data-theme-scope],
+[data-preset],
+[data-style] {
+  /* Long-form reading text: between primary and secondary, so paragraphs keep life without
+   * competing with headings. Lightness gap to primary stays small at every preset. */
+  --ca-text-body: color-mix(in oklab, var(--ca-text-primary) 78%, var(--ca-text-secondary));
+  /* Control roles: fields, chips and alerts read these, so surface styles restyle them too. */
+  --ca-field-bg:           var(--ca-surface-raised);
+  --ca-field-border-color: var(--ca-outline-subtle);
+  --ca-field-shadow:       0 0 #0000;
+  --ca-chip-bg:            var(--ca-glass-tint-thin);
+  --ca-chip-border-color:  var(--ca-glass-border);
+  --ca-chip-shadow:        0 0 #0000;
+  --ca-alert-border-color: transparent;
+  --ca-alert-shadow:       0 0 #0000;
+  /* Translucent over glass; opaque styles set a real surface below the tint. */
+  --ca-alert-surface:      transparent;
+  --ca-mat-edge:
+    inset 0 0.5px 0 var(--ca-glass-rim),
+    inset 0 -0.5px 0 var(--ca-mat-edge-low);
+  --ca-mat-edge-low: rgba(0, 0, 0, 0.08);
+  /* Stroke color for outlined surfaces and control boundaries (>= 3:1 for WCAG 1.4.11). */
+  --ca-border-color: var(--ca-outline-strong);
+
+  --ca-mat-ultra-thin-filter: var(--ca-blur-ultra-thin);
+  --ca-mat-ultra-thin-fill:   var(--ca-glass-tint-ultra-thin);
+  --ca-mat-ultra-thin-shadow: 0 2px 8px oklch(0.25 0.008 70 / 0.06);
+
+  --ca-mat-thin-filter: var(--ca-blur-thin);
+  --ca-mat-thin-fill:   var(--ca-glass-tint-thin);
+  --ca-mat-thin-shadow: 0 4px 16px oklch(0.25 0.008 70 / 0.10);
+
+  --ca-mat-regular-filter: var(--ca-blur-regular);
+  --ca-mat-regular-fill:   var(--ca-glass-tint);
+  --ca-mat-regular-shadow: var(--ca-glass-shadow);
+
+  --ca-mat-thick-filter: var(--ca-blur-thick);
+  --ca-mat-thick-fill:   var(--ca-glass-tint-thick);
+  --ca-mat-thick-shadow: 0 16px 48px oklch(0.25 0.008 70 / 0.16);
+
+  --ca-mat-chrome-filter: var(--ca-blur-chrome);
+  --ca-mat-chrome-fill:   var(--ca-glass-tint-chrome);
+  --ca-mat-chrome-shadow: 0 1px 0 var(--ca-glass-border);
+}
+
 /* ── 1. Ultra Thin ───────────────────────────────────────────────────────── */
 .glass-ultra-thin {
-  -webkit-backdrop-filter: var(--ca-blur-ultra-thin);
-  backdrop-filter: var(--ca-blur-ultra-thin);
-  background-color: var(--ca-glass-tint-ultra-thin);
-  box-shadow:
-    0 2px 8px oklch(0.25 0.008 70 / 0.06),
-    inset 0 0.5px 0 var(--ca-glass-rim),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.06);
+  -webkit-backdrop-filter: var(--ca-mat-ultra-thin-filter);
+  backdrop-filter: var(--ca-mat-ultra-thin-filter);
+  background: var(--ca-mat-ultra-thin-fill);
+  box-shadow: var(--ca-mat-ultra-thin-shadow), var(--ca-mat-edge);
 }
 
 /* ── 2. Thin ─────────────────────────────────────────────────────────────── */
 .glass-thin {
-  -webkit-backdrop-filter: var(--ca-blur-thin);
-  backdrop-filter: var(--ca-blur-thin);
-  background-color: var(--ca-glass-tint-thin);
-  box-shadow:
-    0 4px 16px oklch(0.25 0.008 70 / 0.10),
-    inset 0 0.5px 0 var(--ca-glass-rim),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.08);
+  -webkit-backdrop-filter: var(--ca-mat-thin-filter);
+  backdrop-filter: var(--ca-mat-thin-filter);
+  background: var(--ca-mat-thin-fill);
+  box-shadow: var(--ca-mat-thin-shadow), var(--ca-mat-edge);
 }
 
 /* ── 3. Regular ──────────────────────────────────────────────────────────── */
 .glass-regular {
-  -webkit-backdrop-filter: var(--ca-blur-regular);
-  backdrop-filter: var(--ca-blur-regular);
-  background-color: var(--ca-glass-tint);
-  box-shadow:
-    var(--ca-glass-shadow),
-    inset 0 0.5px 0 var(--ca-glass-rim),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.10);
+  -webkit-backdrop-filter: var(--ca-mat-regular-filter);
+  backdrop-filter: var(--ca-mat-regular-filter);
+  background: var(--ca-mat-regular-fill);
+  box-shadow: var(--ca-mat-regular-shadow), var(--ca-mat-edge);
 }
 
 /* ── 4. Thick ────────────────────────────────────────────────────────────── */
 .glass-thick {
-  -webkit-backdrop-filter: var(--ca-blur-thick);
-  backdrop-filter: var(--ca-blur-thick);
-  background-color: var(--ca-glass-tint-thick);
-  box-shadow:
-    0 16px 48px oklch(0.25 0.008 70 / 0.16),
-    inset 0 0.5px 0 var(--ca-glass-rim),
-    inset 0 -0.5px 0 rgba(0, 0, 0, 0.12);
+  -webkit-backdrop-filter: var(--ca-mat-thick-filter);
+  backdrop-filter: var(--ca-mat-thick-filter);
+  background: var(--ca-mat-thick-fill);
+  box-shadow: var(--ca-mat-thick-shadow), var(--ca-mat-edge);
 }
 
 /* ── 5. Chrome ───────────────────────────────────────────────────────────── */
 .glass-chrome {
-  -webkit-backdrop-filter: var(--ca-blur-chrome);
-  backdrop-filter: var(--ca-blur-chrome);
-  background-color: var(--ca-glass-tint-chrome);
-  box-shadow:
-    inset 0 0.5px 0 var(--ca-glass-rim),
-    inset 0 -0.5px 0 var(--ca-glass-border),
-    0 1px 0 var(--ca-glass-border);
+  -webkit-backdrop-filter: var(--ca-mat-chrome-filter);
+  backdrop-filter: var(--ca-mat-chrome-filter);
+  background: var(--ca-mat-chrome-fill);
+  box-shadow: var(--ca-mat-chrome-shadow), var(--ca-mat-edge);
 }
 
 /* ── Navigation layer ────────────────────────────────────────────────────── */
@@ -408,6 +445,180 @@
   --ca-shadow-md: 0 0 0 1px var(--ca-outline-subtle);
   --ca-shadow-lg: 0 0 0 1px var(--ca-outline-subtle);
   --ca-shadow-xl: 0 0 0 1px var(--ca-outline-default);
+}
+
+/* ── Opaque material styles: no blur anywhere, overlays on solid surfaces ── */
+[data-style="outlined"],
+[data-style="neumorphic"],
+[data-style="clay"],
+[data-style="tonal"] {
+  --ca-alert-surface:   var(--ca-surface-raised);
+  --ca-blur-ultra-thin: none;
+  --ca-blur-thin:       none;
+  --ca-blur-regular:    none;
+  --ca-blur-thick:      none;
+  --ca-blur-chrome:     none;
+  --ca-overlay-blur:    none;
+  --ca-panel-blur:      none;
+  --ca-chrome-blur:     none;
+  --ca-upload-blur:     none;
+  --ca-overlay-bg:      var(--ca-surface-overlay);
+  --ca-panel-bg:        var(--ca-surface-overlay);
+  --ca-chrome-bg:       var(--ca-surface-raised);
+  --ca-upload-bg:       var(--ca-surface-raised);
+}
+
+/* ── Outlined: border-defined surfaces, no elevation (Swiss, Brutalism, Terminal).
+ *    Recipes raise --ca-border-width and swap --ca-mat-*-shadow for hard offsets. ── */
+[data-style="outlined"] {
+  --ca-mat-edge: inset 0 0 0 var(--ca-border-width) var(--ca-border-color);
+  --ca-mat-ultra-thin-fill: var(--ca-surface-raised);
+  --ca-mat-thin-fill:       var(--ca-surface-raised);
+  --ca-mat-regular-fill:    var(--ca-surface-raised);
+  --ca-mat-thick-fill:      var(--ca-surface-overlay);
+  --ca-mat-chrome-fill:     var(--ca-surface-base);
+  --ca-mat-ultra-thin-shadow: 0 0 #0000;
+  --ca-mat-thin-shadow:       0 0 #0000;
+  --ca-mat-regular-shadow:    0 0 #0000;
+  --ca-mat-thick-shadow:      0 0 #0000;
+  --ca-mat-chrome-shadow:     0 0 #0000;
+  --ca-overlay-border: var(--ca-border-color);
+  --ca-panel-border:   var(--ca-border-color);
+  --ca-chrome-border:  var(--ca-border-color);
+  --ca-overlay-shadow: inset 0 0 0 var(--ca-border-width) var(--ca-border-color);
+  --ca-panel-shadow:   inset 0 0 0 var(--ca-border-width) var(--ca-border-color);
+  --ca-shadow-xs: none;
+  --ca-shadow-sm: none;
+  --ca-shadow-md: none;
+  --ca-shadow-lg: none;
+  --ca-shadow-xl: none;
+  --ca-field-bg:           var(--ca-surface-base);
+  --ca-field-border-color: var(--ca-border-color);
+  --ca-chip-bg:            transparent;
+  --ca-chip-border-color:  var(--ca-border-color);
+  --ca-alert-border-color: var(--ca-border-color);
+}
+
+/* ── Neumorphic: one base color, extruded by paired light/dark shadows. Low contrast by
+ *    nature: keep text tokens untouched and use it for showcases, not dense data UIs. ── */
+[data-style="neumorphic"] {
+  --ca-neu-light: color-mix(in oklab, var(--ca-surface-base) 40%, white);
+  --ca-neu-dark:  color-mix(in oklab, var(--ca-surface-base) 78%, black);
+  --ca-neu-distance: 6px;
+  --ca-neu-blur:     14px;
+  --ca-mat-edge: 0 0 #0000;
+  --ca-mat-ultra-thin-fill: var(--ca-surface-base);
+  --ca-mat-thin-fill:       var(--ca-surface-base);
+  --ca-mat-regular-fill:    var(--ca-surface-base);
+  --ca-mat-thick-fill:      var(--ca-surface-base);
+  --ca-mat-chrome-fill:     var(--ca-surface-base);
+  --ca-mat-ultra-thin-shadow: calc(var(--ca-neu-distance) * -0.5) calc(var(--ca-neu-distance) * -0.5) calc(var(--ca-neu-blur) * 0.5) var(--ca-neu-light), calc(var(--ca-neu-distance) * 0.5) calc(var(--ca-neu-distance) * 0.5) calc(var(--ca-neu-blur) * 0.5) var(--ca-neu-dark);
+  --ca-mat-thin-shadow:    calc(var(--ca-neu-distance) * -1) calc(var(--ca-neu-distance) * -1) var(--ca-neu-blur) var(--ca-neu-light), var(--ca-neu-distance) var(--ca-neu-distance) var(--ca-neu-blur) var(--ca-neu-dark);
+  --ca-mat-regular-shadow: calc(var(--ca-neu-distance) * -1) calc(var(--ca-neu-distance) * -1) var(--ca-neu-blur) var(--ca-neu-light), var(--ca-neu-distance) var(--ca-neu-distance) var(--ca-neu-blur) var(--ca-neu-dark);
+  --ca-mat-thick-shadow:   calc(var(--ca-neu-distance) * -1.5) calc(var(--ca-neu-distance) * -1.5) calc(var(--ca-neu-blur) * 1.5) var(--ca-neu-light), calc(var(--ca-neu-distance) * 1.5) calc(var(--ca-neu-distance) * 1.5) calc(var(--ca-neu-blur) * 1.5) var(--ca-neu-dark);
+  --ca-mat-chrome-shadow:  0 calc(var(--ca-neu-distance) * 0.5) var(--ca-neu-blur) var(--ca-neu-dark);
+  --ca-overlay-bg:     var(--ca-surface-base);
+  --ca-panel-bg:       var(--ca-surface-base);
+  --ca-overlay-shadow: var(--ca-mat-thick-shadow);
+  --ca-panel-shadow:   var(--ca-mat-thick-shadow);
+  --ca-overlay-border: transparent;
+  --ca-panel-border:   transparent;
+  /* Fields are pressed in, chips and alerts raised. */
+  --ca-field-bg:           var(--ca-surface-base);
+  --ca-field-border-color: transparent;
+  --ca-field-shadow:
+    inset calc(var(--ca-neu-distance) * 0.5) calc(var(--ca-neu-distance) * 0.5) calc(var(--ca-neu-blur) * 0.5) var(--ca-neu-dark),
+    inset calc(var(--ca-neu-distance) * -0.5) calc(var(--ca-neu-distance) * -0.5) calc(var(--ca-neu-blur) * 0.5) var(--ca-neu-light);
+  --ca-chip-bg:            var(--ca-surface-base);
+  --ca-chip-border-color:  transparent;
+  --ca-chip-shadow:        var(--ca-mat-ultra-thin-shadow);
+  --ca-alert-shadow:       var(--ca-mat-ultra-thin-shadow);
+}
+
+.dark[data-style="neumorphic"],
+.dark [data-style="neumorphic"] {
+  /* A white-mixed highlight reads as a halo on dark bases; keep it a faint lift. */
+  --ca-neu-light: color-mix(in oklab, var(--ca-surface-base) 88%, white);
+  --ca-neu-dark:  color-mix(in oklab, var(--ca-surface-base) 45%, black);
+}
+
+/* ── Clay: soft, inflated surfaces (inner highlight + inner shade + colored drop). ── */
+[data-style="clay"] {
+  --ca-mat-edge:
+    inset 0 2px 4px color-mix(in oklab, white 55%, transparent),
+    inset 0 -6px 12px color-mix(in oklab, black 10%, transparent);
+  --ca-mat-ultra-thin-fill: var(--ca-surface-raised);
+  --ca-mat-thin-fill:       var(--ca-surface-raised);
+  --ca-mat-regular-fill:    var(--ca-surface-raised);
+  --ca-mat-thick-fill:      var(--ca-surface-overlay);
+  --ca-mat-chrome-fill:     var(--ca-surface-raised);
+  --ca-mat-ultra-thin-shadow: 0 6px 14px color-mix(in oklab, var(--ca-brand-main) 14%, transparent);
+  --ca-mat-thin-shadow:       0 10px 22px color-mix(in oklab, var(--ca-brand-main) 18%, transparent);
+  --ca-mat-regular-shadow:    0 14px 30px color-mix(in oklab, var(--ca-brand-main) 22%, transparent);
+  --ca-mat-thick-shadow:      0 20px 40px color-mix(in oklab, var(--ca-brand-main) 26%, transparent);
+  --ca-mat-chrome-shadow:     0 6px 14px color-mix(in oklab, var(--ca-brand-main) 14%, transparent);
+  --ca-overlay-shadow: var(--ca-mat-thick-shadow), var(--ca-mat-edge);
+  --ca-panel-shadow:   var(--ca-mat-thick-shadow), var(--ca-mat-edge);
+  --ca-field-border-color: transparent;
+  --ca-field-shadow:       inset 0 2px 5px color-mix(in oklab, black 10%, transparent);
+  --ca-chip-bg:            var(--ca-surface-raised);
+  --ca-chip-border-color:  transparent;
+  --ca-chip-shadow:        var(--ca-mat-edge), var(--ca-mat-ultra-thin-shadow);
+  --ca-alert-shadow:       var(--ca-mat-edge), var(--ca-mat-ultra-thin-shadow);
+}
+
+/* ── Chrome (Y2K): glossy vertical gradient, metallic rim, brand glow. Blur stays on. ── */
+[data-style="chrome"] {
+  --ca-chrome-hi: color-mix(in oklab, white 70%, var(--ca-surface-raised));
+  --ca-chrome-lo: color-mix(in oklab, var(--ca-brand-main) 10%, var(--ca-surface-sunken, var(--ca-surface-base)));
+  --ca-mat-edge:
+    inset 0 1px 0 color-mix(in oklab, white 80%, transparent),
+    inset 0 -1px 0 color-mix(in oklab, black 18%, transparent),
+    inset 0 0 0 var(--ca-border-width) color-mix(in oklab, var(--ca-brand-main) 30%, var(--ca-outline-default));
+  --ca-mat-ultra-thin-fill: linear-gradient(180deg, var(--ca-chrome-hi), var(--ca-chrome-lo));
+  --ca-mat-thin-fill:       linear-gradient(180deg, var(--ca-chrome-hi), var(--ca-chrome-lo));
+  --ca-mat-regular-fill:    linear-gradient(180deg, var(--ca-chrome-hi) 0%, var(--ca-surface-raised) 48%, var(--ca-chrome-lo) 100%);
+  --ca-mat-thick-fill:      linear-gradient(180deg, var(--ca-chrome-hi) 0%, var(--ca-surface-overlay) 48%, var(--ca-chrome-lo) 100%);
+  --ca-mat-chrome-fill:     linear-gradient(180deg, var(--ca-chrome-hi), var(--ca-chrome-lo));
+  --ca-mat-regular-shadow:  0 0 24px color-mix(in oklab, var(--ca-brand-main) 28%, transparent);
+  --ca-mat-thick-shadow:    0 0 36px color-mix(in oklab, var(--ca-brand-main) 34%, transparent);
+  --ca-field-bg:           linear-gradient(180deg, var(--ca-surface-sunken, var(--ca-surface-base)), var(--ca-surface-raised));
+  --ca-field-border-color: color-mix(in oklab, var(--ca-brand-main) 35%, var(--ca-outline-default));
+  --ca-field-shadow:       inset 0 2px 4px color-mix(in oklab, black 14%, transparent);
+  --ca-chip-bg:            linear-gradient(180deg, var(--ca-chrome-hi), var(--ca-chrome-lo));
+  --ca-chip-border-color:  color-mix(in oklab, var(--ca-brand-main) 30%, var(--ca-outline-default));
+  --ca-chip-shadow:        inset 0 1px 0 color-mix(in oklab, white 80%, transparent);
+  --ca-alert-border-color: color-mix(in oklab, var(--ca-brand-main) 30%, var(--ca-outline-default));
+  --ca-alert-shadow:       inset 0 1px 0 color-mix(in oklab, white 60%, transparent), 0 0 16px color-mix(in oklab, var(--ca-brand-main) 18%, transparent);
+}
+.dark[data-style="chrome"],
+.dark [data-style="chrome"] {
+  --ca-chrome-hi: color-mix(in oklab, white 16%, var(--ca-surface-raised));
+}
+
+/* ── Tonal (Material 3): surfaces tinted with the brand hue, soft elevation. ── */
+[data-style="tonal"] {
+  --ca-mat-edge: 0 0 #0000;
+  --ca-mat-ultra-thin-fill: color-mix(in oklab, var(--ca-brand-main) 4%, var(--ca-surface-raised));
+  --ca-mat-thin-fill:       color-mix(in oklab, var(--ca-brand-main) 6%, var(--ca-surface-raised));
+  --ca-mat-regular-fill:    color-mix(in oklab, var(--ca-brand-main) 8%, var(--ca-surface-raised));
+  --ca-mat-thick-fill:      color-mix(in oklab, var(--ca-brand-main) 11%, var(--ca-surface-overlay));
+  --ca-mat-chrome-fill:     color-mix(in oklab, var(--ca-brand-main) 6%, var(--ca-surface-base));
+  --ca-mat-ultra-thin-shadow: 0 0 #0000;
+  --ca-mat-thin-shadow:       0 1px 2px oklch(0 0 0 / 0.10);
+  --ca-mat-regular-shadow:    0 1px 3px oklch(0 0 0 / 0.12), 0 1px 2px oklch(0 0 0 / 0.08);
+  --ca-mat-thick-shadow:      0 4px 8px oklch(0 0 0 / 0.12), 0 2px 3px oklch(0 0 0 / 0.08);
+  --ca-mat-chrome-shadow:     0 0 #0000;
+  --ca-overlay-bg: var(--ca-mat-thick-fill);
+  --ca-panel-bg:   var(--ca-mat-thick-fill);
+  --ca-overlay-border: transparent;
+  --ca-panel-border:   transparent;
+  /* M3 filled text field: tinted fill, bottom indicator. */
+  --ca-field-bg:           color-mix(in oklab, var(--ca-brand-main) 7%, var(--ca-surface-raised));
+  --ca-field-border-color: transparent;
+  --ca-field-shadow:       inset 0 calc(var(--ca-border-width) * -1) 0 var(--ca-outline-strong);
+  --ca-chip-bg:            color-mix(in oklab, var(--ca-brand-main) 12%, var(--ca-surface-raised));
+  --ca-chip-border-color:  transparent;
 }
 
 /* ── No backdrop-filter (old WebViews, some Android browsers): translucent tints would

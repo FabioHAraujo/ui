@@ -170,7 +170,8 @@
   {/if}
 
   <!-- Body -->
-  <!-- svelte-ignore a11y_no_noninteractive_tabindex (scrollable region must be keyboard-focusable, axe scrollable-region-focusable) -->
+  <!-- Scrollable region: keyboard-focusable on purpose (axe scrollable-region-focusable). -->
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
   <div class="ca-app-list__body" tabindex="0" role="region" aria-label={t().appList.listContent}>
     {#if list}
       {#if list.rows.length === 0}
@@ -226,46 +227,48 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--ca-space-4, 16px);
+    gap: var(--ca-space-4);
     padding:
-      var(--ca-page-pt, 20px)
-      var(--ca-page-px, 24px)
-      var(--ca-space-3, 12px);
+      var(--ca-page-pt)
+      var(--ca-page-px)
+      var(--ca-space-3);
     flex-shrink: 0;
   }
 
   .ca-app-list__meta { flex: 1; min-width: 0; }
 
   .ca-app-list__title {
+    font-family: var(--ca-font-display);
     font-size: var(--ca-font-size-h5);
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    font-weight: var(--ca-font-weight-heading);
+    letter-spacing: var(--ca-heading-tracking);
+    text-transform: var(--ca-heading-case);
     color: var(--ca-text-primary);
-    margin: 0 0 2px;
-    line-height: 1.2;
+    margin: 0 0 var(--ca-space-0-5);
+    line-height: var(--ca-line-height-tight);
   }
 
   .ca-app-list__desc {
     font-size: var(--ca-font-size-body2);
     color: var(--ca-text-secondary);
     margin: 0;
-    line-height: 1.4;
+    line-height: var(--ca-line-height-snug);
   }
 
   .ca-app-list__actions {
     display: flex;
     align-items: center;
-    gap: var(--ca-space-2, 8px);
+    gap: var(--ca-space-2);
     flex-shrink: 0;
   }
 
   .ca-app-list__toolbar {
     display: flex;
     align-items: center;
-    gap: var(--ca-space-2, 8px);
-    padding: var(--ca-space-2, 8px) var(--ca-page-px, 24px);
+    gap: var(--ca-space-2);
+    padding: var(--ca-space-2) var(--ca-page-px);
     flex-shrink: 0;
-    border-bottom: 1px solid var(--ca-outline-subtle);
+    border-bottom: var(--ca-border-width) solid var(--ca-outline-subtle);
     overflow-x: auto;
     overflow-y: hidden;
   }
@@ -273,8 +276,8 @@
   .ca-app-list__toolbar::-webkit-scrollbar { height: 0; }
 
   .ca-app-list__toolbar-sep {
-    width: 1px;
-    height: 20px;
+    width: var(--ca-border-width);
+    height: var(--ca-space-5);
     background: var(--ca-outline-subtle);
     flex-shrink: 0;
   }
@@ -283,22 +286,22 @@
 
   .ca-app-list__clear {
     font-size: var(--ca-font-size-caption);
-    font-weight: 500;
+    font-weight: var(--ca-font-weight-medium);
     color: var(--ca-text-hint);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 2px 4px;
+    padding: var(--ca-space-0-5) var(--ca-space-1);
     border-radius: var(--ca-radius-sm);
     font-family: inherit;
-    transition: color var(--ca-duration-fast);
+    transition: color var(--ca-duration-fast) var(--ca-ease-standard);
     flex-shrink: 0;
   }
   .ca-app-list__clear:hover { color: var(--ca-text-primary); }
 
   .ca-app-list__sel-label {
     font-size: var(--ca-font-size-caption);
-    font-weight: 500;
+    font-weight: var(--ca-font-weight-medium);
     color: var(--ca-brand-text);
     white-space: nowrap;
     flex-shrink: 0;
@@ -311,11 +314,11 @@
     overflow-x: auto;
   }
 
-  .ca-app-list__body::-webkit-scrollbar      { width: 5px; height: 5px; }
+  .ca-app-list__body::-webkit-scrollbar      { width: var(--ca-space-1-5); height: var(--ca-space-1-5); }
   .ca-app-list__body::-webkit-scrollbar-track { background: transparent; }
   .ca-app-list__body::-webkit-scrollbar-thumb {
     background: var(--ca-outline-default);
-    border-radius: 999px;
+    border-radius: var(--ca-radius-pill);
   }
 
   .ca-app-list__empty {
@@ -323,7 +326,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    min-height: 280px;
+    min-height: calc(var(--ca-space-unit) * 70);
   }
 
   .ca-app-list__empty-msg {
@@ -336,31 +339,34 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--ca-space-3, 12px);
-    padding: var(--ca-space-3, 10px) var(--ca-page-px, 24px);
+    gap: var(--ca-space-3);
+    padding: var(--ca-space-3) var(--ca-page-px);
     flex-shrink: 0;
-    border-top: 1px solid var(--ca-outline-subtle);
+    border-top: var(--ca-border-width) solid var(--ca-outline-subtle);
   }
 
-  @media (max-width: 599px) {
+  @media (max-width: 599.98px) {
+    /* Title and actions share one row (actions never float alone on a line); they only wrap
+       when the title genuinely cannot fit, and then the actions start the new line. */
     .ca-app-list__header {
-      flex-direction: column;
-      align-items: stretch;
+      flex-wrap: wrap;
+      row-gap: var(--ca-space-3);
       padding:
-        var(--ca-space-4, 16px)
-        var(--ca-page-px-sm, 16px)
-        var(--ca-space-3, 10px);
+        var(--ca-space-4)
+        var(--ca-page-px-sm)
+        var(--ca-space-3);
     }
-    .ca-app-list__actions { justify-content: flex-end; }
-    .ca-app-list__toolbar { padding: var(--ca-space-2, 8px) var(--ca-page-px-sm, 16px); }
-    /* The search field takes the free width instead of its 180px floor. */
-    .ca-app-list__toolbar :global(.ca-search-field) { min-width: 0; max-width: none; }
-    .ca-app-list__footer  { padding: var(--ca-space-2, 8px) var(--ca-page-px-sm, 16px); flex-wrap: wrap; }
+    .ca-app-list__toolbar { padding: var(--ca-space-2) var(--ca-page-px-sm); }
+    /* Cards align with the header and toolbar edges instead of touching the screen. */
+    .ca-app-list__body { padding: var(--ca-space-1) var(--ca-page-px-sm) var(--ca-space-3); }
+    /* The search field takes the free width instead of its fixed min-width. */
+    .ca-app-list__toolbar :global(.ca-search-field) { flex: 1 1 auto; min-width: 0; max-width: none; }
+    .ca-app-list__footer  { padding: var(--ca-space-2) var(--ca-page-px-sm); flex-wrap: wrap; }
   }
 
   /* Inside AppShellLayout the mobile header (< 900px) already shows the page title:
      keep the h1 for assistive tech, hide it visually. */
-  @media (max-width: 899px) {
+  @media (max-width: 899.98px) {
     :global(.ca-shell__content) .ca-app-list__title {
       position: absolute;
       width: 1px;

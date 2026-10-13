@@ -101,16 +101,16 @@
   .ca-tf {
     display: flex;
     flex-direction: column;
-    gap: var(--ca-space-1, 4px);
+    gap: var(--ca-space-1);
     width: 100%;
   }
 
   /* ── Label ─────────────────────────────────────────────────── */
   .ca-tf__label {
-    font-size: var(--ca-font-size-body2);
-    font-weight: 500;
+    font-size: var(--ca-font-size-label);
+    font-weight: var(--ca-font-weight-medium);
     color: var(--ca-text-primary);
-    line-height: 1.4;
+    line-height: var(--ca-line-height-snug);
     user-select: none;
   }
 
@@ -122,12 +122,13 @@
   .ca-tf__wrap {
     display: flex;
     align-items: center;
-    gap: var(--ca-space-2, 8px);
-    height: 36px;
-    border-radius: var(--ca-radius-md);
-    padding: 0 10px;
-    background: var(--ca-surface-raised);
-    border: 1px solid var(--ca-outline-subtle);
+    gap: var(--ca-space-2);
+    height: var(--ca-control-height);
+    border-radius: var(--ca-radius-control);
+    padding: 0 var(--ca-space-2-5);
+    background: var(--ca-field-bg);
+    border: var(--ca-border-width) solid var(--ca-field-border-color);
+    box-shadow: var(--ca-field-shadow);
     transition:
       border-color var(--ca-duration-fast) var(--ca-ease-standard),
       box-shadow   var(--ca-duration-fast) var(--ca-ease-standard);
@@ -135,12 +136,12 @@
 
   .ca-tf__wrap--focused {
     border-color: var(--ca-brand-main);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ca-brand-main) 18%, transparent);
+    box-shadow: 0 0 0 var(--ca-border-width-focus) color-mix(in oklab, var(--ca-brand-main) 18%, transparent);
   }
 
   .ca-tf__wrap--error {
     border-color: var(--ca-semantic-error) !important;
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--ca-semantic-error) 18%, transparent) !important;
+    box-shadow: 0 0 0 var(--ca-border-width-focus) color-mix(in oklab, var(--ca-semantic-error) 18%, transparent) !important;
   }
 
   .ca-tf--disabled .ca-tf__wrap {
@@ -178,7 +179,7 @@
   /* Autofill override */
   .ca-tf__input:-webkit-autofill,
   .ca-tf__input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px var(--ca-surface-raised) inset;
+    -webkit-box-shadow: 0 0 0 1000px var(--ca-field-bg) inset;
     -webkit-text-fill-color: var(--ca-text-primary);
     caret-color: var(--ca-text-primary);
   }
@@ -197,7 +198,7 @@
     font-size: var(--ca-font-size-caption);
     color: var(--ca-text-secondary);
     margin: 0;
-    line-height: 1.4;
+    line-height: var(--ca-line-height-snug);
   }
 
   .ca-tf__hint--error {
@@ -206,8 +207,8 @@
 
   /* ── Size: sm ──────────────────────────────────────────────── */
   .ca-tf--sm .ca-tf__wrap {
-    height: 30px;
-    padding: 0 8px;
+    height: var(--ca-control-height-sm);
+    padding: 0 var(--ca-space-2);
   }
 
   .ca-tf--sm .ca-tf__input {

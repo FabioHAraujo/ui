@@ -125,7 +125,11 @@
     {#if tabs}
       {#each tabs as tab, i (i)}
         <CodeTab label={tab.label}>
-          {#if tab.html}{@html tab.html}{:else}<pre class="ca-code"><code>{tab.code ?? ''}</code></pre>{/if}
+          {#if tab.html}{@html tab.html}{:else}
+            <!-- Scrollable code must be keyboard-focusable (axe scrollable-region-focusable). -->
+            <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+            <div class="ca-code"><pre tabindex="0" role="region" aria-label={tab.label}><code>{tab.code ?? ''}</code></pre></div>
+          {/if}
         </CodeTab>
       {/each}
     {:else}
@@ -167,11 +171,12 @@
     /* Shrinkable inside flex/grid parents: long lines scroll in the <pre>, never widen the page. */
     min-width: 0;
     max-width: 100%;
-    margin: 1.25rem 0;
-    border: 1px solid var(--ca-outline-subtle);
+    margin: var(--ca-space-5) 0;
+    border: var(--ca-border-width) solid var(--ca-outline-subtle);
     border-radius: var(--ca-radius-lg);
     background: var(--ca-surface-raised);
     overflow: hidden;
+    container-type: inline-size;
   }
 
   .ca-codetabs__bar {
@@ -179,9 +184,9 @@
     display: flex;
     align-items: stretch;
     justify-content: space-between;
-    gap: 0.5rem;
-    border-bottom: 1px solid var(--ca-outline-subtle);
-    padding-right: 0.25rem;
+    gap: var(--ca-space-2);
+    border-bottom: var(--ca-border-width) solid var(--ca-outline-subtle);
+    padding-right: var(--ca-space-1);
   }
 
   .ca-codetabs__tabs {
@@ -197,16 +202,16 @@
 
   .ca-codetabs__tab {
     flex-shrink: 0;
-    min-height: 44px;
-    padding: 0 1rem;
+    min-height: var(--ca-touch-target);
+    padding: 0 var(--ca-space-4);
     border: none;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
+    border-bottom: var(--ca-border-width-strong) solid transparent;
+    margin-bottom: calc(var(--ca-border-width) * -1);
     background: transparent;
     color: var(--ca-text-secondary);
     font-family: var(--ca-font-sans);
     font-size: var(--ca-font-size-body2);
-    font-weight: 500;
+    font-weight: var(--ca-font-weight-medium);
     cursor: pointer;
     white-space: nowrap;
     transition:
@@ -223,8 +228,8 @@
 
   .ca-codetabs__tab:focus-visible,
   .ca-codetabs__copy:focus-visible {
-    outline: 2px solid var(--ca-brand-main);
-    outline-offset: -2px;
+    outline: var(--ca-border-width-focus) solid var(--ca-focus-ring);
+    outline-offset: calc(var(--ca-border-width-focus) * -1);
     border-radius: var(--ca-radius-sm);
   }
 
@@ -232,16 +237,16 @@
     display: inline-flex;
     align-items: center;
     align-self: center;
-    gap: 0.375rem;
+    gap: var(--ca-space-1-5);
     flex-shrink: 0;
-    min-height: 44px;
-    padding: 0 0.75rem;
+    min-height: var(--ca-touch-target);
+    padding: 0 var(--ca-space-3);
     border: none;
     background: none;
     color: var(--ca-text-secondary);
     font-family: var(--ca-font-sans);
     font-size: var(--ca-font-size-caption);
-    font-weight: 500;
+    font-weight: var(--ca-font-weight-medium);
     cursor: pointer;
     transition: color var(--ca-duration-fast) var(--ca-ease-standard);
   }
@@ -261,9 +266,9 @@
   }
 
   /* On phones the label collapses to the icon to leave room for the tab strip. */
-  @media (max-width: 479px) {
+  @container (max-width: 599.98px) {
     .ca-codetabs__copy span { display: none; }
-    .ca-codetabs__copy { min-width: 44px; justify-content: center; padding: 0; }
+    .ca-codetabs__copy { min-width: var(--ca-touch-target); justify-content: center; padding: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {

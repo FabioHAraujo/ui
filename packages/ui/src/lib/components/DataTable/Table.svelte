@@ -10,19 +10,19 @@
   The glass border + backdrop are applied on the outer div so they don't
   interfere with table layout.
 -->
-<div class="ca-table-wrap {className}">
+<div class="ca-table-root {className}">
   <div class="ca-table-container">
     <table class="ca-table" {...rest}>{@render children?.()}</table>
   </div>
 </div>
 
 <style>
-  .ca-table-wrap {
+  .ca-table-root {
     min-height: 0;
     flex: 1;
     overflow: auto;
     border-radius: var(--ca-radius-lg);
-    border: 1px solid var(--ca-outline-subtle);
+    border: var(--ca-border-width) solid var(--ca-outline-subtle);
     background: var(--ca-surface-raised);
   }
 
@@ -41,7 +41,7 @@
   /* thead / tbody / tr / th / td are styled globally so DataTable
      sub-components can use plain HTML elements without extra classes */
   :global(.ca-table thead) {
-    border-bottom: 1px solid var(--ca-outline-subtle);
+    border-bottom: var(--ca-border-width) solid var(--ca-outline-subtle);
   }
 
   :global(.ca-table tbody tr:last-child) {
@@ -49,7 +49,7 @@
   }
 
   :global(.ca-table tbody tr) {
-    border-bottom: 1px solid var(--ca-outline-subtle);
+    border-bottom: var(--ca-border-width) solid var(--ca-outline-subtle);
     transition: background var(--ca-duration-fast) var(--ca-ease-standard);
   }
 
@@ -58,20 +58,20 @@
   }
 
   :global(.ca-table th) {
-    height: 36px;
-    padding: 0 12px;
+    height: var(--ca-control-height);
+    padding: 0 var(--ca-space-3);
     text-align: left;
     vertical-align: middle;
     font-size: var(--ca-font-size-caption);
-    font-weight: 600;
+    font-weight: var(--ca-font-weight-semibold);
     color: var(--ca-text-hint);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--ca-overline-tracking);
     white-space: nowrap;
   }
 
   :global(.ca-table td) {
-    padding: 10px 12px;
+    padding: var(--ca-space-2-5) var(--ca-space-3);
     vertical-align: middle;
     white-space: nowrap;
     font-size: var(--ca-font-size-body2);

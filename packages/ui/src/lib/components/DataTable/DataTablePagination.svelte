@@ -81,7 +81,7 @@
   .ca-dt-pagination__size {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--ca-space-1-5);
   }
 
   .ca-dt-pagination__label {
@@ -90,9 +90,9 @@
   }
 
   .ca-dt-pagination__select {
-    height: 28px;
-    padding: 0 6px;
-    border: 1px solid var(--ca-outline-default);
+    height: var(--ca-control-height-sm);
+    padding: 0 var(--ca-space-1-5);
+    border: var(--ca-border-width) solid var(--ca-outline-default);
     border-radius: var(--ca-radius-sm);
     background: var(--ca-surface-raised);
     color: var(--ca-text-primary);
@@ -100,13 +100,13 @@
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    width: 56px;
+    width: calc(var(--ca-space-12) + var(--ca-space-2));
   }
 
   .ca-dt-pagination__nav {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--ca-space-1-5);
   }
 
   .ca-dt-pagination__count {
@@ -116,12 +116,12 @@
   }
 
   .ca-dt-pagination__btn {
-    width: 28px;
-    height: 28px;
+    width: var(--ca-space-7);
+    height: var(--ca-space-7);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--ca-outline-default);
+    border: var(--ca-border-width) solid var(--ca-outline-default);
     border-radius: var(--ca-radius-sm);
     background: transparent;
     cursor: pointer;
@@ -139,7 +139,7 @@
   }
 
   /* iOS Safari zooms into focused fields under 16px: keep them at 16px on touch / small screens. */
-  @media (pointer: coarse), (max-width: 767px) {
+  @media (pointer: coarse), (max-width: 899.98px) {
     .ca-dt-pagination__select {
       font-size: max(16px, var(--ca-font-size-body2));
     }
