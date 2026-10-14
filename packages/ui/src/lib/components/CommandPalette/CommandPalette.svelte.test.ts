@@ -119,3 +119,42 @@ describe("CommandPalette", () => {
 		await expect.element(page.getByRole("option")).toHaveLength(3);
 	});
 });
+
+describe("CommandPalette pointer vs keyboard (#80)", () => {
+	// A row that appears or slides under a parked pointer fires mouseenter without any movement
+	// (list renders, dialog animates in). It must not steal the keyboard selection; only a real move does.
+	it("a row entering under a still pointer does not steal the selection", async () => {
+		await open();
+		const options = page.getByRole("option");
+		const third = options.nth(2).element();
+		third.dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+		third.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+		await userEvent.keyboard("{ArrowDown}");
+		await expect.element(options.nth(1)).toHaveAttribute("aria-selected", "true");
+		await expect.element(options.nth(2)).toHaveAttribute("aria-selected", "false");
+		third.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+		await expect.element(options.nth(2)).toHaveAttribute("aria-selected", "true");
+	});
+
+	it("same while filtering", async () => {
+		await open({ minQueryLength: 1 });
+		await input().fill("o");
+		const options = page.getByRole("option");
+		await expect.poll(() => options.elements().length).toBeGreaterThan(1);
+		const last = options.nth(options.elements().length - 1).element();
+		last.dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+		await expect.element(options.first()).toHaveAttribute("aria-selected", "true");
+		last.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+		await expect
+			.element(options.nth(options.elements().length - 1))
+			.toHaveAttribute("aria-selected", "true");
+	});
+
+	it("ArrowDown on an empty list keeps the selection at 0, not -1", async () => {
+		await open();
+		await input().fill("zzzz");
+		await userEvent.keyboard("{ArrowDown}");
+		await input().fill("rep");
+		await expect.element(page.getByRole("option").first()).toHaveAttribute("aria-selected", "true");
+	});
+});
