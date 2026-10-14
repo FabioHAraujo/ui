@@ -84,10 +84,14 @@
     }
   });
 
+  // Rows set the selection on `mousemove`, not `mouseenter`: a row that merely appears or slides under
+  // a stationary pointer (list renders, dialog animates in) fires mouseenter and would steal the
+  // keyboard selection (#80). The row handlers below are the only pointer path.
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      selectedIndex = Math.min(selectedIndex + 1, filtered.length - 1);
+      // Empty list: stay on 0, never -1 (the next results render would have nothing selected).
+      selectedIndex = Math.max(0, Math.min(selectedIndex + 1, filtered.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       selectedIndex = Math.max(selectedIndex - 1, 0);
@@ -166,7 +170,7 @@
               aria-selected={i === selectedIndex}
               class="ca-cmd-item {i === selectedIndex ? 'ca-cmd-item--active' : ''}"
               onclick={() => navigate(item.path)}
-              onmouseenter={() => { selectedIndex = i; }}
+              onmousemove={() => { selectedIndex = i; }}
             >
               <Icon size={14} class="ca-cmd-item__icon" />
               <span class="ca-cmd-item__label">{item.label}</span>
@@ -185,7 +189,7 @@
                   aria-selected={i === selectedIndex}
                   class="ca-cmd-item {i === selectedIndex ? 'ca-cmd-item--active' : ''}"
                   onclick={() => navigate(item.path)}
-                  onmouseenter={() => { selectedIndex = i; }}
+                  onmousemove={() => { selectedIndex = i; }}
                 >
                   <Icon size={14} class="ca-cmd-item__icon" />
                   <span class="ca-cmd-item__label">{item.label}</span>
