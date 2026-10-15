@@ -1,5 +1,37 @@
 # Changelog
 
+## 4.0.0
+
+### Major Changes
+
+- b99075a: `AppShellLayout` renders its content region as `<main id={mainId} tabindex="-1">` by default, so a page built on it has a `<main>` landmark (axe `landmark-one-main`, `region`) and the skip link lands on it. It was a plain `div`. Pass `mainId={null}` when your page renders its own `<main id="main" tabindex="-1">`: the region is then a plain `div`, never a second landmark. If you wrapped your content in `<main>` inside the shell, remove it or pass `mainId={null}`.
+- fdb6798: `nativeFeel()` now has one opt-out class, `.ca-selectable`, for both the context menu and text selection (#136). The context-menu filter used `.selectable` while the selection CSS used `.ca-selectable`, so neither class restored both. The filter and its docs now say `.ca-selectable`, matching the `ca-*` class contract. Clean cutover: `.selectable` was never documented outside a JSDoc line, and no stylesheet ever targeted it, so apps using it must rename it to `ca-selectable` (right-click on a `.selectable` region is now blocked again until they do).
+
+### Minor Changes
+
+- 6e39edc: `caBrandPlugin` writes `src/generated/brand.ts` as soon as the Vite config resolves (the URLs depend only on a hash of the inputs, so no rendering is needed), not only at build start. New `codeatlas-ui brand` command and `brandUrls()` / `runBrand()`: render the icons and the module without a Vite run, so a job that only runs `svelte-check` on a fresh clone type-checks (`svelte-kit sync` does not load Vite plugins).
+- c2d255d: `FormSection` accepts `headingLevel` (`2 | 3 | 4 | 5 | 6`) and `AppSettings`/`AppForm` provide the section heading level like `PageShell`, so `FormSection` and `EmptyState` titles inside them render as `<h2>` under the page `<h1>` (axe `heading-order`) instead of `<h5>`. Outside a page layout the default stays `<h5>`. Only the tag changes, never the look.
+- af02ce2: `RadioGroup`, `Checkbox`, `Switch` and `Select` accept `name`, so their value is part of `FormData` on a native form submit (progressive enhancement, SvelteKit form actions without a hidden-input workaround). `Select` renders a hidden input carrying the selected value when `name` is set.
+- e7b85e7: `ogCard` accepts `lang` (BCP 47, default `"en"`, escaped) for the card's `<html lang>`, so non-English cards get the right hyphenation and locale font selection.
+- 55ecc1a: `Box`, `Flex`, `Stack` and `Grid` are generic on `as`: `<Stack as="form" novalidate onsubmit={...}>` accepts the form's attributes, and the handler's `currentTarget` is an `HTMLFormElement` (same for `as="a"`, `as="label"`, `as="button"`...). An attribute that does not belong to the tag is a type error. Exports `PolymorphicProps` and `ElementTag`.
+
+### Patch Changes
+
+- 153be87: `centsToDisplay` keeps the no-break space `Intl` puts after the currency symbol (`"R$\u00a0123,45"`), so a price no longer wraps between the symbol and the number. `MoneyInput` still shows and parses a plain space in its editable text.
+- a517102: `toCsv`, `toJson`, `ExportColumn` and `ExportMenu` accept any object row type (`T extends object`), so rows typed with an `interface` no longer need a cast. `key` is still checked against `keyof T`.
+- 8d25c2f: `caErrorPlugin({ scaffold: true })` writes a valid `src/error.html`: the theme init script now sits in `<head>` instead of inside `<style>`, the page uses the app theme (`theme` option, same object as `caThemePlugin`) instead of hard-coded amber, its copy and `lang` follow the new `locale` option (`en` default, warns when unset), and the `javascript:history.back()` link is gone (CSP-safe). The scaffolded `+error.svelte` uses tabs and double quotes like the other generated files. `init` now writes `caErrorPlugin({ scaffold: true, theme })`.
+- 9e5655f: `init` without `--write` is now a true dry run: it prints `would create <file>` instead of writing new files. It also stops creating `src/lib/theme.ts` (`src/theme.ts` on Astro) when `vite.config.ts` / `hooks.server.ts` already import `theme` from elsewhere, and wires the files it adds to that import.
+- a7f7e96: Docs and agent skill: apps must install `@lucide/svelte` themselves. Under Bun's isolated linker the package's own dependency is not importable from the app.
+- 3ef5b11: `migrate` keeps the default thickness of `GlassCard` and `GlassSurface`: a usage without `thickness` (default `regular`) becomes `elevation={3}` instead of dropping it, so the migrated card keeps its fill, blur, shadow and rim (`Card` and `Surface` default to `elevation={1}`).
+- 33ad505: `migrate` looks up `typescript` in the project directory first (then next to the CLI) and prints `migrate needs typescript (bun add -d typescript)` with exit code 1 when it is missing, instead of crashing with `Cannot find package 'typescript'`. This also fixes `bunx @codeatlasdev/ui migrate` in layouts where the CLI cache directory cannot see the project's `typescript`.
+- b7cdd79: `migrate` now ends with a list of the usages it left for you (`file:line Component: reason (recipe)`), and `--strict` exits with code 1 when any remain. A `Grid` or `Stack` whose `cols`/`align` could not be mapped still gets its `gap` converted: `gap={20}` next to `cols="2fr 1fr"` becomes `gap="5"` instead of silently turning into step 20 (80px). Dynamic or off-scale gaps are reported, since their meaning changed from pixels to a step.
+- 98ea2ed: Nested modals: only the newest focus trap owns focus, so opening a `Dialog`/`AlertDialog`/`Sheet`/`Drawer` over another no longer loops on `focusin` (`Maximum call stack size exceeded`); closing it hands focus back to the one below.
+- daccdc8: `.ca-prose` heading anchors stay visible on touch screens: a stray second `@media (hover: none)` block hid them with `display: none`, contradicting the rule above it. New "Release lists" docs page documents the `ca-release*` markup and the version-id anchor convention.
+- c0bc624: `--ca-scrim-blur` now drives the modal scrim (#135). It was declared as `none` but never read: the `::backdrop` of Dialog, AlertDialog, Sheet, Drawer, CommandPalette and DocsSearch hardcoded `blur(4px) saturate(180%)`. The scrim reads the token and the token defaults to that same value, so nothing changes visually; `:root { --ca-scrim-blur: none }` now removes the blur from all of them. The CommandPalette scrim shares it (it used a plain `blur(4px)`, now with the shared `saturate(180%)`).
+- 5a3ede3: Agent skill and AGENTS.md import `ThemeOptions` from `@codeatlasdev/ui/vite` (`/astro` in Astro), like the docs and `init`. The package root pulls `.svelte` files that Node cannot load from `vite.config`.
+- 8185835: New `--ca-tooltip-blur` token for the Tooltip surface blur (#137). It defaults to `var(--ca-blur-ultra-thin)`, so the look is unchanged; `--ca-tooltip-blur: none` gives an opaque tooltip without re-tiering the shared ultra-thin blur (`.glass-ultra-thin`, `.glass-btn-clear`, `--ca-upload-blur`).
+- 3dda885: `@codeatlasdev/ui/vite` exports `designStyle`, `DESIGN_STYLES`, `mergeTheme` and `DesignStyleId`, so a `theme.ts` shared with `vite.config` can use a design recipe (including the 3.0 migration `designStyle("liquid", { ... })`) in plain Node. The theming guide and the `init` theme comment now point to this entry instead of `/astro`.
+
 ## 3.1.0
 
 ### Minor Changes
