@@ -36,6 +36,7 @@ site/                 → Astro site (landing + MDX docs + templates) at ui.code
 - **Contributor PRs come first:** if an issue already has an open PR (a fork included), `issue:start` refuses and names it. Review it, approve its CI run (first-time contributors need approval), suggest changes on the PR, and land theirs. Never open a competing PR, and never push to a contributor's branch without saying so on the PR.
 - **Check first:** `bun run issue:status`. Skip issues labeled `in progress` by someone else. Re-read the issue against current `main`: if it is already fixed, prove it with a passing test, comment the evidence and close it.
 - **Test first** (critical rule 0): failing regression test, then the fix, then the passing run. Both outputs go in the PR body. A test you did not run proves nothing: run every test you add or change (Playwright included) before pushing.
+- **CI is paused** (pre-stable): `ci.yml` is disabled and `CI ok` is not required on `main`; the pre-push `validate` is the gate, and run the browser suites locally when you touch them. Resume: `gh workflow enable ci.yml` + re-add `CI ok` to the `main` ruleset.
 - **Gates are real:** never push with `--no-verify` or `LEFTHOOK=0`. A gate that fails only under load is a bug to fix (#73 was exponential regex backtracking; #75, #76, #81 were real races), not to bypass. Open an issue for it.
 - **Done:** `bun run validate`, changeset when the package changes, docs when behavior changes; leave the PR as draft. A maintainer lands it with `sh scripts/issue-land.sh <n>`: rebase on `main` (generated files are rebuilt, real conflicts stop it), validate, regenerate visual baselines on CI, wait until every check on the final head passed (`scripts/pr-gate.ts`), squash-merge, `issue:done`.
 
@@ -51,8 +52,7 @@ Unit tests run on `bun test` (repo root, `bunfig.toml`); component and visual te
 | `bun run test:unit` | `bun test` on `packages/ui/tests/*.test.ts` (fails any test without an `expect`) |
 | `bun run test:browser` | Vitest `browser` project (real Chromium, axe) |
 | `bun run test:e2e` / `test:a11y` | Playwright against the static site (build + preview) |
-| `bun run test:vrt` | visual regression via Docker (Linux-only baselines, compare only) |
-| `bun run test:vrt:update` | regenerate baselines on CI (native amd64) for the pushed branch and pull the bot commit; `test:vrt:update:local` does it in Docker (slow on Apple Silicon) |
+| `bun run test:vrt:update` | regenerate baselines on CI (the only place they are rendered, no Docker) for the pushed branch and pull the bot commit |
 | `bun run test:status` | live and dead test runs of this repo, with their browser count |
 | `bun run test:reap` | kill the browsers of runs whose runner died (this repo only) |
 
@@ -61,7 +61,7 @@ Unit tests run on `bun test` (repo root, `bunfig.toml`); component and visual te
 - tears down the whole test process group on exit, Ctrl+C, SIGTERM or SIGHUP;
 - at the start of every run, kills browsers left by runs whose runner died (SIGKILL, closed terminal, killed agent job).
 
-Ownership is explicit: only processes carrying the tag of a dead run of this repo are touched. Other projects on the machine (`../ac`, …) share `~/Library/Caches/ms-playwright`; never kill Playwright browsers by name or path. To pass extra args: `bun run test:browser -- src/lib/components/Button`. Local runs use half the cores (`maxWorkers`, Playwright `workers: "50%"`); behavior tests use the headless shell, VRT uses full Chromium so pixels match the Docker baselines.
+Ownership is explicit: only processes carrying the tag of a dead run of this repo are touched. Other projects on the machine (`../ac`, …) share `~/Library/Caches/ms-playwright`; never kill Playwright browsers by name or path. To pass extra args: `bun run test:browser -- src/lib/components/Button`. Local runs use a quarter of the cores (`maxWorkers`, Playwright `workers: "25%"`); behavior tests use the headless shell, VRT uses full Chromium so pixels match the CI baselines.
 
 Naming conventions:
 - `*.test.ts` in `packages/ui/tests/`: unit test on `bun:test` (`mock`/`spyOn`/`jest.useFakeTimers`; DOM only through happy-dom's `GlobalRegistrator` inside that file; fresh module via `import("…?fresh=n")`). Types checked by `bun --check`.
