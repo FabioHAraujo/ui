@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="T extends ElementTag = 'div'">
   /**
    * Box — the base layout element. Renders any element (`as`) with the token props
    * (`p`, `px`, `py`) as `data-*` attributes: no inline style. Everything else is forwarded.
@@ -6,17 +6,16 @@
    *   <Box as="section" p={{ base: '3', md: '6' }}>…</Box>
    */
   import type { Snippet } from 'svelte';
-  import type { HTMLAttributes } from 'svelte/elements';
-  import { layoutAttrs, type LayoutProps } from '../Layout/layout.js';
+  import { layoutAttrs, type ElementTag, type LayoutProps, type PolymorphicAttributes } from '../Layout/layout.js';
 
-  interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class'>, Pick<LayoutProps, 'p' | 'px' | 'py'> {
-    /** Element to render. */
-    as?: string;
+  type Props = {
+    /** Element to render (default `div`). Its own attributes and event types become valid props. */
+    as?: T;
     class?: string;
     children?: Snippet;
-  }
+  } & PolymorphicAttributes<T, Pick<LayoutProps, 'p' | 'px' | 'py'>>;
 
-  let { as = 'div', p, px, py, class: className = '', children, ...rest }: Props = $props();
+  let { as = 'div' as T, p, px, py, class: className = '', children, ...rest }: Props = $props();
 </script>
 
 <svelte:element this={as} class="ca-box {className}" {...rest} {...layoutAttrs({ p, px, py })}>

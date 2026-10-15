@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="T extends ElementTag = 'div'">
   /**
    * Grid — CSS grid with equal tracks. `columns` is 1–12 or a responsive object; gap, padding and
    * alignment are token props. All render as `data-*` attributes (no inline style). For an
@@ -8,19 +8,16 @@
    *   <Grid columns={{ base: 1, md: 3 }} gap="4">…</Grid>
    */
   import type { Snippet } from 'svelte';
-  import type { HTMLAttributes } from 'svelte/elements';
-  import { layoutAttrs, type LayoutProps } from '../Layout/layout.js';
+  import { layoutAttrs, type ElementTag, type LayoutProps, type PolymorphicAttributes } from '../Layout/layout.js';
 
-  interface Props
-    extends Omit<HTMLAttributes<HTMLElement>, 'class'>,
-      Pick<LayoutProps, 'columns' | 'gap' | 'p' | 'px' | 'py' | 'align'> {
-    /** Element to render. */
-    as?: string;
+  type Props = {
+    /** Element to render (default `div`). Its own attributes and event types become valid props. */
+    as?: T;
     class?: string;
     children?: Snippet;
-  }
+  } & PolymorphicAttributes<T, Pick<LayoutProps, 'columns' | 'gap' | 'p' | 'px' | 'py' | 'align'>>;
 
-  let { as = 'div', columns, gap, p, px, py, align, class: className = '', children, ...rest }: Props = $props();
+  let { as = 'div' as T, columns, gap, p, px, py, align, class: className = '', children, ...rest }: Props = $props();
 </script>
 
 <svelte:element

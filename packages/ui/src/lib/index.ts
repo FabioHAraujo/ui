@@ -128,8 +128,11 @@ export type {
 	Align,
 	Columns,
 	Direction,
+	ElementTag,
 	Justify,
 	LayoutProps,
+	PolymorphicAttributes,
+	PolymorphicProps,
 	Responsive,
 	Space,
 } from "./components/Layout/layout.js";
