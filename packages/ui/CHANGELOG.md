@@ -1,5 +1,48 @@
 # Changelog
 
+## 3.0.0
+
+### Major Changes
+
+- a1d14f5: Sober default theme, Liquid Glass is now opt-in (#111). The package used to look like a UI-kit demo: a glass material over a three-hue mesh, glow on selected states, a white rim on every surface, hue-tinted 24-40px shadows, 10px controls, 2px icons and 700 headings. The default is now solid and neutral:
+  
+  - `defaultStyle: "solid"`, `paper: "plain"`, `radius: 0.8` (`--ca-radius-md` is 8px), `iconStroke: 1.75`, heading weight 600 (and no extra h1 tracking).
+  - Surfaces, text and outlines carry almost no chroma (the brand hue stays on fills, focus, links and charts); shadows are neutral black (`--ca-shadow-*`, `--ca-glass-shadow`, `--ca-mat-*-shadow`).
+  - `[data-style="solid"]` and `[data-style="flat"]` set `--ca-glow-primary(-strong)` and `--ca-glass-rim` to transparent and draw `--ca-mat-edge` as a hairline, so `.glass-tinted`, `.glass-prominent`, `.glass-glow`, `.glass-active`, `.glass-btn-prominent` and the AppShell nav pills lose their halo and rim without a component change. The page mesh (`--ca-page-mesh`) is drawn only by `glass` and `frosted`.
+  - New recipe `designStyle("liquid")` reproduces the former look exactly (glass, mesh, glow, round corners, bold headings, tinted shadows). `designStyle("default")` now means the sober default.
+  
+  Migration: to keep the old look, use `designStyle("liquid", { ...yourTheme })`, or set `defaultStyle: "glass"`, `paper: "mesh"`, `radius: 1`, `iconStroke: 2` and `typography: { weights: { heading: 700 } }`. `colorScheme.setStyle("glass")` still switches at runtime. Apps that override `--ca-*` tokens are unaffected; apps that read `--ca-radius-*` or the shadow tokens get the new values. `defineTheme()` with no options now resolves the new defaults (`designTokens` emits nothing for them).
+
+### Minor Changes
+
+- 8b36a1e: AppShellLayout: the shell keeps its state across page loads (#109). On an MPA (Astro, a full reload) every navigation is a new document, and the panel, the selected module, the expanded sections and the panel scroll all reset. `persistPanel` (default `true`) now keeps the panel open/closed, the selected module and the section open map in `localStorage["ca-shell"]` (the old `ca-panel-open` key is migrated), and the panel scroll per module in `sessionStorage`. An inline script emitted right after the sidebar restores them before the first paint and sets `data-ca-panel` / `data-ca-module` on `<html>`, so a stored-closed panel is laid out closed with no flash, on the same model as the theme script. Stored values are validated and discarded when malformed. The user's last choice for a section wins over `defaultOpen`; the section holding the current page always opens. The shell now starts at its target width instead of animating open on load. `persistPanel={false}` keeps the old always-default behavior for demos and embeds.
+- 3476d9a: Brand assets from one mark. `caBrandPlugin` and `generateBrand` (`@codeatlasdev/ui/vite`) render a content-hashed favicon (SVG that follows `prefers-color-scheme`, ICO, PNG), `apple-touch-icon`, 192/512/maskable manifest icons and a web app manifest from one SVG with `{{ink}}`/`{{spark}}` placeholders and your theme; `resolveBrand` and `renderMark` expose the resolved sRGB colors. `iconLinks` and `ogCard` (`@codeatlasdev/ui/seo`) emit the head links and the 1200x630 social-card HTML for `renderOgImage`. `<Seo>` now also writes `og:image:type` and `twitter:image`. `@resvg/resvg-js` and `png-to-ico` are optional peer dependencies.
+- 1eeca1c: Surface engine and layout primitives (#112).
+  
+  New components: `Box`, `Flex`, `Stack`, `Grid`, `Container`, `Section` (layout), `Surface`, `Card` and `SurfacePanel`.
+  
+  - **Layout primitives** take token props (`gap`, `p`/`px`/`py`, `align`, `justify`, `direction`, `columns`, `wrap`) and a polymorphic `as`. A prop renders as a `data-*` attribute (`data-gap="4"`), a responsive object (`{ base: "2", md: "4" }`) as `data-md-gap="4"`, styled by `styles/layout.css` in `@layer ca.utilities`. No inline `style`.
+  - **`Surface`** has orthogonal axes: `elevation` 0-5, `material` `auto | solid | frosted | glass | liquid`, `tone`, `variant` `filled | outlined | ghost`, `radius`, `interactive`, `glow`, `as`. One `.ca-surface` rule reads `--ca-surface-*` variables. `material="auto"` follows `<html data-style>`; the explicit materials look the same under every style. It never sets `will-change` or `isolation`, and it has `forced-colors` and reduced-transparency entries.
+  - **`Card`** (`title`, `headingLevel`, `href`, `flush`, `full`, `headerActions`) is built on `Surface`; `SurfacePanel` is a raised `<section>` (the AppShell sidebar `Panel` keeps its name).
+  - Docs: [Surface](/docs/surfaces/surface/), [Card](/docs/surfaces/card/), [Layout primitives](/docs/layout/layout-primitives/); `docs/css-api.md` lists the new `ca-*` classes and the data attributes.
+  
+  **Behavior changes to review in `Stack`, `Grid` and `Row`** (they were the only layout components with inline `style`):
+  
+  - `Stack` and `Grid` `gap` is now a spacing step string (`gap="4"` is 16px), not pixels. `align` / `justify` use `start | center | end | between | ...` instead of raw CSS values. `Grid` `cols` is now `columns` (1-12, or a responsive object); `rowGap`, `colGap` and CSS template strings (`"2fr 1fr"`, `repeat(auto-fill, ...)`) are gone: write `grid-template-columns` in a class.
+  - `Row` is deprecated in favor of `Flex`. It still renders `.ca-row` and maps a pixel `gap` to the matching step.
+  - `GlassCard` and `GlassSurface` are deprecated in favor of `Card` and `Surface`, and removed in the next major. They render the new components, keep their `ca-glass-card*` and `glass*` classes and look the same under every `data-style`, and log a `[ca-ui]` warning in development.
+  
+  Size: `styles/core.css` grows from 9.6 to 13.0 kB gzip (limit 9.6 to 13.6 kB), `global.css` from 12.6 to 15.9 kB: `layout.css` is ~2.2 kB (every token prop and step at the base and four breakpoints, generated by `scripts/build-layout.ts`) and `surface.css` ~1.2 kB (the five materials by six elevations). JS entries are unchanged.
+  
+  Migration: `bunx @codeatlasdev/ui migrate --write src` rewrites `GlassCard` to `Card material="glass"` (`thickness` to `elevation`, `tinted` to `tone="brand"`, `glowing` to `glow`, static `padding` to `p`), `GlassSurface` to `Surface` (`refraction` to `material="liquid"`), `Row` to `Flex`, and `Stack`/`Grid` pixel gaps, `cols` and `align`/`justify` values. Dynamic or off-scale usages are left as they are, with their import, for you to finish.
+- 49b2bf4: Unified layer engine. Dialog, AlertDialog, Sheet, Drawer, Lightbox, CommandPalette, DocsSearch, DropdownMenu, Popover, Tooltip, Select, Combobox, NotificationBell and the date pickers now share one layer stack (`primitives/layer.ts`).
+  
+  - Modals are native `<dialog>` + `showModal()`; menus, popovers and tooltips are `popover` elements. Both live in the top layer, so stacking no longer depends on `z-index`: a menu inside a dialog is always on top. The `--ca-z-dropdown` and `--ca-z-tooltip` tokens remain for your own in-flow UI but are no longer used by overlays.
+  - Anchored layers use CSS anchor positioning when supported and Floating UI otherwise.
+  - One Escape / outside-press / focus stack: only the topmost layer reacts, so nested overlays dismiss in order. Focus returns to the trigger on close.
+  - New `onLayerChange(listener)` (and a `layerchange` `CustomEvent` on `document`) fires on every layer open and close with the open layers and their rectangles, so hosts can park or snapshot native views.
+  - The `.ca-floating` wrapper `div` is gone: `.ca-floating` is now on the layer element itself (the one carrying `data-state`/`data-side`), and `.ca-date__float` was removed.
+
 ## 2.3.2
 
 ### Patch Changes
