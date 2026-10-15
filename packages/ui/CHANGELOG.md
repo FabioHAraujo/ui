@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.1.0
+
+### Minor Changes
+
+- 0579bb3: `.ca-prose` styles release lists, so a changelog page needs no custom CSS (#126). Wrap one `<section class="ca-release">` per version (heading with its channel `.ca-chip`, then a `.ca-release__meta` row of date and links, then the rendered notes), add a `.ca-release-jump` pill index and close with `.ca-release-thanks`. Anchored releases clear a sticky `DocsShell` header (`scroll-margin-top`), and the meta links and pills keep 44px touch targets. Classes only, no JS or component: the markup can come from Markdown rendered at build time or at the edge.
+- 973fe00: Add `SwatchGroup`: a single-choice color swatch picker (`role="radiogroup"`, roving focus, preset or custom `color`). Its coarse-pointer hit area is the swatch itself, so neighbouring swatches never overlap and every click lands on the swatch the user aimed at.
+
+### Patch Changes
+
+- b27c73a: `generateBrand` and the brand Vite plugin no longer load every system font for each PNG they render. resvg did that by default on every construction (~450 ms per render on Windows, ~2.7 s per icon set, at every build and dev start); fonts now load only when the mark has `<text>` (#120).
+- 5c79b24: `FilterGroup` draws its label with `--ca-text-secondary` instead of `--ca-text-hint`. The hint role can be set low by a custom preset, and the label failed the 4.5:1 axe check on a raised surface in dark mode.
+- 5c79b24: `KpiCard` is built on `Card` instead of the deprecated `GlassCard`, so rendering it no longer logs the `[ca-ui]` deprecation warning in dev. The look is unchanged (elevation 3).
+
 ## 3.0.0
 
 ### Major Changes
