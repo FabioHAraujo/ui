@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.1.0
+
+### Minor Changes
+
+- ccae97c: Numbered demo catalog (`ca-prompt`): every docs demo has a stable `#NNN` id. The package ships `demos.json` (export `@codeatlasdev/ui/demos.json`) and `dist/api/v1` reference texts, and `ca-ui-mcp` gains `search_demos` and `get_demo`. The agent skill documents picking demos by number.
+
+### Patch Changes
+
+- 6ab52ee: Checkbox, Switch and RadioGroup: on touch screens (`pointer: coarse`) a tap on the box toggles the control again. The 44px hit-area overlay painted over the native input and swallowed the tap; the native input now is the 44px hit area.
+
 ## 4.0.0
 
 ### Major Changes
