@@ -1,8 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 import { render } from "vitest-browser-svelte";
 import { checkA11y } from "../../../../tests/a11y";
+import { VIEWPORTS } from "../../../../tests/viewports";
 import TabsHarness from "./TabsHarness.test.svelte";
+import TabsIcon from "./TabsIcon.test.svelte";
+import TabsOverflow from "./TabsOverflow.test.svelte";
 
 describe("Tabs", () => {
 	it("marks the active tab and shows only its panel", async () => {
@@ -81,5 +84,102 @@ describe("Tabs", () => {
 		const panel = screen.getByRole("tabpanel").element();
 		expect(tab.getAttribute("aria-controls")).toBe(panel.id);
 		expect(panel.getAttribute("aria-labelledby")).toBe(tab.id);
+	});
+});
+
+describe("TabsList overflow", () => {
+	it("scrolls inside itself on a phone instead of widening the page", async () => {
+		await page.viewport(...VIEWPORTS.mobile);
+		const screen = await render(TabsOverflow, {});
+		const list = screen.getByRole("tablist").element() as HTMLElement;
+		expect(list.scrollWidth).toBeGreaterThan(list.clientWidth);
+		expect(list.getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth);
+		expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(window.innerWidth);
+		expect(getComputedStyle(list).overflowX).toBe("auto");
+		expect(await checkA11y(screen.container)).toHaveNoViolations();
+	});
+
+	it("keeps its intrinsic width on desktop instead of spanning the column", async () => {
+		await page.viewport(1600, 720);
+		const screen = await render(TabsOverflow, {});
+		const list = screen.getByRole("tablist").element() as HTMLElement;
+		const root = list.closest(".ca-tabs") as HTMLElement;
+		expect(list.scrollWidth).toBeLessThanOrEqual(list.clientWidth);
+		expect(list.getBoundingClientRect().width).toBeLessThan(
+			root.getBoundingClientRect().width - 100
+		);
+	});
+
+	it("scrolls the selected tab into view on mount and when it changes", async () => {
+		await page.viewport(...VIEWPORTS.mobile);
+		const screen = await render(TabsOverflow, { value: "integrations" });
+		const list = screen.getByRole("tablist").element() as HTMLElement;
+		const inView = (name: string) => {
+			const tab = screen.getByRole("tab", { name }).element() as HTMLElement;
+			const t = tab.getBoundingClientRect();
+			const l = list.getBoundingClientRect();
+			return t.left >= l.left - 1 && t.right <= l.right + 1;
+		};
+		await expect.poll(() => inView("Integrations")).toBe(true);
+		(screen.getByRole("tab", { name: "General" }).element() as HTMLElement).focus();
+		await expect.poll(() => inView("General")).toBe(true);
+	});
+
+	it("fade masks the trailing edge only while there is more to scroll", async () => {
+		await page.viewport(...VIEWPORTS.mobile);
+		const screen = await render(TabsOverflow, { fade: true });
+		const list = screen.getByRole("tablist").element() as HTMLElement;
+		await expect.poll(() => list.dataset.fade).toBe("end");
+		list.scrollLeft = list.scrollWidth;
+		await expect.poll(() => list.dataset.fade).toBe("start");
+		expect(getComputedStyle(list).maskImage).toContain("linear-gradient");
+	});
+});
+
+describe("TabsTrigger icon", () => {
+	it("renders a fixed, aria-hidden icon box and keeps the label as the name", async () => {
+		const screen = await render(TabsIcon, {});
+		const tab = screen.getByRole("tab", { name: "Plain" });
+		const box = tab.element().querySelector(".ca-tabs-trigger__icon") as HTMLElement;
+		expect(box.getAttribute("aria-hidden")).toBe("true");
+		const r = box.getBoundingClientRect();
+		expect(r.width).toBe(r.height);
+		expect(r.width).toBeGreaterThan(0);
+		expect(await checkA11y(screen.container)).toHaveNoViolations();
+	});
+
+	it("a plain icon follows the state color, a brand icon never does", async () => {
+		const screen = await render(TabsIcon, {});
+		const box = (name: string) =>
+			screen
+				.getByRole("tab", { name })
+				.element()
+				.querySelector(".ca-tabs-trigger__icon") as HTMLElement;
+		const trigger = (name: string) => screen.getByRole("tab", { name }).element() as HTMLElement;
+		// Plain icon: tinted like the trigger text (active state).
+		expect(getComputedStyle(box("Plain")).color).toBe(getComputedStyle(trigger("Plain")).color);
+		// Brand icon: the active/disabled trigger color does not reach it.
+		(trigger("Brand") as HTMLElement).focus();
+		await expect.poll(() => trigger("Brand").dataset.state).toBe("active");
+		expect(getComputedStyle(box("Brand")).color).not.toBe(getComputedStyle(trigger("Brand")).color);
+		expect(getComputedStyle(box("Off")).opacity).toBe("1");
+		expect(getComputedStyle(box("Off")).color).not.toBe(getComputedStyle(trigger("Off")).color);
+	});
+
+	it("SchemeAsset shows the variant of the active scheme", async () => {
+		const screen = await render(TabsIcon, {});
+		const shown = (id: string) =>
+			getComputedStyle(screen.getByTestId(id).element()).display !== "none" &&
+			(screen.getByTestId(id).element() as SVGElement).getBoundingClientRect().width > 0;
+		document.documentElement.classList.remove("dark");
+		expect(shown("brand-light")).toBe(true);
+		expect(shown("brand-dark")).toBe(false);
+		document.documentElement.classList.add("dark");
+		try {
+			expect(shown("brand-light")).toBe(false);
+			expect(shown("brand-dark")).toBe(true);
+		} finally {
+			document.documentElement.classList.remove("dark");
+		}
 	});
 });
