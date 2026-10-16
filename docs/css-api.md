@@ -184,7 +184,7 @@ Total: 796 unique classes across 81 components.
 
 ## Lightbox
 
-`.ca-lightbox` `.ca-lightbox-in` `.ca-lightbox-out` `.ca-lightbox__close` `.ca-lightbox__img` `.ca-lightbox__overlay` `.ca-lightbox__sr` `.ca-lightbox__stage`
+`.ca-lightbox` `.ca-lightbox-in` `.ca-lightbox-out` `.ca-lightbox__action` `.ca-lightbox__caption` `.ca-lightbox__caption-text` `.ca-lightbox__close` `.ca-lightbox__counter` `.ca-lightbox__img` `.ca-lightbox__meta` `.ca-lightbox__nav` `.ca-lightbox__nav--next` `.ca-lightbox__nav--prev` `.ca-lightbox__overlay` `.ca-lightbox__sr` `.ca-lightbox__stage` `.ca-lightbox__tools` `.ca-lightbox__video`
 
 ## LiveList
 
@@ -264,6 +264,8 @@ Total: 796 unique classes across 81 components.
 ## Skeleton
 
 `.ca-shimmer` `.ca-skeleton` `.ca-skeleton--circular` `.ca-skeleton--rectangular` `.ca-skeleton--rounded` `.ca-skeleton--text` `.ca-skeleton-rows`
+
+The `skeleton` prop of `Avatar`, `KpiCard`, `TextField`, `Table`, `Card` and `GlassCard` sets `[data-skeleton]` (and `aria-busy="true"`) on the component's frame; the placeholder paint and the `ca-shimmer` keyframes live in `utilities.css`.
 
 ## SkipLink
 
